@@ -1,96 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Gacinia Pharmacy Design System - Healthcare Professional Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Background & Surface */
+    --background: 210 11% 98%;
+    --foreground: 210 6% 13%;
+    --surface: 0 0% 100%;
 
+    /* Brand Colors - Medical Green Primary */
+    --primary: 134 61% 41%;        /* #28A745 */
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 134 40% 85%;  /* Light green for hover states */
+    --primary-dark: 134 61% 31%;   /* Dark green for active states */
+
+    /* Secondary - Professional Blue */
+    --secondary: 211 100% 50%;     /* #007BFF */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 211 100% 85%;
+    --secondary-dark: 211 100% 35%;
+
+    /* Accent - Premium Gold */
+    --accent: 51 100% 50%;         /* #FFD700 */
+    --accent-foreground: 210 6% 13%;
+    --accent-light: 51 100% 90%;
+    --accent-dark: 45 94% 47%;
+
+    /* Semantic Colors */
+    --success: 134 61% 41%;        /* Same as primary */
+    --success-foreground: 0 0% 100%;
+    --warning: 48 100% 67%;        /* #FFC107 */
+    --warning-foreground: 210 6% 13%;
+    --error: 354 70% 54%;          /* #DC3545 */
+    --error-foreground: 0 0% 100%;
+
+    /* Neutral Palette */
+    --muted: 210 14% 92%;          /* #F8F9FA equivalent */
+    --muted-foreground: 210 6% 43%;
+    --border: 214 13% 87%;         /* #DEE2E6 equivalent */
+    --input: 214 13% 87%;
+    --ring: 134 61% 41%;
+
+    /* Card & Popover */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 210 6% 13%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 6% 13%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Destructive */
+    --destructive: 354 70% 54%;
+    --destructive-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
+    /* Radius */
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-dark)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent-light)), hsl(var(--accent)));
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--primary) / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(var(--primary) / 0.1), 0 2px 4px -1px hsl(var(--primary) / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(var(--primary) / 0.1), 0 4px 6px -2px hsl(var(--primary) / 0.05);
+    --shadow-xl: 0 20px 25px -5px hsl(var(--primary) / 0.1), 0 10px 10px -5px hsl(var(--primary) / 0.04);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.15);
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Sidebar tokens */
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: hsl(var(--surface));
+    --sidebar-foreground: hsl(var(--foreground));
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--muted));
+    --sidebar-accent-foreground: hsl(var(--foreground));
+    --sidebar-border: hsl(var(--border));
+    --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 210 6% 8%;
+    --foreground: 210 6% 93%;
+    --surface: 210 6% 10%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --primary: 134 50% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 134 40% 25%;
+    --primary-dark: 134 50% 35%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --secondary: 211 80% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 211 80% 25%;
+    --secondary-dark: 211 80% 35%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --accent: 51 80% 45%;
+    --accent-foreground: 210 6% 8%;
+    --accent-light: 51 80% 25%;
+    --accent-dark: 45 80% 35%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --success: 134 50% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 48 80% 55%;
+    --warning-foreground: 210 6% 8%;
+    --error: 354 60% 50%;
+    --error-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 210 6% 15%;
+    --muted-foreground: 210 6% 65%;
+    --border: 210 6% 20%;
+    --input: 210 6% 20%;
+    --ring: 134 50% 45%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --card: 210 6% 10%;
+    --card-foreground: 210 6% 93%;
+    --popover: 210 6% 10%;
+    --popover-foreground: 210 6% 93%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 354 60% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 210 6% 8%;
+    --sidebar-foreground: 210 6% 93%;
+    --sidebar-primary: 134 50% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 210 6% 15%;
+    --sidebar-accent-foreground: 210 6% 93%;
+    --sidebar-border: 210 6% 20%;
+    --sidebar-ring: 134 50% 45%;
   }
 }
 
@@ -100,6 +146,62 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+@layer components {
+  /* Hero gradient background */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Pharmacy card hover effect */
+  .pharmacy-card {
+    transition: var(--transition-smooth);
+    @apply hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Custom button variants */
+  .btn-pharmacy {
+    @apply bg-primary text-primary-foreground hover:bg-primary-dark transition-colors rounded-lg px-6 py-3 font-medium;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary-dark transition-colors rounded-lg px-6 py-3 font-medium;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-lg px-6 py-3 font-medium;
   }
 }
