@@ -4,6 +4,8 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { TrustSection } from '@/components/home/TrustSection';
+import { PromotionalBanners } from '@/components/home/PromotionalBanners';
+import { LocationContact } from '@/components/home/LocationContact';
 
 const Index = () => {
   return (
@@ -13,7 +15,9 @@ const Index = () => {
         <HeroSection />
         <CategoryGrid />
         <FeaturedProducts />
+        <PromotionalBanners />
         <TrustSection />
+        <LocationContact />
       </main>
       <Footer />
     </div>
