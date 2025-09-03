@@ -146,38 +146,28 @@ const Products = () => {
           />
         </div>
 
-        <div className="flex gap-8">
-          {/* Desktop Filters Sidebar */}
-          <div className="hidden lg:block">
-            <ProductFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              onClearFilters={clearFilters}
-            />
-          </div>
+        {/* Filters Sheet */}
+        <div className="mb-6">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-80">
+              <ProductFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                onClearFilters={clearFilters}
+                isMobile
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
 
-          {/* Mobile Filters Sheet */}
-          <div className="lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filters
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-80">
-                <ProductFilters
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  onClearFilters={clearFilters}
-                  isMobile
-                />
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          {/* Products Content */}
-          <div className="flex-1 min-w-0">
+        {/* Products Content */}
+        <div className="w-full">
             {/* Toolbar */}
             <div className="flex justify-between items-center mb-6">
               <p className="text-sm text-muted-foreground">
@@ -198,7 +188,6 @@ const Products = () => {
               onQuickView={handleQuickView}
               onToggleWishlist={handleToggleWishlist}
             />
-          </div>
         </div>
       </main>
       
