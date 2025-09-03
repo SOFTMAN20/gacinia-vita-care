@@ -45,19 +45,21 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   return (
     <>
       {/* Top Contact Bar */}
-      <div className="bg-primary text-primary-foreground py-2 px-4 text-sm">
+      <div className="bg-primary text-primary-foreground py-2 mobile-padding text-sm">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1">
               <Phone size={14} />
-              <span>+255 25 250 3456</span>
+              <span className="hidden xs:inline">+255 25 250 3456</span>
+              <span className="xs:hidden">Call</span>
             </div>
             <div className="flex items-center gap-1">
               <MapPin size={14} />
-              <span>{language === 'en' ? 'Mbeya, Esso - Near Highway' : 'Mbeya, Esso - Karibu na Barabara Kuu'}</span>
+              <span className="hidden sm:inline">{language === 'en' ? 'Mbeya, Esso - Near Highway' : 'Mbeya, Esso - Karibu na Barabara Kuu'}</span>
+              <span className="sm:hidden">{language === 'en' ? 'Mbeya' : 'Mbeya'}</span>
             </div>
           </div>
-          <div className="hidden md:block text-xs">
+          <div className="hidden lg:block text-xs">
             {language === 'en' ? 'Licensed Pharmacy & Medical Supplies' : 'Duka la Dawa Lililoidhinishwa na Vifaa vya Matibabu'}
           </div>
         </div>
@@ -65,8 +67,8 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
 
       {/* Main Navbar */}
       <nav className="bg-surface shadow-md sticky top-0 z-50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+        <div className="container mx-auto mobile-padding">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo */}
             <div className="flex items-center">
               <div className="flex items-center space-x-2">
@@ -155,11 +157,13 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              <CartIcon />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="touch-target"
               >
                 <Menu size={20} />
               </Button>
@@ -182,15 +186,15 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t bg-surface">
-            <div className="px-4 py-4 space-y-4">
+          <div className="md:hidden border-t bg-surface animate-slide-in-right">
+            <div className="mobile-padding py-4 space-y-4">
               {/* Mobile Search */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   type="search"
                   placeholder={language === 'en' ? 'Search...' : 'Tafuta...'}
-                  className="pl-10 pr-4"
+                  className="pl-10 pr-4 touch-target"
                 />
               </div>
 
@@ -200,7 +204,8 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="block py-2 text-foreground hover:text-primary transition-colors"
+                    className="block py-3 px-2 text-foreground hover:text-primary transition-colors touch-target rounded-lg hover:bg-muted"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
                   </a>
@@ -213,7 +218,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                   variant="ghost"
                   size="sm"
                   onClick={toggleLanguage}
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 touch-target"
                 >
                   <Globe size={16} />
                   {language === 'en' ? 'EN' : 'SW'}
@@ -222,27 +227,25 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 <div className="flex items-center gap-2">
                   {isLoggedIn ? (
                     <>
-                      <Button variant="ghost" size="sm" asChild>
+                      <Button variant="ghost" size="sm" asChild className="touch-target">
                         <Link to="/dashboard" className="flex items-center gap-1">
                           <User size={16} />
-                          {language === 'en' ? 'Dashboard' : 'Dashibodi'}
+                          <span className="hidden xs:inline">{language === 'en' ? 'Dashboard' : 'Dashibodi'}</span>
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="sm" asChild>
+                      <Button variant="ghost" size="sm" asChild className="touch-target">
                         <Link to="/profile" className="flex items-center gap-1">
                           <Settings size={16} />
-                          {language === 'en' ? 'Profile' : 'Wasifu'}
+                          <span className="hidden xs:inline">{language === 'en' ? 'Profile' : 'Wasifu'}</span>
                         </Link>
                       </Button>
                     </>
                   ) : (
-                    <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-1 touch-target">
                       <User size={16} />
-                      {language === 'en' ? 'Login' : 'Ingia'}
+                      <span className="hidden xs:inline">{language === 'en' ? 'Login' : 'Ingia'}</span>
                     </Button>
                   )}
-
-                  <CartIcon />
                 </div>
               </div>
             </div>

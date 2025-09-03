@@ -204,4 +204,64 @@
   .btn-outline {
     @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-lg px-6 py-3 font-medium;
   }
+
+  /* Touch-friendly mobile classes */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .mobile-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Responsive text sizing */
+  .text-responsive-xs { @apply text-xs sm:text-sm; }
+  .text-responsive-sm { @apply text-sm sm:text-base; }
+  .text-responsive-base { @apply text-base sm:text-lg; }
+  .text-responsive-lg { @apply text-lg sm:text-xl; }
+  .text-responsive-xl { @apply text-xl sm:text-2xl; }
+  .text-responsive-2xl { @apply text-2xl sm:text-3xl; }
+  .text-responsive-3xl { @apply text-3xl sm:text-4xl; }
+
+  /* Responsive grid layouts */
+  .grid-responsive-1 { @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4; }
+  .grid-responsive-2 { @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3; }
+  .grid-responsive-3 { @apply grid-cols-2 sm:grid-cols-3 lg:grid-cols-4; }
+
+  /* Card hover animations */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  /* Interactive elements */
+  .interactive {
+    @apply transition-all duration-200 hover:scale-105 active:scale-95;
+  }
+
+  /* Mobile-first responsive spacing */
+  .spacing-responsive {
+    @apply space-y-4 sm:space-y-6 lg:space-y-8;
+  }
+
+  /* Tablet optimizations */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .tablet-optimized {
+      @apply px-6 py-4;
+    }
+    
+    .tablet-grid {
+      @apply grid-cols-2 gap-4;
+    }
+  }
+
+  /* Touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    .hover-lift:hover {
+      @apply translate-y-0;
+    }
+    
+    .interactive:active {
+      @apply scale-95;
+    }
+  }
 }
