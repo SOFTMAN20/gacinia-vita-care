@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Search, 
   User, 
@@ -9,10 +11,13 @@ import {
   Cross, 
   Phone, 
   MapPin,
-  Globe
+  Globe,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { CartIcon } from '@/components/cart/CartIcon';
 import { CartDrawer } from '@/components/cart/CartDrawer';
+import { useUser } from '@/contexts/UserContext';
 
 interface NavbarProps {
   cartItemCount?: number;
@@ -21,6 +26,8 @@ interface NavbarProps {
 export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState<'en' | 'sw'>('en');
+  const { state } = useUser();
+  const { user, isLoggedIn } = state;
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'sw' : 'en');
@@ -103,10 +110,39 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
               </Button>
 
               {/* Account */}
-              <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                <User size={16} />
-                {language === 'en' ? 'Account' : 'Akaunti'}
-              </Button>
+              {isLoggedIn ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                      <User size={16} />
+                      {user?.name?.split(' ')[0] || (language === 'en' ? 'User' : 'Mtumiaji')}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard">
+                        <User className="w-4 h-4 mr-2" />
+                        {language === 'en' ? 'Dashboard' : 'Dashibodi'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <Settings className="w-4 h-4 mr-2" />
+                        {language === 'en' ? 'Profile Settings' : 'Mipangilio ya Wasifu'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {language === 'en' ? 'Logout' : 'Ondoka'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <User size={16} />
+                  {language === 'en' ? 'Login' : 'Ingia'}
+                </Button>
+              )}
 
               {/* Cart */}
               <CartIcon />
@@ -178,10 +214,27 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 </Button>
 
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                    <User size={16} />
-                    {language === 'en' ? 'Account' : 'Akaunti'}
-                  </Button>
+                  {isLoggedIn ? (
+                    <>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to="/dashboard" className="flex items-center gap-1">
+                          <User size={16} />
+                          {language === 'en' ? 'Dashboard' : 'Dashibodi'}
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to="/profile" className="flex items-center gap-1">
+                          <Settings size={16} />
+                          {language === 'en' ? 'Profile' : 'Wasifu'}
+                        </Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                      <User size={16} />
+                      {language === 'en' ? 'Login' : 'Ingia'}
+                    </Button>
+                  )}
 
                   <CartIcon />
                 </div>
