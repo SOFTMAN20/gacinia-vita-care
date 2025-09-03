@@ -131,6 +131,12 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                         {language === 'en' ? 'Profile Settings' : 'Mipangilio ya Wasifu'}
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">
+                        <Settings className="w-4 h-4 mr-2" />
+                        {language === 'en' ? 'Admin Portal' : 'Mlango wa Msimamizi'}
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem>
                       <LogOut className="w-4 h-4 mr-2" />
                       {language === 'en' ? 'Logout' : 'Ondoka'}
