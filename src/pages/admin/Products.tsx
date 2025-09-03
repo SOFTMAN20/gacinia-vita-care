@@ -7,7 +7,10 @@ import {
   Trash2, 
   Eye,
   Package,
-  AlertTriangle
+  AlertTriangle,
+  Settings,
+  Archive,
+  FolderTree
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,6 +30,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ProductForm from '@/components/admin/ProductForm';
+import CategoriesManager from '@/components/admin/CategoriesManager';
+import InventoryManager from '@/components/admin/InventoryManager';
 
 // Mock product data
 const mockProducts = [
@@ -110,6 +117,9 @@ const getStockIndicator = (stock: number, minStock: number) => {
 export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
   const categories = ['all', 'Pain Relief', 'Antibiotics', 'Medical Equipment', 'Supplements', 'Cosmetics'];
 
@@ -119,6 +129,46 @@ export default function AdminProducts() {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleProductSubmit = (data: any) => {
+    console.log('Product submitted:', data);
+    setShowProductForm(false);
+    setEditingProduct(null);
+  };
+
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk action: ${action} on products:`, selectedProducts);
+    setSelectedProducts([]);
+  };
+
+  const toggleProductSelection = (productId: string) => {
+    setSelectedProducts(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const selectAllProducts = () => {
+    setSelectedProducts(
+      selectedProducts.length === filteredProducts.length 
+        ? [] 
+        : filteredProducts.map(p => p.id)
+    );
+  };
+
+  if (showProductForm) {
+    return (
+      <ProductForm
+        product={editingProduct}
+        onSubmit={handleProductSubmit}
+        onCancel={() => {
+          setShowProductForm(false);
+          setEditingProduct(null);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -130,11 +180,49 @@ export default function AdminProducts() {
             Manage your pharmacy inventory and product catalog
           </p>
         </div>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Product
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowProductForm(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Product
+          </Button>
+          {selectedProducts.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Bulk Actions ({selectedProducts.length})
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleBulkAction('activate')}>
+                  <Package className="w-4 h-4 mr-2" />
+                  Activate Selected
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkAction('deactivate')}>
+                  <Archive className="w-4 h-4 mr-2" />
+                  Deactivate Selected
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleBulkAction('delete')}
+                  className="text-destructive"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Selected
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="products" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="products" className="space-y-6">
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -221,6 +309,14 @@ export default function AdminProducts() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <input
+                    type="checkbox"
+                    checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                    onChange={selectAllProducts}
+                    className="rounded border-gray-300"
+                  />
+                </TableHead>
                 <TableHead>Product</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Category</TableHead>
@@ -234,6 +330,14 @@ export default function AdminProducts() {
             <TableBody>
               {filteredProducts.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.includes(product.id)}
+                      onChange={() => toggleProductSelection(product.id)}
+                      className="rounded border-gray-300"
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="font-medium">{product.name}</div>
                   </TableCell>
@@ -262,7 +366,10 @@ export default function AdminProducts() {
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setEditingProduct(product);
+                          setShowProductForm(true);
+                        }}>
                           <Edit3 className="w-4 h-4 mr-2" />
                           Edit Product
                         </DropdownMenuItem>
@@ -279,6 +386,16 @@ export default function AdminProducts() {
           </Table>
         </CardContent>
       </Card>
+      </TabsContent>
+
+      <TabsContent value="categories">
+        <CategoriesManager />
+      </TabsContent>
+
+      <TabsContent value="inventory">
+        <InventoryManager />
+      </TabsContent>
+      </Tabs>
     </div>
   );
 }
