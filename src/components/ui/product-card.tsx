@@ -44,6 +44,8 @@ interface ProductCardProps {
   isWishlisted?: boolean;
 }
 
+import { useCart } from '@/contexts/CartContext';
+
 export function ProductCard({ 
   product, 
   className,
@@ -52,6 +54,7 @@ export function ProductCard({
   onToggleWishlist,
   isWishlisted = false
 }: ProductCardProps) {
+  const { addItem } = useCart();
   const discountPercentage = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
@@ -173,7 +176,10 @@ export function ProductCard({
         {/* Actions */}
         <div className="mt-4 space-y-2">
           <Button
-            onClick={() => onAddToCart?.(product)}
+            onClick={() => {
+              addItem(product, 1);
+              onAddToCart?.(product);
+            }}
             disabled={!product.inStock}
             className="w-full text-sm"
             size="sm"

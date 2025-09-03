@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
-  ShoppingCart, 
   User, 
   Menu, 
   Cross, 
@@ -12,6 +11,8 @@ import {
   MapPin,
   Globe
 } from 'lucide-react';
+import { CartIcon } from '@/components/cart/CartIcon';
+import { CartDrawer } from '@/components/cart/CartDrawer';
 
 interface NavbarProps {
   cartItemCount?: number;
@@ -108,15 +109,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
               </Button>
 
               {/* Cart */}
-              <Button variant="ghost" size="sm" className="relative flex items-center gap-1">
-                <ShoppingCart size={16} />
-                {cartItemCount > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-error text-error-foreground text-xs min-w-[1.25rem] h-5 flex items-center justify-center rounded-full">
-                    {cartItemCount}
-                  </Badge>
-                )}
-                {language === 'en' ? 'Cart' : 'Kikapu'}
-              </Button>
+              <CartIcon />
             </div>
 
             {/* Mobile Menu Button */}
@@ -190,21 +183,16 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                     {language === 'en' ? 'Account' : 'Akaunti'}
                   </Button>
 
-                  <Button variant="ghost" size="sm" className="relative flex items-center gap-1">
-                    <ShoppingCart size={16} />
-                    {cartItemCount > 0 && (
-                      <Badge className="absolute -top-2 -right-2 bg-error text-error-foreground text-xs min-w-[1.25rem] h-5 flex items-center justify-center rounded-full">
-                        {cartItemCount}
-                      </Badge>
-                    )}
-                    {language === 'en' ? 'Cart' : 'Kikapu'}
-                  </Button>
+                  <CartIcon />
                 </div>
               </div>
             </div>
           </div>
         )}
       </nav>
+      
+      {/* Cart Drawer */}
+      <CartDrawer />
     </>
   );
 }
