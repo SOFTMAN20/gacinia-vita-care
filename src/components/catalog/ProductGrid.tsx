@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Grid, List, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductCard, Product } from '@/components/ui/product-card';
+import { ProductQuickView } from '@/components/product/ProductQuickView';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -202,6 +204,19 @@ export function ProductGrid({
   onToggleWishlist,
   isLoading = false
 }: ProductGridProps) {
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
+  const handleQuickView = (product: Product) => {
+    setQuickViewProduct(product);
+    setIsQuickViewOpen(true);
+    onQuickView(product);
+  };
+
+  const handleCloseQuickView = () => {
+    setIsQuickViewOpen(false);
+    setQuickViewProduct(null);
+  };
   if (isLoading) {
     return (
       <div className={`grid gap-6 ${
@@ -262,7 +277,7 @@ export function ProductGrid({
               key={product.id}
               product={product}
               onAddToCart={onAddToCart}
-              onQuickView={onQuickView}
+              onQuickView={handleQuickView}
               onToggleWishlist={onToggleWishlist}
             />
           ))
@@ -272,12 +287,19 @@ export function ProductGrid({
               key={product.id}
               product={product}
               onAddToCart={onAddToCart}
-              onQuickView={onQuickView}
+              onQuickView={handleQuickView}
               onToggleWishlist={onToggleWishlist}
             />
           ))
         )}
       </div>
+
+      {/* Quick View Modal */}
+      <ProductQuickView
+        product={quickViewProduct}
+        isOpen={isQuickViewOpen}
+        onClose={handleCloseQuickView}
+      />
     </div>
   );
 }

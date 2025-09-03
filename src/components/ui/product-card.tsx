@@ -114,7 +114,11 @@ export function ProductCard({
             size="sm"
             variant="secondary"
             className="w-8 h-8 p-0 bg-surface/90 hover:bg-surface"
-            onClick={() => onQuickView?.(product)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onQuickView?.(product);
+            }}
           >
             <Eye size={16} className="text-muted-foreground" />
           </Button>
