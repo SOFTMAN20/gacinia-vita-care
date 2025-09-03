@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Filter } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -10,13 +12,18 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { sampleProducts } from '@/data/products';
 import { Product } from '@/components/ui/product-card';
+import { useCart } from '@/contexts/CartContext';
 
 const Products = () => {
+  const { category } = useParams();
+  const { t } = useTranslation();
+  const { addItem } = useCart();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filters, setFilters] = useState<FilterState>({
-    categories: [],
+    categories: category ? [category] : [],
     brands: [],
     priceRange: [0, 100000],
     availability: [],
@@ -98,8 +105,7 @@ const Products = () => {
   }, [searchQuery, filters, sortBy]);
 
   const handleAddToCart = (product: Product) => {
-    console.log('Adding to cart:', product);
-    // TODO: Implement cart functionality
+    addItem(product, 1);
   };
 
   const handleQuickView = (product: Product) => {
@@ -131,7 +137,7 @@ const Products = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-heading text-3xl font-bold text-foreground mb-4">
-            Products Catalog
+            {category ? `${category.charAt(0).toUpperCase() + category.slice(1)} Products` : 'Products Catalog'}
           </h1>
           <ProductSearch
             searchQuery={searchQuery}
