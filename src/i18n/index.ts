@@ -19,7 +19,7 @@ i18n
     },
     lng: 'en', // default language
     fallbackLng: 'en',
-    debug: false,
+    debug: true, // Enable debug to see what's happening
     
     detection: {
       order: ['localStorage', 'navigator'],
