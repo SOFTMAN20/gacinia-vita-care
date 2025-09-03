@@ -5,34 +5,41 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './locales/en.json';
 import sw from './locales/sw.json';
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: {
-        translation: en
+const initI18n = () => {
+  return i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      resources: {
+        en: {
+          translation: en
+        },
+        sw: {
+          translation: sw
+        }
       },
-      sw: {
-        translation: sw
-      }
-    },
-    lng: 'en', // default language
-    fallbackLng: 'en',
-    debug: true, // Enable debug to see what's happening
-    
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
+      lng: 'en',
+      fallbackLng: 'en',
+      debug: true,
+      
+      detection: {
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage'],
+      },
 
-    interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
-    },
+      interpolation: {
+        escapeValue: false,
+      },
 
-    // Custom formatting for currency and numbers
-    nsSeparator: false,
-    keySeparator: false,
-  });
+      react: {
+        useSuspense: false, // Disable suspense to avoid loading issues
+      },
+
+      nsSeparator: false,
+      keySeparator: false,
+    });
+};
+
+initI18n();
 
 export default i18n;

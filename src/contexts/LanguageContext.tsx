@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface LanguageContextType {
@@ -8,12 +8,20 @@ interface LanguageContextType {
   formatCurrency: (amount: number) => string;
   formatDate: (date: Date) => string;
   formatNumber: (num: number) => string;
+  isReady: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const { t, i18n } = useTranslation();
+  const { t, i18n, ready } = useTranslation();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (ready && i18n.isInitialized) {
+      setIsReady(true);
+    }
+  }, [ready, i18n.isInitialized]);
 
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
@@ -56,11 +64,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     formatCurrency,
     formatDate,
     formatNumber,
+    isReady,
   };
 
   return (
     <LanguageContext.Provider value={value}>
-      {children}
+      {isReady ? children : (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">Loading...</div>
+        </div>
+      )}
     </LanguageContext.Provider>
   );
 }
