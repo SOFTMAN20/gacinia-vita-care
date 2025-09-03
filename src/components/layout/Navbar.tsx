@@ -11,14 +11,13 @@ import {
   Cross, 
   Phone, 
   MapPin,
+  Globe,
   Settings,
   LogOut
 } from 'lucide-react';
 import { CartIcon } from '@/components/cart/CartIcon';
 import { CartDrawer } from '@/components/cart/CartDrawer';
-import { LanguageToggle } from '@/components/ui/language-toggle';
 import { useUser } from '@/contexts/UserContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NavbarProps {
   cartItemCount?: number;
@@ -26,17 +25,21 @@ interface NavbarProps {
 
 export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'sw'>('en');
   const { state } = useUser();
   const { user, isLoggedIn } = state;
-  const { t, language } = useLanguage();
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'en' ? 'sw' : 'en');
+  };
 
   const menuItems = [
-    { name: t('nav.medicines'), href: '/catalog/medicines' },
-    { name: t('nav.cosmetics'), href: '/catalog/cosmetics' },
-    { name: t('nav.equipment'), href: '/catalog/equipment' },
-    { name: t('nav.wholesale'), href: '/wholesale' },
-    { name: t('nav.about'), href: '/about' },
-    { name: t('nav.contact'), href: '/contact' },
+    { name: language === 'en' ? 'Medicines' : 'Dawa', href: '/catalog/medicines' },
+    { name: language === 'en' ? 'Cosmetics' : 'Vipodozi', href: '/catalog/cosmetics' },
+    { name: language === 'en' ? 'Equipment' : 'Vifaa', href: '/catalog/equipment' },
+    { name: language === 'en' ? 'Wholesale' : 'Jumla', href: '/wholesale' },
+    { name: language === 'en' ? 'About' : 'Kuhusu', href: '/about' },
+    { name: language === 'en' ? 'Contact' : 'Mawasiliano', href: '/contact' },
   ];
 
   return (
@@ -47,17 +50,17 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1">
               <Phone size={14} />
-              <span className="hidden xs:inline">{t('header.phone')}</span>
-              <span className="xs:hidden">{t('common.call')}</span>
+              <span className="hidden xs:inline">+255 25 250 3456</span>
+              <span className="xs:hidden">Call</span>
             </div>
             <div className="flex items-center gap-1">
               <MapPin size={14} />
-              <span className="hidden sm:inline">{t('header.location')}</span>
-              <span className="sm:hidden">Mbeya</span>
+              <span className="hidden sm:inline">{language === 'en' ? 'Mbeya, Esso - Near Highway' : 'Mbeya, Esso - Karibu na Barabara Kuu'}</span>
+              <span className="sm:hidden">{language === 'en' ? 'Mbeya' : 'Mbeya'}</span>
             </div>
           </div>
           <div className="hidden lg:block text-xs">
-            {t('header.tagline')}
+            {language === 'en' ? 'Licensed Pharmacy & Medical Supplies' : 'Duka la Dawa Lililoidhinishwa na Vifaa vya Matibabu'}
           </div>
         </div>
       </div>
@@ -74,10 +77,10 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 </div>
                 <div>
                   <h1 className="font-heading text-xl font-bold text-primary">
-                    {t('header.company')}
+                    Gacinia
                   </h1>
                   <p className="text-xs text-muted-foreground">
-                    {t('header.subtitle')}
+                    {language === 'en' ? 'Pharmacy & Medical' : 'Duka la Dawa na Matibabu'}
                   </p>
                 </div>
               </div>
@@ -89,7 +92,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   type="search"
-                  placeholder={t('header.searchPlaceholder')}
+                  placeholder={language === 'en' ? 'Search medicines, cosmetics, equipment...' : 'Tafuta dawa, vipodozi, vifaa...'}
                   className="pl-10 pr-4"
                 />
               </div>
@@ -98,7 +101,15 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
               {/* Language Toggle */}
-              <LanguageToggle />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleLanguage}
+                className="flex items-center gap-1"
+              >
+                <Globe size={16} />
+                {language === 'en' ? 'EN' : 'SW'}
+              </Button>
 
               {/* Account */}
               {isLoggedIn ? (
@@ -106,38 +117,38 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-1">
                       <User size={16} />
-                      {user?.name?.split(' ')[0] || t('nav.user')}
+                      {user?.name?.split(' ')[0] || (language === 'en' ? 'User' : 'Mtumiaji')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard">
-                          <User className="w-4 h-4 mr-2" />
-                          {t('nav.dashboard')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/profile">
-                          <Settings className="w-4 h-4 mr-2" />
-                          {t('nav.profile')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin">
-                          <Settings className="w-4 h-4 mr-2" />
-                          {t('nav.admin')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <LogOut className="w-4 h-4 mr-2" />
-                        {t('nav.logout')}
-                      </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard">
+                        <User className="w-4 h-4 mr-2" />
+                        {language === 'en' ? 'Dashboard' : 'Dashibodi'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <Settings className="w-4 h-4 mr-2" />
+                        {language === 'en' ? 'Profile Settings' : 'Mipangilio ya Wasifu'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">
+                        <Settings className="w-4 h-4 mr-2" />
+                        {language === 'en' ? 'Admin Portal' : 'Mlango wa Msimamizi'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {language === 'en' ? 'Logout' : 'Ondoka'}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <Button variant="ghost" size="sm" className="flex items-center gap-1">
                   <User size={16} />
-                  {t('nav.login')}
+                  {language === 'en' ? 'Login' : 'Ingia'}
                 </Button>
               )}
 
@@ -182,7 +193,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   type="search"
-                  placeholder={t('common.search') + '...'}
+                  placeholder={language === 'en' ? 'Search...' : 'Tafuta...'}
                   className="pl-10 pr-4 touch-target"
                 />
               </div>
@@ -203,7 +214,15 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
 
               {/* Mobile Actions */}
               <div className="flex items-center justify-between pt-4 border-t">
-                <LanguageToggle className="touch-target" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-1 touch-target"
+                >
+                  <Globe size={16} />
+                  {language === 'en' ? 'EN' : 'SW'}
+                </Button>
 
                 <div className="flex items-center gap-2">
                   {isLoggedIn ? (
@@ -211,20 +230,20 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                       <Button variant="ghost" size="sm" asChild className="touch-target">
                         <Link to="/dashboard" className="flex items-center gap-1">
                           <User size={16} />
-                          <span className="hidden xs:inline">{t('nav.dashboard')}</span>
+                          <span className="hidden xs:inline">{language === 'en' ? 'Dashboard' : 'Dashibodi'}</span>
                         </Link>
                       </Button>
                       <Button variant="ghost" size="sm" asChild className="touch-target">
                         <Link to="/profile" className="flex items-center gap-1">
                           <Settings size={16} />
-                          <span className="hidden xs:inline">{t('nav.profile')}</span>
+                          <span className="hidden xs:inline">{language === 'en' ? 'Profile' : 'Wasifu'}</span>
                         </Link>
                       </Button>
                     </>
                   ) : (
                     <Button variant="ghost" size="sm" className="flex items-center gap-1 touch-target">
                       <User size={16} />
-                      <span className="hidden xs:inline">{t('nav.login')}</span>
+                      <span className="hidden xs:inline">{language === 'en' ? 'Login' : 'Ingia'}</span>
                     </Button>
                   )}
                 </div>
