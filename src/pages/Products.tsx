@@ -154,7 +154,7 @@ const Products = () => {
           <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="mb-4">
+                <Button variant="outline">
                   <Filter className="h-4 w-4 mr-2" />
                   Filters
                 </Button>
