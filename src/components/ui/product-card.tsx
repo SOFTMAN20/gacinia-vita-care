@@ -10,13 +10,29 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
+  images?: string[];
   category: string;
+  brand?: string;
   inStock: boolean;
   stockCount?: number;
   requiresPrescription?: boolean;
   wholesaleAvailable?: boolean;
+  wholesalePrice?: number;
   rating?: number;
   reviewCount?: number;
+  description?: string;
+  keyFeatures?: string[];
+  technicalSpecs?: Record<string, string>;
+  usageInstructions?: string;
+  dosage?: string;
+  ingredients?: string;
+  storageRequirements?: string;
+  expiryDate?: string;
+  batchNumber?: string;
+  manufacturer?: string;
+  sku?: string;
+  weight?: string;
+  dimensions?: string;
 }
 
 interface ProductCardProps {
