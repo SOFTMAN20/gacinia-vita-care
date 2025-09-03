@@ -39,10 +39,6 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/catalog/:category" element={<Products />} />
-              <Route path="/wholesale" element={<div>Wholesale Portal (Coming Soon)</div>} />
-              <Route path="/about" element={<div>About Us (Coming Soon)</div>} />
-              <Route path="/contact" element={<div>Contact Us (Coming Soon)</div>} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminLayout />}>
