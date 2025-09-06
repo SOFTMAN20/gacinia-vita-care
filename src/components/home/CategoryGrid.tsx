@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Pill, Sparkles, Stethoscope, Building2, ArrowRight } from 'lucide-react';
 import categoryEquipment from '@/assets/category-equipment.jpg';
 import categoryCosmetics from '@/assets/category-cosmetics.jpg';
+import categoryMedicines from '@/assets/category-medicines.jpg';
+import categoryWholesale from '@/assets/category-wholesale.jpg';
 
 export function CategoryGrid() {
   const language = 'en'; // This would come from global state
@@ -20,7 +22,7 @@ export function CategoryGrid() {
       count: '500+',
       href: '/catalog/medicines',
       color: 'bg-primary',
-      image: null, // Will use icon for this one
+      image: categoryMedicines,
     },
     {
       id: 'cosmetics',
@@ -62,7 +64,7 @@ export function CategoryGrid() {
       count: '1000+',
       href: '/wholesale',
       color: 'bg-gradient-secondary',
-      image: null,
+      image: categoryWholesale,
     },
   ];
 
