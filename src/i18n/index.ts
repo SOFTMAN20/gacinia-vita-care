@@ -20,11 +20,11 @@ const resources = {
       },
       // Header
       header: {
-        phone: '+255 25 250 3456',
+        phone: '+255621624287',
         location: 'Mbeya, Esso - Near Highway',
         tagline: 'Licensed Pharmacy & Medical Supplies',
         company: 'Gacinia',
-        subtitle: 'Pharmacy & Medical',
+        subtitle: 'Pharmacy & Medical ',
         searchPlaceholder: 'Search medicines, cosmetics, equipment...'
       },
       // Common
@@ -60,7 +60,7 @@ const resources = {
       },
       // Header
       header: {
-        phone: '+255 25 250 3456',
+        phone: '+255621624287',
         location: 'Mbeya, Esso - Karibu na Barabara Kuu',
         tagline: 'Duka la Dawa Lililoidhinishwa na Vifaa vya Matibabu',
         company: 'Gacinia',

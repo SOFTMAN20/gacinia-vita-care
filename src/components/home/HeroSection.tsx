@@ -44,7 +44,7 @@ export function HeroSection() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    }, 3000);
     return () => clearInterval(timer);
   }, [slides.length]);
 
@@ -71,12 +71,12 @@ export function HeroSection() {
           alt="Gacinia Pharmacy Interior"
           className="w-full h-full object-cover opacity-20"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-secondary/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary/40 to-secondary/60" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-        <div className="max-w-3xl text-white">
+      <div className="relative z-10 container mx-auto px-4 h-full flex items-center justify-center">
+        <div className="max-w-3xl text-white text-center">
           <h1 className="font-heading text-4xl md:text-6xl font-bold mb-6 leading-tight">
             {language === 'en' ? currentSlideData.title : currentSlideData.titleSw}
           </h1>
@@ -84,7 +84,7 @@ export function HeroSection() {
             {language === 'en' ? currentSlideData.subtitle : currentSlideData.subtitleSw}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="lg" className="text-base px-8">
               <ShoppingBag size={20} />
               {language === 'en' ? currentSlideData.cta1 : currentSlideData.cta1Sw}
@@ -100,7 +100,7 @@ export function HeroSection() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-12 flex flex-wrap items-center gap-6 text-sm opacity-80">
+          <div className="mt-12 flex flex-wrap items-center gap-6 text-sm opacity-80 justify-center">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-accent rounded-full"></div>
               <span>{language === 'en' ? 'Licensed Pharmacy' : 'Duka la Dawa Lililoidhinishwa'}</span>

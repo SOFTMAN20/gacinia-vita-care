@@ -76,7 +76,7 @@ export function LocationContact() {
                   <div>
                     <p className="font-medium">Phone</p>
                     <p className="text-sm text-muted-foreground">
-                      +255 25 250 3456
+                      +255621624287
                     </p>
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export function LocationContact() {
                   <div>
                     <p className="font-medium">WhatsApp</p>
                     <p className="text-sm text-muted-foreground">
-                      +255 25 250 3456
+                      +255621624287
                     </p>
                   </div>
                 </div>
