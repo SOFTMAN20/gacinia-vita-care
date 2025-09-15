@@ -76,8 +76,9 @@ export function SEOHead({
       "name": "Gacinia Pharmacy & Medical Supplies",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Esso - Near Highway",
+        "streetAddress": "Standi Kuu ya Mabasi Opposite to Agakhan Hospital",
         "addressLocality": "Mbeya",
+        "postalCode": "6586",
         "addressCountry": "Tanzania"
       },
       "telephone": "+255-25-250-3456",

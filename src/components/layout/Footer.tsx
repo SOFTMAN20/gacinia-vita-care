@@ -70,8 +70,8 @@ export function Footer() {
               <div className="flex items-start space-x-2">
                 <MapPin size={16} className="mt-0.5 opacity-75" />
                 <div className="text-sm opacity-90">
-                  <p>Mbeya, Esso</p>
-                  <p>Near Highway, Tanzania</p>
+                  <p>Standi Kuu ya Mabasi Opposite to</p>
+                  <p>Agakhan Hospital, Mbeya 6586</p>
                 </div>
               </div>
               

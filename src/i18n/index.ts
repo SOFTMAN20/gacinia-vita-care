@@ -21,7 +21,7 @@ const resources = {
       // Header
       header: {
         phone: '+255621624287',
-        location: 'Mbeya, Esso - Near Highway',
+        location: 'Standi Kuu ya Mabasi Opposite to Agakhan Hospital, Mbeya 6586',
         tagline: 'Licensed Pharmacy & Medical Supplies',
         company: 'Gacinia',
         subtitle: 'Pharmacy & Medical ',
@@ -61,7 +61,7 @@ const resources = {
       // Header
       header: {
         phone: '+255621624287',
-        location: 'Mbeya, Esso - Karibu na Barabara Kuu',
+        location: 'Standi Kuu ya Mabasi Opposite to Hospitali ya Agakhan, Mbeya 6586',
         tagline: 'Duka la Dawa Lililoidhinishwa na Vifaa vya Matibabu',
         company: 'Gacinia',
         subtitle: 'Duka la Dawa na Matibabu',

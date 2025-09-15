@@ -8,6 +8,8 @@ import { UserProvider } from "@/contexts/UserContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AppErrorBoundary } from "@/components/ui/error-boundary";
 import Index from "./pages/Index";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -38,8 +40,8 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/products" element={<Products />} />
                   <Route path="/products/:id" element={<ProductDetail />} />
-                  <Route path="/about" element={<div>About Us (Coming Soon)</div>} />
-                  <Route path="/contact" element={<div>Contact Us (Coming Soon)</div>} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/dashboard" element={<Dashboard />} />

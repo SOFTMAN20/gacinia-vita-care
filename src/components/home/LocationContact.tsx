@@ -29,21 +29,27 @@ export function LocationContact() {
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <div className="aspect-video bg-muted relative">
-                {/* Placeholder for map - In production, integrate with Google Maps or similar */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
-                    <h3 className="font-heading text-xl font-bold text-foreground mb-2">
-                      Gacinia Pharmacy Location
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Mbeya, Esso - Near Highway, Tanzania
-                    </p>
-                    <Button className="bg-primary hover:bg-primary/90">
-                      <Navigation className="w-4 h-4 mr-2" />
-                      Get Directions
-                    </Button>
-                  </div>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.3344!2d33.4628!3d-8.9094!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwNTQnMzMuOCJTIDMzwrAyNyc0Ni4xIkU!5e0!3m2!1sen!2stz!4v1635789012345"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Gacinia Pharmacy Location - Standi Kuu ya Mabasi Opposite to Agakhan Hospital, Mbeya"
+                  className="absolute inset-0"
+                ></iframe>
+                
+                {/* Overlay with Get Directions button */}
+                <div className="absolute bottom-4 right-4">
+                  <Button 
+                    className="bg-primary hover:bg-primary/90 shadow-lg"
+                    onClick={() => window.open('https://maps.app.goo.gl/GPGFrXh2cXMsBUTe9', '_blank')}
+                  >
+                    <Navigation className="w-4 h-4 mr-2" />
+                    Get Directions
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -65,8 +71,8 @@ export function LocationContact() {
                   <div>
                     <p className="font-medium">Address</p>
                     <p className="text-sm text-muted-foreground">
-                      Mbeya, Esso - Near Highway<br />
-                      Mbeya Region, Tanzania
+                      Standi Kuu ya Mabasi Opposite to Agakhan Hospital<br />
+                      Mbeya 6586, Tanzania
                     </p>
                   </div>
                 </div>
