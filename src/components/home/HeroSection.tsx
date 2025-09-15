@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ShoppingBag, Building2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import heroImage from '@/assets/hero-pharmacy.jpg';
 
 export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     {
@@ -40,6 +42,44 @@ export function HeroSection() {
   ];
 
   const [language] = useState<'en' | 'sw'>('en'); // This would come from global state
+
+  // Button click handlers
+  const handlePrimaryAction = (slideIndex: number) => {
+    switch(slideIndex) {
+      case 0: // Shop Now
+      case 2: // Order Now
+        navigate('/products');
+        break;
+      case 1: // Browse Catalog
+        navigate('/products');
+        break;
+      default:
+        navigate('/products');
+    }
+  };
+
+  const handleSecondaryAction = (slideIndex: number) => {
+    switch(slideIndex) {
+      case 0: // Wholesale Portal
+        navigate('/products?wholesale=true');
+        break;
+      case 1: // Contact Us
+        navigate('/contact');
+        break;
+      case 2: { // Learn More
+        // For now, scroll to trust section or navigate to about
+        const trustSection = document.querySelector('#trust-section');
+        if (trustSection) {
+          trustSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          navigate('/about');
+        }
+        break;
+      }
+      default:
+        navigate('/contact');
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -85,7 +125,12 @@ export function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="lg" className="text-base px-8">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="text-base px-8"
+              onClick={() => handlePrimaryAction(currentSlide)}
+            >
               <ShoppingBag size={20} />
               {language === 'en' ? currentSlideData.cta1 : currentSlideData.cta1Sw}
             </Button>
@@ -93,6 +138,7 @@ export function HeroSection() {
               variant="outline" 
               size="lg" 
               className="text-base px-8 border-white text-white hover:bg-white hover:text-primary"
+              onClick={() => handleSecondaryAction(currentSlide)}
             >
               <Building2 size={20} />
               {language === 'en' ? currentSlideData.cta2 : currentSlideData.cta2Sw}
