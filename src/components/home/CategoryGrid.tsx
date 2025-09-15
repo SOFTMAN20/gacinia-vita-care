@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Pill, Sparkles, Stethoscope, Building2, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import categoryEquipment from '@/assets/category-equipment.jpg';
 import categoryCosmetics from '@/assets/category-cosmetics.jpg';
 import categoryMedicines from '@/assets/category-medicines.jpg';
@@ -8,6 +9,7 @@ import categoryWholesale from '@/assets/category-wholesale.jpg';
 
 export function CategoryGrid() {
   const language = 'en'; // This would come from global state
+  const navigate = useNavigate();
 
   const categories = [
     {
@@ -20,7 +22,7 @@ export function CategoryGrid() {
       descriptionSw: 'Dawa za uwongozi na za kawaida',
       icon: Pill,
       count: '500+',
-      href: '/catalog/medicines',
+      href: '/products?category=prescription-medicines,over-the-counter',
       color: 'bg-primary',
       image: categoryMedicines,
     },
@@ -34,7 +36,7 @@ export function CategoryGrid() {
       descriptionSw: 'Bidhaa za urembo na utunzaji wa kibinafsi',
       icon: Sparkles,
       count: '200+',
-      href: '/catalog/cosmetics',
+      href: '/products?category=cosmetics-personal-care',
       color: 'bg-secondary',
       image: categoryCosmetics,
     },
@@ -48,7 +50,7 @@ export function CategoryGrid() {
       descriptionSw: 'Vifaa vya kimatibabu vya kitaaluma',
       icon: Stethoscope,
       count: '150+',
-      href: '/catalog/equipment',
+      href: '/products?category=medical-equipment,first-aid-wellness',
       color: 'bg-accent',
       image: categoryEquipment,
     },
@@ -62,7 +64,7 @@ export function CategoryGrid() {
       descriptionSw: 'Mikataba ya jumla kwa vituo vya afya',
       icon: Building2,
       count: '1000+',
-      href: '/wholesale',
+      href: '/products?wholesale=true',
       color: 'bg-gradient-secondary',
       image: categoryWholesale,
     },
@@ -134,12 +136,10 @@ export function CategoryGrid() {
                       variant="ghost"
                       size="sm"
                       className="self-start mt-4 text-white border-white/30 hover:bg-white/20 hover:text-white group-hover:translate-x-1 transition-all"
-                      asChild
+                      onClick={() => navigate(category.href)}
                     >
-                      <a href={category.href}>
-                        {language === 'en' ? 'Explore' : 'Chunguza'}
-                        <ArrowRight size={16} />
-                      </a>
+                      {language === 'en' ? 'Explore' : 'Chunguza'}
+                      <ArrowRight size={16} />
                     </Button>
                   </div>
                 </div>
@@ -150,7 +150,12 @@ export function CategoryGrid() {
 
         {/* Call to Action */}
         <div className="text-center mt-12">
-          <Button variant="pharmacy" size="lg" className="shadow-lg">
+          <Button 
+            variant="pharmacy" 
+            size="lg" 
+            className="shadow-lg"
+            onClick={() => navigate('/products')}
+          >
             {language === 'en' ? 'View All Products' : 'Ona Bidhaa Zote'}
             <ArrowRight size={20} />
           </Button>

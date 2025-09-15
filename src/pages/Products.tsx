@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Filter } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
@@ -16,6 +16,7 @@ import { useCart } from '@/contexts/CartContext';
 
 const Products = () => {
   const { category } = useParams();
+  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const { addItem } = useCart();
   
@@ -23,12 +24,75 @@ const Products = () => {
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filters, setFilters] = useState<FilterState>({
-    categories: category ? [category] : [],
+    categories: [],
     brands: [],
-    priceRange: [0, 100000],
+    priceRange: [0, 100000] as [number, number],
     availability: [],
     special: []
   });
+
+  // Handle URL parameters for category filtering and search
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    const wholesaleParam = searchParams.get('wholesale');
+    const searchParam = searchParams.get('search');
+    
+    const newFilters: FilterState = {
+      categories: [],
+      brands: [],
+      priceRange: [0, 100000] as [number, number],
+      availability: [],
+      special: []
+    };
+    
+    // Handle category filtering
+    if (categoryParam) {
+      const categories = categoryParam.split(',');
+      newFilters.categories = categories;
+    } else if (category) {
+      newFilters.categories = [category];
+    }
+    
+    // Handle wholesale filtering
+    if (wholesaleParam === 'true') {
+      newFilters.special = ['wholesale'];
+    }
+    
+    // Handle search query
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    } else {
+      setSearchQuery('');
+    }
+    
+    setFilters(newFilters);
+  }, [searchParams, category]);
+
+  // Get page title based on filters
+  const getPageTitle = () => {
+    const categoryParam = searchParams.get('category');
+    const wholesaleParam = searchParams.get('wholesale');
+    const searchParam = searchParams.get('search');
+    
+    if (searchParam) {
+      return `Search Results for "${searchParam}"`;
+    } else if (wholesaleParam === 'true') {
+      return 'Wholesale Products';
+    } else if (categoryParam) {
+      const categories = categoryParam.split(',');
+      if (categories.includes('prescription-medicines') || categories.includes('over-the-counter')) {
+        return 'Medicines';
+      } else if (categories.includes('cosmetics-personal-care')) {
+        return 'Cosmetics & Personal Care';
+      } else if (categories.includes('medical-equipment') || categories.includes('first-aid-wellness')) {
+        return 'Medical Equipment & Wellness';
+      }
+    } else if (category) {
+      return `${category.charAt(0).toUpperCase() + category.slice(1)} Products`;
+    }
+    
+    return 'Products Catalog';
+  };
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
@@ -105,7 +169,8 @@ const Products = () => {
   }, [searchQuery, filters, sortBy]);
 
   const handleAddToCart = (product: Product) => {
-    addItem(product, 1);
+    // ProductCard component already handles addItem, so we don't need to call it here
+    console.log('Product added to cart:', product);
   };
 
   const handleQuickView = (product: Product) => {
@@ -122,7 +187,7 @@ const Products = () => {
     setFilters({
       categories: [],
       brands: [],
-      priceRange: [0, 100000],
+      priceRange: [0, 100000] as [number, number],
       availability: [],
       special: []
     });
@@ -137,7 +202,7 @@ const Products = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-heading text-3xl font-bold text-foreground mb-4">
-            {category ? `${category.charAt(0).toUpperCase() + category.slice(1)} Products` : 'Products Catalog'}
+            {getPageTitle()}
           </h1>
           <ProductSearch
             searchQuery={searchQuery}

@@ -2,12 +2,14 @@ import { ProductCard, Product } from '@/components/ui/product-card';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import productsShowcase from '@/assets/products-showcase.jpg';
 
 
 export function FeaturedProducts() {
   const language = 'en'; // This would come from global state
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   // Mock product data - in real app this would come from API
   const products: Product[] = [
@@ -126,7 +128,7 @@ export function FeaturedProducts() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {products.map((product) => (
             <ProductCard 
               key={product.id} 
@@ -138,7 +140,11 @@ export function FeaturedProducts() {
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
+          <Button 
+            variant="outline" 
+            size="lg"
+            onClick={() => navigate('/products')}
+          >
             {language === 'en' ? 'View All Products' : 'Ona Bidhaa Zote'}
           </Button>
         </div>

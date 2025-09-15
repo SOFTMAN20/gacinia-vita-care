@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,19 +27,29 @@ interface NavbarProps {
 
 export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { state } = useUser();
   const { user, isLoggedIn } = state;
   const { language } = useLanguage();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const menuItems = [
-    { name: t('nav.medicines'), href: '/catalog/medicines' },
-    { name: t('nav.cosmetics'), href: '/catalog/cosmetics' },
-    { name: t('nav.equipment'), href: '/catalog/equipment' },
-    { name: t('nav.wholesale'), href: '/wholesale' },
+    { name: t('nav.medicines'), href: '/products?category=prescription-medicines,over-the-counter' },
+    { name: t('nav.cosmetics'), href: '/products?category=cosmetics-personal-care' },
+    { name: t('nav.equipment'), href: '/products?category=medical-equipment,first-aid-wellness' },
+    { name: t('nav.wholesale'), href: '/products?wholesale=true' },
     { name: t('nav.about'), href: '/about' },
     { name: t('nav.contact'), href: '/contact' },
   ];
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
 
   return (
     <>
@@ -87,15 +97,17 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
 
             {/* Search Bar - Desktop */}
             <div className="hidden md:flex flex-1 max-w-lg mx-8">
-              <div className="relative w-full">
+              <form onSubmit={handleSearch} className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
                 <Input
                   type="search"
                   placeholder={t('header.searchPlaceholder')}
                   className="pl-10 pr-4"
                   aria-label={t('header.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-              </div>
+              </form>
             </div>
 
             {/* Desktop Navigation */}
