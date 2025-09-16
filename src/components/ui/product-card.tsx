@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { ShareProduct } from './share-product';
 
 export interface Product {
   id: string;
@@ -111,6 +112,13 @@ export function ProductCard({
               )} 
             />
           </Button>
+          
+          <ShareProduct 
+            product={product}
+            variant="secondary"
+            size="icon"
+            className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full [&>svg]:text-green-600 [&>svg]:hover:text-green-700"
+          />
         </div>
 
         {/* Stock Status Overlay */}

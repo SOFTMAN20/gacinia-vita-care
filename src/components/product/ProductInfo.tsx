@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Product } from '@/components/ui/product-card';
+import { ShareProduct } from '@/components/ui/share-product';
 
 interface ProductInfoProps {
   product: Product;
@@ -36,9 +37,18 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-          {product.name}
-        </h1>
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground flex-1">
+            {product.name}
+          </h1>
+          <ShareProduct 
+            product={product}
+            variant="outline"
+            size="default"
+            showText={true}
+            className="flex-shrink-0"
+          />
+        </div>
 
         {/* Rating */}
         {product.rating && (
