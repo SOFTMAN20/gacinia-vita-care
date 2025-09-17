@@ -119,6 +119,18 @@ export function ProductCard({
             size="icon"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full [&>svg]:text-green-600 [&>svg]:hover:text-green-700"
           />
+          
+          <Button
+            size="sm"
+            variant="secondary"
+            className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full"
+            onClick={() => onQuickView?.(product)}
+          >
+            <Eye 
+              size={14} 
+              className="text-blue-600 hover:text-blue-700 transition-colors" 
+            />
+          </Button>
         </div>
 
         {/* Stock Status Overlay */}
