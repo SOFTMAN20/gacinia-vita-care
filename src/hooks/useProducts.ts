@@ -23,7 +23,7 @@ export function useProducts(filters: ProductFilters = {}) {
 
   useEffect(() => {
     fetchProducts();
-  }, [filters]);
+  }, [JSON.stringify(filters)]);
 
   const fetchProducts = async () => {
     try {
@@ -45,7 +45,7 @@ export function useProducts(filters: ProductFilters = {}) {
           .from('categories')
           .select('id')
           .eq('slug', filters.category)
-          .single();
+          .maybeSingle();
         
         if (categoryData) {
           query = query.eq('category_id', categoryData.id);

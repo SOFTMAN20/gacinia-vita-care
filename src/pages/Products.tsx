@@ -32,13 +32,15 @@ const Products = () => {
     special: []
   });
 
-  // Fetch data from Supabase
-  const { products, loading, error } = useProducts({
+  // Memoize filters to avoid refetch loops
+  const stableFilters = useMemo(() => ({
     category: filters.categories.length > 0 ? filters.categories[0] : undefined,
     search: searchQuery || undefined,
     minPrice: filters.priceRange[0],
     maxPrice: filters.priceRange[1],
-  });
+  }), [filters.categories, filters.priceRange, searchQuery]);
+
+  const { products, loading, error } = useProducts(stableFilters);
 
   const { categories } = useCategories();
 
