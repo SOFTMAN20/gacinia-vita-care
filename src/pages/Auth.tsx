@@ -25,7 +25,7 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
 
-  const { signIn, signUp, user, profile, loading } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,35 +33,10 @@ export default function Auth() {
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    // Wait for auth loading to complete and user to be available
-    if (!loading && user) {
-      // If we have a user but no profile yet, wait for profile to load
-      if (!profile) {
-        return;
-      }
-      
-      // Now we have both user and profile, redirect based on role
-      if (profile.role === 'admin') {
-        console.log('Redirecting admin to /admin');
-        navigate('/admin', { replace: true });
-      } else {
-        console.log('Redirecting customer to:', from);
-        navigate(from, { replace: true });
-      }
+    if (user) {
+      navigate(from, { replace: true });
     }
-  }, [user, profile, loading, navigate, from]);
-
-  // Show loading state when user is logged in but profile is still loading
-  if (user && !profile && !loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Setting up your account...</p>
-        </div>
-      </div>
-    );
-  }
+  }, [user, navigate, from]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
