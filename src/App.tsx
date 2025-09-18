@@ -4,8 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
-import { UserProvider } from "@/contexts/UserContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppErrorBoundary } from "@/components/ui/error-boundary";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -17,6 +18,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Auth from "./pages/Auth";
 import { AdminLayout } from "./components/layout/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
@@ -30,7 +32,7 @@ const App = () => (
   <AppErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <UserProvider>
+        <AuthProvider>
           <CartProvider>
             <TooltipProvider>
               <Toaster />
@@ -43,12 +45,29 @@ const App = () => (
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/cart" element={<Cart />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/checkout" element={
+                    <ProtectedRoute>
+                      <Checkout />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
                   
                   {/* Admin Routes */}
-                  <Route path="/admin" element={<AdminLayout />}>
+                  <Route path="/admin" element={
+                    <ProtectedRoute roles={['admin']}>
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  }>
                     <Route index element={<AdminDashboard />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="orders" element={<AdminOrders />} />
@@ -64,7 +83,7 @@ const App = () => (
               </BrowserRouter>
             </TooltipProvider>
           </CartProvider>
-        </UserProvider>
+        </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>
   </AppErrorBoundary>

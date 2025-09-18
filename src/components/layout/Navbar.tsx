@@ -18,7 +18,7 @@ import {
 import { CartIcon } from '@/components/cart/CartIcon';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { LanguageToggle } from '@/components/ui/language-toggle';
-import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NavbarProps {
@@ -28,8 +28,7 @@ interface NavbarProps {
 export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { state } = useUser();
-  const { user, isLoggedIn } = state;
+  const { user, profile, hasRole, signOut } = useAuth();
   const { language } = useLanguage();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -116,12 +115,12 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
               <LanguageToggle />
 
               {/* Account */}
-              {isLoggedIn ? (
+              {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-1">
                       <User size={16} />
-                      {user?.name?.split(' ')[0] || 'User'}
+                      {profile?.full_name?.split(' ')[0] || profile?.username || 'User'}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-surface border border-border">
@@ -137,13 +136,15 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                         {t('nav.profile')}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin" className="flex items-center w-full">
-                        <Settings className="w-4 h-4 mr-2" />
-                        {t('nav.admin')}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    {hasRole('admin') && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="flex items-center w-full">
+                          <Settings className="w-4 h-4 mr-2" />
+                          {t('nav.admin')}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={() => signOut()}>
                       <LogOut className="w-4 h-4 mr-2" />
                       {t('nav.logout')}
                     </DropdownMenuItem>
@@ -151,7 +152,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 </DropdownMenu>
               ) : (
                 <Button variant="ghost" size="sm" asChild className="flex items-center gap-1">
-                  <Link to="/login">
+                  <Link to="/auth">
                     <User size={16} />
                     {t('common.login')}
                   </Link>
@@ -225,7 +226,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 <LanguageToggle />
 
                 <div className="flex items-center gap-2">
-                  {isLoggedIn ? (
+                  {user ? (
                     <>
                       <Button variant="ghost" size="sm" asChild className="touch-target">
                         <Link to="/dashboard" className="flex items-center gap-1">

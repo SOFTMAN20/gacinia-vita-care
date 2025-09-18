@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,374 +15,396 @@ import { User, Mail, Phone, Globe, Bell, Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Profile() {
-  const { state, dispatch } = useUser();
-  const { user } = state;
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
+    full_name: profile?.full_name || '',
+    username: profile?.username || '',
     email: user?.email || '',
-    phone: user?.phone || '',
-    language: user?.language || 'en',
+    phone: profile?.phone || '',
+    language: 'en',
   });
 
-  const handleSave = () => {
-    dispatch({
-      type: 'UPDATE_PROFILE',
-      payload: formData,
-    });
-    setIsEditing(false);
-    toast({
-      title: 'Profile Updated',
-      description: 'Your profile has been successfully updated.',
-    });
-  };
-
-  const handleNotificationChange = (type: 'email' | 'sms' | 'push', value: boolean) => {
-    if (user) {
-      dispatch({
-        type: 'UPDATE_PROFILE',
-        payload: {
-          notifications: {
-            ...user.notifications,
-            [type]: value,
-          },
-        },
+  const handleSave = async () => {
+    try {
+      // TODO: Implement profile update with Supabase
+      setIsEditing(false);
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive",
       });
     }
   };
 
-  if (!user) return null;
+  const handleNotificationChange = (type: 'email' | 'sms' | 'push', value: boolean) => {
+    // TODO: Implement notification settings update with Supabase
+    toast({
+      title: "Settings Updated",
+      description: `${type} notifications ${value ? 'enabled' : 'disabled'}.`,
+    });
+  };
+
+  if (!user || !profile) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Profile Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account information and preferences
-          </p>
-        </div>
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+              <div>
+                <h1 className="text-3xl font-bold">Profile Settings</h1>
+                <p className="text-muted-foreground">Manage your account and preferences</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">{profile.full_name || profile.username}</h2>
+                  <p className="text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground capitalize">{profile.role} Account</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <Tabs defaultValue="personal" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="personal">Personal Info</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="personal">Personal Info</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="preferences">Preferences</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="personal">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <User className="w-5 h-5" />
-                  <span>Personal Information</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Profile Picture */}
-                <div className="flex items-center space-x-4">
-                  <Avatar className="w-20 h-20">
-                    <AvatarImage src="/placeholder.svg" alt={user.name} />
-                    <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
+            {/* Personal Information Tab */}
+            <TabsContent value="personal" className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <Button variant="outline" size="sm">Change Photo</Button>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      JPG, GIF or PNG. 1MB max.
+                    <CardTitle>Personal Information</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Update your personal details and contact information
                     </p>
                   </div>
-                </div>
-
-                {/* Form Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      value={isEditing ? formData.name : user.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      disabled={!isEditing}
-                    />
+                  <Button
+                    variant={isEditing ? "outline" : "default"}
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    {isEditing ? "Cancel" : "Edit"}
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="full_name">Full Name</Label>
+                      <Input
+                        id="full_name"
+                        value={formData.full_name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        id="username"
+                        value={formData.username}
+                        onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        disabled={true}
+                        className="bg-muted"
+                      />
+                      <p className="text-xs text-muted-foreground">Email cannot be changed here</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                        disabled={!isEditing}
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={isEditing ? formData.email : user.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      value={isEditing ? formData.phone : user.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="language">Preferred Language</Label>
-                    <Select
-                      value={isEditing ? formData.language : user.language}
-                      onValueChange={(value: 'en' | 'sw') => 
-                        setFormData({ ...formData, language: value })
-                      }
-                      disabled={!isEditing}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="sw">Kiswahili</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="flex space-x-4">
-                  {isEditing ? (
-                    <>
-                      <Button onClick={handleSave}>Save Changes</Button>
+                  {isEditing && (
+                    <div className="flex justify-end space-x-2">
                       <Button variant="outline" onClick={() => setIsEditing(false)}>
                         Cancel
                       </Button>
-                    </>
-                  ) : (
-                    <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                      <Button onClick={handleSave}>
+                        Save Changes
+                      </Button>
+                    </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="security">
-            <div className="space-y-6">
+            {/* Security Tab */}
+            <TabsContent value="security" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Shield className="w-5 h-5" />
-                    <span>Password & Security</span>
-                  </CardTitle>
+                  <CardTitle>Password & Security</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your account security settings
+                  </p>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-medium">Password</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Last changed 3 months ago
-                      </p>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h4 className="font-medium">Password</h4>
+                        <p className="text-sm text-muted-foreground">Last changed 3 months ago</p>
+                      </div>
+                      <Button variant="outline">Change Password</Button>
                     </div>
-                    <Button variant="outline">Change Password</Button>
+
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h4 className="font-medium">Two-Factor Authentication</h4>
+                        <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                      </div>
+                      <Switch />
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Active Sessions</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-3 border rounded">
+                          <div>
+                            <p className="font-medium">Current Session</p>
+                            <p className="text-sm text-muted-foreground">Chrome on Windows • Active now</p>
+                          </div>
+                          <Badge variant="secondary">Current</Badge>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-medium">Two-Factor Authentication</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Add an extra layer of security to your account
-                      </p>
+                  <div className="border-t pt-6">
+                    <h4 className="font-medium text-destructive mb-4">Danger Zone</h4>
+                    <div className="space-y-4">
+                      <div className="p-4 border border-destructive rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h5 className="font-medium">Delete Account</h5>
+                            <p className="text-sm text-muted-foreground">
+                              Permanently delete your account and all data
+                            </p>
+                          </div>
+                          <Button variant="destructive" size="sm">
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="secondary">Not Enabled</Badge>
-                      <Button variant="outline">Enable</Button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-medium">Active Sessions</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Manage devices that are signed in to your account
-                      </p>
-                    </div>
-                    <Button variant="outline">View Sessions</Button>
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
 
+            {/* Notifications Tab */}
+            <TabsContent value="notifications" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-destructive">
-                    <Trash2 className="w-5 h-5" />
-                    <span>Danger Zone</span>
-                  </CardTitle>
+                  <CardTitle>Notification Preferences</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Choose how you want to be notified about updates
+                  </p>
                 </CardHeader>
-                <CardContent>
-                  <div className="p-4 border border-destructive rounded-lg">
-                    <h3 className="font-medium text-destructive mb-2">Delete Account</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Once you delete your account, there is no going back. Please be certain.
-                    </p>
-                    <Button variant="destructive">Delete Account</Button>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Email Notifications
+                        </h4>
+                        <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                      </div>
+                      <Switch 
+                        defaultChecked={true}
+                        onCheckedChange={(checked) => handleNotificationChange('email', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          SMS Notifications
+                        </h4>
+                        <p className="text-sm text-muted-foreground">Receive updates via text message</p>
+                      </div>
+                      <Switch 
+                        defaultChecked={false}
+                        onCheckedChange={(checked) => handleNotificationChange('sms', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Bell className="w-4 h-4" />
+                          Push Notifications
+                        </h4>
+                        <p className="text-sm text-muted-foreground">Receive browser notifications</p>
+                      </div>
+                      <Switch 
+                        defaultChecked={true}
+                        onCheckedChange={(checked) => handleNotificationChange('push', checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-6">
+                    <h4 className="font-medium mb-4">Notification Types</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Order updates</span>
+                        <Switch defaultChecked />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Promotional offers</span>
+                        <Switch defaultChecked />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Product recommendations</span>
+                        <Switch />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Account security alerts</span>
+                        <Switch defaultChecked />
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Bell className="w-5 h-5" />
-                  <span>Notification Preferences</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Email Notifications</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Receive notifications via email
-                      </p>
+            {/* Preferences Tab */}
+            <TabsContent value="preferences" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>App Preferences</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Customize your app experience
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label>Currency</Label>
+                      <Select defaultValue="tzs">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="tzs">Tanzanian Shilling (TZS)</SelectItem>
+                          <SelectItem value="usd">US Dollar (USD)</SelectItem>
+                          <SelectItem value="eur">Euro (EUR)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Switch
-                      checked={user.notifications.email}
-                      onCheckedChange={(checked) => handleNotificationChange('email', checked)}
-                    />
+
+                    <div className="space-y-2">
+                      <Label>Time Zone</Label>
+                      <Select defaultValue="eat">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="eat">East Africa Time (EAT)</SelectItem>
+                          <SelectItem value="utc">UTC</SelectItem>
+                          <SelectItem value="est">Eastern Standard Time</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Date Format</Label>
+                      <Select defaultValue="dd/mm/yyyy">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="dd/mm/yyyy">DD/MM/YYYY</SelectItem>
+                          <SelectItem value="mm/dd/yyyy">MM/DD/YYYY</SelectItem>
+                          <SelectItem value="yyyy-mm-dd">YYYY-MM-DD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Language</Label>
+                      <Select defaultValue="en">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="sw">Kiswahili</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">SMS Notifications</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Receive notifications via SMS
-                      </p>
-                    </div>
-                    <Switch
-                      checked={user.notifications.sms}
-                      onCheckedChange={(checked) => handleNotificationChange('sms', checked)}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Push Notifications</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Receive push notifications in your browser
-                      </p>
-                    </div>
-                    <Switch
-                      checked={user.notifications.push}
-                      onCheckedChange={(checked) => handleNotificationChange('push', checked)}
-                    />
-                  </div>
-                </div>
-
-                <div className="border-t pt-6">
-                  <h3 className="font-medium mb-4">Notification Types</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Order updates</span>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Prescription reminders</span>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Price drop alerts</span>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">New products</span>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Promotional offers</span>
-                      <Switch />
+                  <div className="border-t pt-6">
+                    <h4 className="font-medium mb-4">Display Preferences</h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Dark Mode</p>
+                          <p className="text-sm text-muted-foreground">Use dark theme</p>
+                        </div>
+                        <Switch />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Compact View</p>
+                          <p className="text-sm text-muted-foreground">Show more items per page</p>
+                        </div>
+                        <Switch />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="preferences">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Globe className="w-5 h-5" />
-                  <span>App Preferences</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Currency</Label>
-                    <Select defaultValue="tzs">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="tzs">Tanzanian Shilling (TZS)</SelectItem>
-                        <SelectItem value="usd">US Dollar (USD)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Time Zone</Label>
-                    <Select defaultValue="eat">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="eat">East Africa Time (EAT)</SelectItem>
-                        <SelectItem value="utc">UTC</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Date Format</Label>
-                    <Select defaultValue="dd/mm/yyyy">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="dd/mm/yyyy">DD/MM/YYYY</SelectItem>
-                        <SelectItem value="mm/dd/yyyy">MM/DD/YYYY</SelectItem>
-                        <SelectItem value="yyyy-mm-dd">YYYY-MM-DD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="border-t pt-6">
-                  <h3 className="font-medium mb-4">Display Preferences</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Show product prices including tax</span>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Auto-save items to wishlist</span>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Show wholesale prices (if eligible)</span>
-                      <Switch />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
 
       <Footer />
     </div>
