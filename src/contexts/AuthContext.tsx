@@ -74,16 +74,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
+        // If profile doesn't exist or there's an RLS error, still allow login
+        // User can still access the app, just without profile data
         return;
       }
 
-      setProfile(data);
+      if (data) {
+        setProfile(data);
+      } else {
+        console.log('No profile found for user, they may need to complete setup');
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      // Don't block login if profile fetch fails
     }
   };
 
