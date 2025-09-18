@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { 
   Users, 
   Package, 
@@ -14,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import ProductForm from '@/components/admin/ProductForm';
 
 // Mock data for admin dashboard
 const dashboardData = {
@@ -118,6 +120,29 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function AdminDashboard() {
+  const [showProductForm, setShowProductForm] = useState(false);
+
+  const handleProductSubmit = (data: Record<string, unknown> & { images: string[] }) => {
+    console.log('Product submitted:', data);
+    setShowProductForm(false);
+    // Here you would typically make an API call to save the product
+  };
+
+  const handleProductCancel = () => {
+    setShowProductForm(false);
+  };
+
+  // If product form is open, show it instead of dashboard
+  if (showProductForm) {
+    return (
+      <ProductForm
+        onSubmit={handleProductSubmit}
+        onCancel={handleProductCancel}
+        isLoading={false}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -129,7 +154,7 @@ export default function AdminDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={() => setShowProductForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>

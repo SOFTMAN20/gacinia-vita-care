@@ -155,6 +155,9 @@ export default function InventoryManager() {
   const [stockMovements, setStockMovements] = useState<StockMovement[]>(mockStockMovements);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [isAdjustmentDialogOpen, setIsAdjustmentDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
   const [adjustmentData, setAdjustmentData] = useState({
     type: 'in' as 'in' | 'out' | 'adjustment',
     quantity: 0,
@@ -237,6 +240,141 @@ export default function InventoryManager() {
     setAdjustmentData({ type: 'in', quantity: 0, reason: '', reference: '' });
   };
 
+  // Export functionality
+  const handleExport = () => {
+    const csvHeaders = [
+      'Product ID',
+      'Product Name', 
+      'SKU',
+      'Current Stock',
+      'Min Stock',
+      'Max Stock',
+      'Reorder Level',
+      'Unit Cost (TSh)',
+      'Location',
+      'Supplier',
+      'Last Restocked',
+      'Expiry Date',
+      'Batch Number',
+      'Status'
+    ];
+
+    const csvData = inventoryItems.map(item => [
+      item.productId,
+      item.productName,
+      item.sku,
+      item.currentStock,
+      item.minStock,
+      item.maxStock,
+      item.reorderLevel,
+      item.unitCost,
+      item.location,
+      item.supplier,
+      item.lastRestocked,
+      item.expiryDate || '',
+      item.batchNumber || '',
+      getStockStatus(item)
+    ]);
+
+    const csvContent = [csvHeaders, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `gacinia-inventory-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Import functionality
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'text/csv') {
+      setImportFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        const rows = text.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+        const headers = rows[0];
+        const data = rows.slice(1, 6); // Preview first 5 rows
+        
+        const preview = data.map(row => {
+          const obj: any = {};
+          headers.forEach((header, index) => {
+            obj[header] = row[index] || '';
+          });
+          return obj;
+        });
+        
+        setImportPreview(preview.filter(item => item['Product Name'])); // Filter out empty rows
+      };
+      reader.readAsText(file);
+    } else {
+      alert('Please select a valid CSV file');
+    }
+  };
+
+  const handleImport = () => {
+    if (!importFile) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const rows = text.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+      const headers = rows[0];
+      const data = rows.slice(1);
+
+      const importedItems: InventoryItem[] = data
+        .filter(row => row[1]) // Filter rows with product names
+        .map((row, index) => ({
+          id: `imported-${Date.now()}-${index}`,
+          productId: row[0] || `PRD-${Date.now()}-${index}`,
+          productName: row[1],
+          sku: row[2] || `SKU-${Date.now()}-${index}`,
+          currentStock: parseInt(row[3]) || 0,
+          minStock: parseInt(row[4]) || 5,
+          maxStock: parseInt(row[5]) || 100,
+          reorderLevel: parseInt(row[6]) || 10,
+          unitCost: parseFloat(row[7]) || 0,
+          location: row[8] || 'Main Store',
+          supplier: row[9] || 'Unknown Supplier',
+          lastRestocked: row[10] || new Date().toISOString().split('T')[0],
+          expiryDate: row[11] || undefined,
+          batchNumber: row[12] || undefined,
+        }));
+
+      // Update existing items or add new ones
+      setInventoryItems(prev => {
+        const updated = [...prev];
+        importedItems.forEach(importedItem => {
+          const existingIndex = updated.findIndex(item => 
+            item.sku === importedItem.sku || item.productId === importedItem.productId
+          );
+          
+          if (existingIndex >= 0) {
+            // Update existing item
+            updated[existingIndex] = { ...updated[existingIndex], ...importedItem, id: updated[existingIndex].id };
+          } else {
+            // Add new item
+            updated.push(importedItem);
+          }
+        });
+        return updated;
+      });
+
+      setIsImportDialogOpen(false);
+      setImportFile(null);
+      setImportPreview([]);
+      alert(`Successfully imported ${importedItems.length} items!`);
+    };
+    reader.readAsText(importFile);
+  };
+
   const stats = {
     totalItems: inventoryItems.length,
     lowStock: inventoryItems.filter(item => getStockStatus(item) === 'low_stock').length,
@@ -256,11 +394,11 @@ export default function InventoryManager() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExport}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
@@ -553,6 +691,133 @@ export default function InventoryManager() {
                 disabled={!adjustmentData.quantity || !adjustmentData.reason}
               >
                 Apply Adjustment
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Dialog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Import Inventory Data</DialogTitle>
+            <DialogDescription>
+              Upload a CSV file to import or update inventory items
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {!importFile && (
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                <div className="text-center">
+                  <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <div className="mt-4">
+                    <Label htmlFor="csv-upload" className="cursor-pointer">
+                      <span className="mt-2 block text-sm font-medium">
+                        Upload CSV file
+                      </span>
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        CSV files only. Max 10MB.
+                      </span>
+                    </Label>
+                    <Input
+                      id="csv-upload"
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </div>
+                  <Button className="mt-4" asChild>
+                    <Label htmlFor="csv-upload" className="cursor-pointer">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Choose File
+                    </Label>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {importFile && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-4 h-4 text-primary" />
+                    <span className="font-medium">{importFile.name}</span>
+                    <Badge variant="secondary">{(importFile.size / 1024).toFixed(1)} KB</Badge>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setImportFile(null);
+                      setImportPreview([]);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+
+                {importPreview.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2">Preview (First 5 rows)</h4>
+                    <div className="border rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Product Name</TableHead>
+                            <TableHead>SKU</TableHead>
+                            <TableHead>Current Stock</TableHead>
+                            <TableHead>Min Stock</TableHead>
+                            <TableHead>Unit Cost</TableHead>
+                            <TableHead>Supplier</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {importPreview.map((row, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{row['Product Name']}</TableCell>
+                              <TableCell>{row['SKU']}</TableCell>
+                              <TableCell>{row['Current Stock']}</TableCell>
+                              <TableCell>{row['Min Stock']}</TableCell>
+                              <TableCell>{row['Unit Cost (TSh)']}</TableCell>
+                              <TableCell>{row['Supplier']}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Headers: Product ID, Product Name, SKU, Current Stock, Min Stock, Max Stock, Reorder Level, Unit Cost (TSh), Location, Supplier, Last Restocked, Expiry Date, Batch Number</li>
+                    <li>• Existing items (matched by SKU or Product ID) will be updated</li>
+                    <li>• New items will be added to inventory</li>
+                    <li>• Numeric fields will default to 0 if empty</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsImportDialogOpen(false);
+                  setImportFile(null);
+                  setImportPreview([]);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleImport}
+                disabled={!importFile}
+              >
+                Import Data
               </Button>
             </div>
           </div>
