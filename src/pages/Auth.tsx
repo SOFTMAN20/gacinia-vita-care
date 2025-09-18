@@ -25,7 +25,7 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
 
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, profile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,10 +33,16 @@ export default function Auth() {
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
+    if (user && profile) {
+      // Redirect admin users to admin dashboard
+      if (profile.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        // Redirect regular users to where they came from or home
+        navigate(from, { replace: true });
+      }
     }
-  }, [user, navigate, from]);
+  }, [user, profile, navigate, from]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
