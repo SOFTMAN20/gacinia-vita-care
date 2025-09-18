@@ -124,18 +124,14 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-surface border border-border">
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard" className="flex items-center w-full">
-                        <User className="w-4 h-4 mr-2" />
-                        {t('nav.dashboard')}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center w-full">
-                        <Settings className="w-4 h-4 mr-2" />
-                        {t('nav.profile')}
-                      </Link>
-                    </DropdownMenuItem>
+                    {!hasRole('admin') && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard" className="flex items-center w-full">
+                          <User className="w-4 h-4 mr-2" />
+                          {t('nav.profile')}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     {hasRole('admin') && (
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="flex items-center w-full">
@@ -228,22 +224,26 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 <div className="flex items-center gap-2">
                   {user ? (
                     <>
-                      <Button variant="ghost" size="sm" asChild className="touch-target">
-                        <Link to="/dashboard" className="flex items-center gap-1">
-                          <User size={16} />
-                          <span className="hidden xs:inline">{t('nav.dashboard')}</span>
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" size="sm" asChild className="touch-target">
-                        <Link to="/profile" className="flex items-center gap-1">
-                          <Settings size={16} />
-                          <span className="hidden xs:inline">{t('nav.profile')}</span>
-                        </Link>
-                      </Button>
+                      {!hasRole('admin') && (
+                        <Button variant="ghost" size="sm" asChild className="touch-target">
+                          <Link to="/dashboard" className="flex items-center gap-1">
+                            <User size={16} />
+                            <span className="hidden xs:inline">{t('nav.profile')}</span>
+                          </Link>
+                        </Button>
+                      )}
+                      {hasRole('admin') && (
+                        <Button variant="ghost" size="sm" asChild className="touch-target">
+                          <Link to="/admin" className="flex items-center gap-1">
+                            <Settings size={16} />
+                            <span className="hidden xs:inline">{t('nav.admin')}</span>
+                          </Link>
+                        </Button>
+                      )}
                     </>
                   ) : (
                     <Button variant="ghost" size="sm" asChild className="flex items-center gap-1 touch-target">
-                      <Link to="/login">
+                      <Link to="/auth">
                         <User size={16} />
                         <span className="hidden xs:inline">{t('common.login')}</span>
                       </Link>
