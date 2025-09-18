@@ -140,7 +140,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                         </Link>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={() => signOut()}>
+                    <DropdownMenuItem onClick={() => { signOut(); navigate('/products'); }}>
                       <LogOut className="w-4 h-4 mr-2" />
                       {t('nav.logout')}
                     </DropdownMenuItem>
