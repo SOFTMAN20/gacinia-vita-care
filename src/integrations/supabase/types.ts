@@ -14,7 +14,164 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          name_swahili: string | null
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          name_swahili?: string | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          name_swahili?: string | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          batch_number: string | null
+          brand: string | null
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          dimensions: string | null
+          dosage: string | null
+          expiry_date: string | null
+          featured: boolean | null
+          id: string
+          image_url: string | null
+          images: string[] | null
+          in_stock: boolean | null
+          ingredients: string | null
+          is_active: boolean | null
+          key_features: string[] | null
+          manufacturer: string | null
+          min_stock_level: number | null
+          name: string
+          original_price: number | null
+          price: number
+          rating: number | null
+          requires_prescription: boolean | null
+          review_count: number | null
+          short_description: string | null
+          sku: string | null
+          stock_count: number | null
+          storage_requirements: string | null
+          technical_specs: Json | null
+          updated_at: string | null
+          usage_instructions: string | null
+          weight: string | null
+          wholesale_available: boolean | null
+          wholesale_price: number | null
+        }
+        Insert: {
+          batch_number?: string | null
+          brand?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          dimensions?: string | null
+          dosage?: string | null
+          expiry_date?: string | null
+          featured?: boolean | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          in_stock?: boolean | null
+          ingredients?: string | null
+          is_active?: boolean | null
+          key_features?: string[] | null
+          manufacturer?: string | null
+          min_stock_level?: number | null
+          name: string
+          original_price?: number | null
+          price: number
+          rating?: number | null
+          requires_prescription?: boolean | null
+          review_count?: number | null
+          short_description?: string | null
+          sku?: string | null
+          stock_count?: number | null
+          storage_requirements?: string | null
+          technical_specs?: Json | null
+          updated_at?: string | null
+          usage_instructions?: string | null
+          weight?: string | null
+          wholesale_available?: boolean | null
+          wholesale_price?: number | null
+        }
+        Update: {
+          batch_number?: string | null
+          brand?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          dimensions?: string | null
+          dosage?: string | null
+          expiry_date?: string | null
+          featured?: boolean | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          in_stock?: boolean | null
+          ingredients?: string | null
+          is_active?: boolean | null
+          key_features?: string[] | null
+          manufacturer?: string | null
+          min_stock_level?: number | null
+          name?: string
+          original_price?: number | null
+          price?: number
+          rating?: number | null
+          requires_prescription?: boolean | null
+          review_count?: number | null
+          short_description?: string | null
+          sku?: string | null
+          stock_count?: number | null
+          storage_requirements?: string | null
+          technical_specs?: Json | null
+          updated_at?: string | null
+          usage_instructions?: string | null
+          weight?: string | null
+          wholesale_available?: boolean | null
+          wholesale_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

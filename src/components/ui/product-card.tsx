@@ -100,7 +100,7 @@ export function ProductCard({
         <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <Button
             size="sm"
-            variant="secondary"
+            variant="outline"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full"
             onClick={() => onToggleWishlist?.(product)}
           >
@@ -115,14 +115,14 @@ export function ProductCard({
           
           <ShareProduct 
             product={product}
-            variant="secondary"
+            variant="outline"
             size="icon"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full [&>svg]:text-green-600 [&>svg]:hover:text-green-700"
           />
           
           <Button
             size="sm"
-            variant="secondary"
+            variant="outline"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full"
             onClick={() => onQuickView?.(product)}
           >
