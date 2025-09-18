@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -106,6 +106,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     });
+
+    // If signup is successful and user is created, call edge function to create profile
+    if (data.user && !error) {
+      try {
+        const { error: profileError } = await supabase.functions.invoke('create-profile', {
+          body: {
+            userId: data.user.id,
+            email: email,
+            fullName: userData.full_name,
+            role: userData.role || 'customer'
+          }
+        });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        } else {
+          console.log('Profile created successfully via edge function');
+        }
+      } catch (profileError) {
+        console.error('Error calling create-profile function:', profileError);
+      }
+    }
     
     return { error };
   };
@@ -124,6 +146,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setSession(null);
     setProfile(null);
+    
+    // Redirect to products page after logout
+    window.location.href = '/products';
   };
 
   const hasRole = (role: 'admin' | 'customer') => {
