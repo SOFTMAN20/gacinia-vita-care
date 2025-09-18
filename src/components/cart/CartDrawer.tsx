@@ -49,7 +49,7 @@ export function CartDrawer() {
                   {state.items.map((item) => (
                     <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
                       <img
-                        src={item.product.image}
+                        src={item.product.image_url || '/placeholder.svg'}
                         alt={item.product.name}
                         className="w-16 h-16 object-cover rounded-md"
                       />
@@ -69,7 +69,7 @@ export function CartDrawer() {
                           </Button>
                         </div>
 
-                        {item.product.requiresPrescription && (
+                        {item.product.requires_prescription && (
                           <Badge variant="outline" className="text-xs">
                             Prescription Required
                           </Badge>
@@ -91,7 +91,7 @@ export function CartDrawer() {
                               size="sm"
                               onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                               className="h-7 w-7 p-0"
-                              disabled={item.quantity >= (item.product.stockCount || 99)}
+                              disabled={item.quantity >= (item.product.stock_count || 99)}
                             >
                               <Plus size={12} />
                             </Button>
@@ -101,9 +101,9 @@ export function CartDrawer() {
                             <p className="font-medium text-sm">
                               TZS {(item.product.price * item.quantity).toLocaleString()}
                             </p>
-                            {item.product.originalPrice && (
+                            {item.product.original_price && (
                               <p className="text-xs text-muted-foreground line-through">
-                                TZS {(item.product.originalPrice * item.quantity).toLocaleString()}
+                                TZS {(item.product.original_price * item.quantity).toLocaleString()}
                               </p>
                             )}
                           </div>
