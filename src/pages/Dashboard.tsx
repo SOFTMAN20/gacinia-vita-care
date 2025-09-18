@@ -1,6 +1,9 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +25,15 @@ import { Link } from 'react-router-dom';
 export default function Dashboard() {
   const { state } = useUser();
   const { user, orders, prescriptions, wishlist } = state;
+  const { profile } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect admin users to admin dashboard
+  useEffect(() => {
+    if (profile?.role === 'admin') {
+      navigate('/admin');
+    }
+  }, [profile, navigate]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
