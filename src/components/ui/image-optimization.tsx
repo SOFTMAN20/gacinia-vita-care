@@ -35,10 +35,27 @@ export function OptimizedImage({
     }
   }, [hasError, fallback]);
 
+  // Update src when prop changes
+  React.useEffect(() => {
+    setImageSrc(src);
+    setIsLoaded(false);
+    setHasError(false);
+  }, [src]);
+
+  // Generate optimized URLs for Supabase Storage
+  const getOptimizedUrl = (url: string, width?: number) => {
+    if (url.includes('supabase') && width) {
+      return `${url}?width=${width}&quality=80`;
+    }
+    return url;
+  };
+
+  const optimizedSrc = sizes ? getOptimizedUrl(imageSrc, 800) : imageSrc;
+
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <img
-        src={imageSrc}
+        src={optimizedSrc}
         alt={alt}
         loading={loading}
         sizes={sizes}

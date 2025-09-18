@@ -29,6 +29,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { ImageUploader } from '@/components/ui/image-uploader';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
@@ -111,23 +112,8 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
     },
   });
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            setImages(prev => [...prev, e.target!.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
-
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+  const handleImagesChange = (newImages: string[]) => {
+    setImages(newImages);
   };
 
   const addTag = () => {
@@ -270,58 +256,12 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                   <CardTitle>Product Images</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
-                      <div className="text-center">
-                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                        <div className="mt-4">
-                          <Label htmlFor="image-upload" className="cursor-pointer">
-                            <span className="mt-2 block text-sm font-medium">
-                              Upload product images
-                            </span>
-                            <span className="mt-1 block text-xs text-muted-foreground">
-                              PNG, JPG, WEBP up to 10MB each
-                            </span>
-                          </Label>
-                          <Input
-                            id="image-upload"
-                            type="file"
-                            multiple
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {images.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {images.map((image, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={image}
-                              alt={`Product ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg border"
-                            />
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => removeImage(index)}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                            {index === 0 && (
-                              <Badge className="absolute bottom-1 left-1 text-xs">
-                                Primary
-                              </Badge>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <ImageUploader
+                    bucket="product-images"
+                    maxFiles={10}
+                    currentImages={images}
+                    onImagesChange={handleImagesChange}
+                  />
                 </CardContent>
               </Card>
 

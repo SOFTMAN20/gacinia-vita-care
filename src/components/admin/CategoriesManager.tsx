@@ -36,6 +36,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
+import { ImageUploader } from '@/components/ui/image-uploader';
 
 interface Category {
   id: string;
@@ -188,17 +189,8 @@ export default function CategoriesManager() {
     setCategories(prev => prev.filter(cat => cat.id !== categoryId));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          handleInputChange('image', e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImagesChange = (images: string[]) => {
+    handleInputChange('image', images[0] || '');
   };
 
   const CategoryForm = () => (
@@ -237,24 +229,12 @@ export default function CategoriesManager() {
 
       <div>
         <Label htmlFor="image">Category Image</Label>
-        <div className="flex items-center gap-4">
-          {formData.image && (
-            <img 
-              src={formData.image} 
-              alt="Category" 
-              className="w-16 h-16 object-cover rounded-lg border"
-            />
-          )}
-          <div className="flex-1">
-            <Input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium"
-            />
-          </div>
-        </div>
+        <ImageUploader
+          bucket="category-images"
+          maxFiles={1}
+          currentImages={formData.image ? [formData.image] : []}
+          onImagesChange={handleImagesChange}
+        />
       </div>
 
       <div className="flex items-center justify-between rounded-lg border p-3">
