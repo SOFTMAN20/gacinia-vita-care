@@ -122,7 +122,7 @@ export function ProductCard({
           
           <Button
             size="sm"
-            variant="secondary"
+            variant="outline"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full"
             onClick={() => onQuickView?.(product)}
           >
