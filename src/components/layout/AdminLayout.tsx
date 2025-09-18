@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
   Breadcrumb,
@@ -36,6 +37,13 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut, profile } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   // Generate breadcrumbs based on current path
   const generateBreadcrumbs = () => {
@@ -155,8 +163,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       <span className="text-white text-sm font-medium">A</span>
                     </div>
                     <div className="hidden sm:block text-left">
-                      <p className="text-sm font-medium">Admin User</p>
-                      <p className="text-xs text-muted-foreground">admin@gacinia.co.tz</p>
+                      <p className="text-sm font-medium">{profile?.full_name || 'Admin User'}</p>
+                      <p className="text-xs text-muted-foreground">{profile?.role || 'Administrator'}</p>
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
@@ -170,7 +178,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </DropdownMenuItem>
