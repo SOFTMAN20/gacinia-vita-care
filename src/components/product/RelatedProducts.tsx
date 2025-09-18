@@ -1,4 +1,5 @@
-import { ProductCard, Product } from '@/components/ui/product-card';
+import { ProductCard } from '@/components/ui/product-card';
+import { Product } from '@/hooks/useProducts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

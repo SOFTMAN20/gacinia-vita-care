@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { Product } from '@/components/ui/product-card';
+import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
 
 export interface CartItem {

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Grid, List, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ProductCard, Product } from '@/components/ui/product-card';
+import { ProductCard } from '@/components/ui/product-card';
+import { Product } from '@/hooks/useProducts';
 import { ProductQuickView } from '@/components/product/ProductQuickView';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

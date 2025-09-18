@@ -2,7 +2,7 @@ import { Star, AlertTriangle, Shield, Clock, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Product } from '@/components/ui/product-card';
+import { Product } from '@/hooks/useProducts';
 import { ShareProduct } from '@/components/ui/share-product';
 
 interface ProductInfoProps {

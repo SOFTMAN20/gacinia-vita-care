@@ -18,7 +18,7 @@ import {
   Mail,
   Link
 } from 'lucide-react';
-import { Product } from './product-card';
+import { Product } from '@/hooks/useProducts';
 
 interface ShareProductProps {
   product: Product;

@@ -10,8 +10,9 @@ import { ProductGrid, ViewMode } from '@/components/catalog/ProductGrid';
 import { ProductSearch } from '@/components/catalog/ProductSearch';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { sampleProducts } from '@/data/products';
-import { Product } from '@/components/ui/product-card';
+import { useProducts } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
+import { Product } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 
 const Products = () => {
@@ -30,6 +31,16 @@ const Products = () => {
     availability: [],
     special: []
   });
+
+  // Fetch data from Supabase
+  const { products, loading, error } = useProducts({
+    category: filters.categories.length > 0 ? filters.categories[0] : undefined,
+    search: searchQuery || undefined,
+    minPrice: filters.priceRange[0],
+    maxPrice: filters.priceRange[1],
+  });
+
+  const { categories } = useCategories();
 
   // Handle URL parameters for category filtering and search
   useEffect(() => {
@@ -79,16 +90,8 @@ const Products = () => {
     } else if (wholesaleParam === 'true') {
       return 'Wholesale Products';
     } else if (categoryParam) {
-      const categories = categoryParam.split(',');
-      if (categories.includes('prescription-medicines') || categories.includes('over-the-counter')) {
-        return 'Medicines';
-      } else if (categories.includes('cosmetics-personal-care')) {
-        return 'Cosmetics & Personal Care';
-      } else if (categories.includes('medical-equipment') || categories.includes('first-aid-wellness')) {
-        return 'Medical Equipment & Wellness';
-      }
-    } else if (category) {
-      return `${category.charAt(0).toUpperCase() + category.slice(1)} Products`;
+      const category = categories.find(cat => cat.slug === categoryParam);
+      return category ? category.name : 'Products';
     }
     
     return 'Products Catalog';
@@ -96,46 +99,24 @@ const Products = () => {
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
-    let products = [...sampleProducts];
-
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      products = products.filter(product =>
-        product.name.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply category filter
-    if (filters.categories.length > 0) {
-      products = products.filter(product =>
-        filters.categories.includes(product.category)
-      );
-    }
-
-    // Apply price range filter
-    products = products.filter(product =>
-      product.price >= filters.priceRange[0] && 
-      product.price <= filters.priceRange[1]
-    );
+    let filteredProducts = [...products];
 
     // Apply availability filter
     if (filters.availability.length > 0) {
-      products = products.filter(product => {
-        if (filters.availability.includes('in-stock') && product.inStock && (product.stockCount || 0) > 5) return true;
-        if (filters.availability.includes('low-stock') && product.inStock && (product.stockCount || 0) <= 5) return true;
-        if (filters.availability.includes('out-of-stock') && !product.inStock) return true;
+      filteredProducts = filteredProducts.filter(product => {
+        if (filters.availability.includes('in-stock') && product.in_stock && (product.stock_count || 0) > 5) return true;
+        if (filters.availability.includes('low-stock') && product.in_stock && (product.stock_count || 0) <= 5) return true;
+        if (filters.availability.includes('out-of-stock') && !product.in_stock) return true;
         return false;
       });
     }
 
     // Apply special filters
     if (filters.special.length > 0) {
-      products = products.filter(product => {
-        if (filters.special.includes('prescription') && product.requiresPrescription) return true;
-        if (filters.special.includes('wholesale') && product.wholesaleAvailable) return true;
-        if (filters.special.includes('on-sale') && product.originalPrice) return true;
+      filteredProducts = filteredProducts.filter(product => {
+        if (filters.special.includes('prescription') && product.requires_prescription) return true;
+        if (filters.special.includes('wholesale') && product.wholesale_available) return true;
+        if (filters.special.includes('on-sale') && product.original_price) return true;
         return false;
       });
     }
@@ -143,19 +124,19 @@ const Products = () => {
     // Apply sorting
     switch (sortBy) {
       case 'price-low-high':
-        products.sort((a, b) => a.price - b.price);
+        filteredProducts.sort((a, b) => a.price - b.price);
         break;
       case 'price-high-low':
-        products.sort((a, b) => b.price - a.price);
+        filteredProducts.sort((a, b) => b.price - a.price);
         break;
       case 'name-a-z':
-        products.sort((a, b) => a.name.localeCompare(b.name));
+        filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'name-z-a':
-        products.sort((a, b) => b.name.localeCompare(a.name));
+        filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case 'rating':
-        products.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        filteredProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'newest':
       case 'best-selling':
@@ -165,8 +146,8 @@ const Products = () => {
         break;
     }
 
-    return products;
-  }, [searchQuery, filters, sortBy]);
+    return filteredProducts;
+  }, [products, filters, sortBy]);
 
   const handleAddToCart = (product: Product) => {
     // ProductCard component already handles addItem, so we don't need to call it here
@@ -233,26 +214,46 @@ const Products = () => {
 
         {/* Products Content */}
         <div className="w-full">
-            {/* Toolbar */}
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-muted-foreground">
-                {filteredAndSortedProducts.length} products found
-              </p>
-              <ProductSort
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-              />
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-muted-foreground">Loading products...</p>
             </div>
+          )}
 
-            {/* Products Grid */}
-            <ProductGrid
-              products={filteredAndSortedProducts}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              onAddToCart={handleAddToCart}
-              onQuickView={handleQuickView}
-              onToggleWishlist={handleToggleWishlist}
-            />
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <p className="text-destructive">{error}</p>
+            </div>
+          )}
+
+          {/* Results */}
+          {!loading && !error && (
+            <>
+              {/* Toolbar */}
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-sm text-muted-foreground">
+                  {filteredAndSortedProducts.length} products found
+                </p>
+                <ProductSort
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                />
+              </div>
+
+              {/* Products Grid */}
+              <ProductGrid
+                products={filteredAndSortedProducts}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                onAddToCart={handleAddToCart}
+                onQuickView={handleQuickView}
+                onToggleWishlist={handleToggleWishlist}
+              />
+            </>
+          )}
         </div>
       </main>
       
