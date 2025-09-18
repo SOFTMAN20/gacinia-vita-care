@@ -148,7 +148,7 @@ const Checkout = () => {
                 {state.items.map((item) => (
                   <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
                     <img
-                      src={item.product.image}
+                      src={item.product.image_url}
                       alt={item.product.name}
                       className="w-16 h-16 object-cover rounded"
                     />
@@ -157,7 +157,7 @@ const Checkout = () => {
                       <p className="text-sm text-muted-foreground">
                         Quantity: {item.quantity}
                       </p>
-                      {item.product.requiresPrescription && (
+                      {item.product.requires_prescription && (
                         <Badge variant="outline" className="mt-1">
                           <AlertTriangle size={12} className="mr-1" />
                           Prescription Required

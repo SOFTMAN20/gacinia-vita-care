@@ -132,7 +132,7 @@ const Cart = () => {
                   <CardContent className="p-6">
                     <div className="flex gap-4">
                       <img
-                        src={item.product.image}
+                        src={item.product.image_url}
                         alt={item.product.name}
                         className="w-24 h-24 object-cover rounded-lg"
                       />
@@ -142,11 +142,11 @@ const Cart = () => {
                           <div>
                             <h3 className="font-medium text-lg">{item.product.name}</h3>
                             <p className="text-muted-foreground capitalize">
-                              {item.product.category}
+                              {item.product.category?.name || 'General'}
                             </p>
                             
                             <div className="flex gap-2 mt-2">
-                              {item.product.requiresPrescription && (
+                              {item.product.requires_prescription && (
                                 <Badge variant="outline" className="text-xs">
                                   Prescription Required
                                 </Badge>
@@ -163,9 +163,9 @@ const Cart = () => {
                             <p className="font-semibold text-lg">
                               TZS {(item.product.price * item.quantity).toLocaleString()}
                             </p>
-                            {item.product.originalPrice && (
+                            {item.product.original_price && (
                               <p className="text-sm text-muted-foreground line-through">
-                                TZS {(item.product.originalPrice * item.quantity).toLocaleString()}
+                                TZS {(item.product.original_price * item.quantity).toLocaleString()}
                               </p>
                             )}
                             <p className="text-xs text-muted-foreground">
@@ -193,15 +193,15 @@ const Cart = () => {
                                 size="sm"
                                 onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                                 className="h-8 w-8 p-0"
-                                disabled={item.quantity >= (item.product.stockCount || 99)}
+                                disabled={item.quantity >= (item.product.stock_count || 99)}
                               >
                                 <Plus size={14} />
                               </Button>
                             </div>
                             
-                            {item.product.stockCount && item.product.stockCount <= 5 && (
+                            {item.product.stock_count && item.product.stock_count <= 5 && (
                               <span className="text-xs text-warning">
-                                Only {item.product.stockCount} left
+                                Only {item.product.stock_count} left
                               </span>
                             )}
                           </div>

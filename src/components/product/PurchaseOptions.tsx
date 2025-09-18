@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Minus, Plus, ShoppingCart, Zap, Upload, Truck, Shield, CreditCard } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Zap, Upload, Truck, Shield, CreditCard, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

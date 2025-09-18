@@ -44,7 +44,7 @@ export function ShareProduct({
   // Create share content
   const shareTitle = `Check out ${product.name} at Gacinia Pharmacy`;
   const shareDescription = `${product.name} - TZS ${product.price.toLocaleString()} | Quality medicines and healthcare products in Mbeya, Tanzania`;
-  const shareImage = product.image;
+  const shareImage = product.image_url;
 
   // Social media sharing URLs
   const shareUrls = {

@@ -60,7 +60,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       if (existingItemIndex >= 0) {
         newItems = state.items.map((item, index) =>
           index === existingItemIndex
-            ? { ...item, quantity: Math.min(item.quantity + quantity, product.stockCount || 99) }
+            ? { ...item, quantity: Math.min(item.quantity + quantity, product.stock_count || 99) }
             : item
         );
       } else {
@@ -69,9 +69,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           {
             id: product.id,
             product,
-            quantity: Math.min(quantity, product.stockCount || 99),
+            quantity: Math.min(quantity, product.stock_count || 99),
             addedAt: new Date(),
-            prescriptionUploaded: !product.requiresPrescription
+            prescriptionUploaded: !product.requires_prescription
           }
         ];
       }
@@ -94,7 +94,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       const newItems = state.items.map(item =>
         item.id === id
-          ? { ...item, quantity: Math.min(quantity, item.product.stockCount || 99) }
+          ? { ...item, quantity: Math.min(quantity, item.product.stock_count || 99) }
           : item
       );
       const totals = calculateCartTotals(newItems, state.discount);
@@ -181,7 +181,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [state.items]);
 
   const addItem = (product: Product, quantity: number = 1) => {
-    if (!product.inStock) {
+    if (!product.in_stock) {
       toast({
         title: "Out of Stock",
         description: "This product is currently out of stock.",

@@ -10,8 +10,8 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
-  const discountPercentage = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercentage = product.original_price 
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0;
 
   return (
@@ -24,13 +24,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
               {product.brand}
             </Badge>
           )}
-          {product.requiresPrescription && (
+          {product.requires_prescription && (
             <Badge className="bg-warning/10 text-warning border-warning/20">
               <AlertTriangle size={12} className="mr-1" />
               Prescription Required
             </Badge>
           )}
-          {product.wholesaleAvailable && (
+          {product.wholesale_available && (
             <Badge className="bg-accent/10 text-accent border-accent/20">
               Wholesale Available
             </Badge>
@@ -67,7 +67,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
               ))}
             </div>
             <span className="text-sm text-muted-foreground">
-              {product.rating} ({product.reviewCount} reviews)
+              {product.rating} ({product.review_count} reviews)
             </span>
           </div>
         )}
@@ -78,10 +78,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
             <span className="text-3xl font-bold text-primary">
               TZS {product.price.toLocaleString()}
             </span>
-            {product.originalPrice && (
+            {product.original_price && (
               <>
                 <span className="text-lg text-muted-foreground line-through">
-                  TZS {product.originalPrice.toLocaleString()}
+                  TZS {product.original_price.toLocaleString()}
                 </span>
                 <Badge className="bg-error text-error-foreground">
                   -{discountPercentage}% OFF
@@ -90,22 +90,22 @@ export function ProductInfo({ product }: ProductInfoProps) {
             )}
           </div>
           
-          {product.wholesalePrice && (
+          {product.wholesale_price && (
             <p className="text-sm text-muted-foreground">
-              Wholesale price: TZS {product.wholesalePrice.toLocaleString()} (bulk orders)
+              Wholesale price: TZS {product.wholesale_price.toLocaleString()} (bulk orders)
             </p>
           )}
         </div>
 
         {/* Stock Status */}
         <div className="flex items-center gap-2">
-          {product.inStock ? (
+          {product.in_stock ? (
             <>
               <div className="w-2 h-2 rounded-full bg-success"></div>
               <span className="text-sm text-success font-medium">In Stock</span>
-              {product.stockCount && product.stockCount <= 5 && (
+              {product.stock_count && product.stock_count <= 5 && (
                 <span className="text-sm text-warning">
-                  (Only {product.stockCount} left)
+                  (Only {product.stock_count} left)
                 </span>
               )}
             </>
@@ -141,14 +141,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
             </Card>
           )}
 
-          {product.keyFeatures && product.keyFeatures.length > 0 && (
+          {product.key_features && product.key_features.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Key Features</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {product.keyFeatures.map((feature, index) => (
+                  {product.key_features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                       <span className="text-muted-foreground">{feature}</span>
@@ -185,10 +185,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     <span className="text-muted-foreground">{product.dimensions}</span>
                   </div>
                 )}
-                {product.technicalSpecs && Object.entries(product.technicalSpecs).map(([key, value]) => (
+                {product.technical_specs && Object.entries(product.technical_specs).map(([key, value]) => (
                   <div key={key} className="flex justify-between py-2 border-b">
                     <span className="font-medium">{key}</span>
-                    <span className="text-muted-foreground">{value}</span>
+                    <span className="text-muted-foreground">{String(value)}</span>
                   </div>
                 ))}
               </div>
@@ -197,7 +197,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </TabsContent>
 
         <TabsContent value="usage" className="space-y-4">
-          {product.usageInstructions && (
+          {product.usage_instructions && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -207,7 +207,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {product.usageInstructions}
+                  {product.usage_instructions}
                 </p>
               </CardContent>
             </Card>
@@ -244,7 +244,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </TabsContent>
 
         <TabsContent value="safety" className="space-y-4">
-          {product.storageRequirements && (
+          {product.storage_requirements && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -254,7 +254,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {product.storageRequirements}
+                  {product.storage_requirements}
                 </p>
               </CardContent>
             </Card>
@@ -271,16 +271,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
                   <span className="text-muted-foreground">{product.manufacturer}</span>
                 </div>
               )}
-              {product.batchNumber && (
+              {product.batch_number && (
                 <div className="flex justify-between py-2 border-b">
                   <span className="font-medium">Batch Number</span>
-                  <span className="text-muted-foreground">{product.batchNumber}</span>
+                  <span className="text-muted-foreground">{product.batch_number}</span>
                 </div>
               )}
-              {product.expiryDate && (
+              {product.expiry_date && (
                 <div className="flex justify-between py-2 border-b">
                   <span className="font-medium">Expiry Date</span>
-                  <span className="text-muted-foreground">{product.expiryDate}</span>
+                  <span className="text-muted-foreground">{product.expiry_date}</span>
                 </div>
               )}
             </CardContent>
