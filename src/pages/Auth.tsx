@@ -23,9 +23,7 @@ export default function Auth() {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
 
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
@@ -71,7 +69,7 @@ export default function Auth() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signupEmail || !signupPassword || !username || !fullName) {
+    if (!signupEmail || !signupPassword || !fullName) {
       setError('Please fill in all required fields');
       return;
     }
@@ -90,9 +88,7 @@ export default function Auth() {
     setError('');
 
     const { error } = await signUp(signupEmail, signupPassword, {
-      username,
       full_name: fullName,
-      phone,
       role: 'customer'
     });
 
@@ -210,27 +206,15 @@ export default function Auth() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="username">Username *</Label>
-                      <Input
-                        id="username"
-                        placeholder="Choose a username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="full-name">Full Name *</Label>
-                      <Input
-                        id="full-name"
-                        placeholder="Your full name"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        required
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="full-name">Full Name *</Label>
+                    <Input
+                      id="full-name"
+                      placeholder="Your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -242,17 +226,6 @@ export default function Auth() {
                       value={signupEmail}
                       onChange={(e) => setSignupEmail(e.target.value)}
                       required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="Your phone number"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
 

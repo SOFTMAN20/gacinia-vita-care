@@ -18,9 +18,7 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signUp: (email: string, password: string, userData: {
-    username: string;
     full_name: string;
-    phone?: string;
     role?: 'admin' | 'customer';
   }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -90,9 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, userData: {
-    username: string;
     full_name: string;
-    phone?: string;
     role?: 'admin' | 'customer';
   }) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -103,9 +99,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          username: userData.username,
+          username: userData.full_name.toLowerCase().replace(/\s+/g, ''), // Generate username from full name
           full_name: userData.full_name,
-          phone: userData.phone || '',
+          phone: '',
           role: userData.role || 'customer'
         }
       }
