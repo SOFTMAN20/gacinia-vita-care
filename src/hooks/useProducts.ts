@@ -40,7 +40,16 @@ export function useProducts(filters: ProductFilters = {}) {
 
       // Apply filters
       if (filters.category) {
-        query = query.eq('categories.slug', filters.category);
+        // Find category by slug first, then filter by category_id
+        const { data: categoryData } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('slug', filters.category)
+          .single();
+        
+        if (categoryData) {
+          query = query.eq('category_id', categoryData.id);
+        }
       }
 
       if (filters.search) {
