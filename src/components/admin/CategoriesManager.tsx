@@ -7,8 +7,12 @@ import {
   Save,
   X,
   FolderTree,
-  Tag
+  Tag,
+  Loader2
 } from 'lucide-react';
+
+import { useAdminCategories } from '@/hooks/useAdminCategories';
+import { OptimizedImage } from '@/components/ui/image-optimization';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,90 +42,32 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { ImageUploader } from '@/components/ui/image-uploader';
 
-interface Category {
-  id: string;
-  name: string;
-  nameSwahili: string;
-  slug: string;
-  description: string;
-  image: string;
-  parentId?: string;
-  isActive: boolean;
-  productCount: number;
-  seoTitle?: string;
-  seoDescription?: string;
-  sortOrder: number;
-}
-
-const mockCategories: Category[] = [
-  {
-    id: '1',
-    name: 'Prescription Medicines',
-    nameSwahili: 'Dawa za Prescription',
-    slug: 'prescription-medicines',
-    description: 'Medicines requiring valid prescription',
-    image: '/placeholder-category.jpg',
-    isActive: true,
-    productCount: 45,
-    sortOrder: 1
-  },
-  {
-    id: '2',
-    name: 'Over-the-Counter',
-    nameSwahili: 'Dawa za Kawaida',
-    slug: 'over-the-counter',
-    description: 'Medicines available without prescription',
-    image: '/placeholder-category.jpg',
-    isActive: true,
-    productCount: 62,
-    sortOrder: 2
-  },
-  {
-    id: '3',
-    name: 'Medical Equipment',
-    nameSwahili: 'Vifaa vya Kidaktari',
-    slug: 'medical-equipment',
-    description: 'Medical devices and equipment',
-    image: '/placeholder-category.jpg',
-    isActive: true,
-    productCount: 28,
-    sortOrder: 3
-  },
-  {
-    id: '4',
-    name: 'Cosmetics & Personal Care',
-    nameSwahili: 'Vipodozi na Huduma za Kibinafsi',
-    slug: 'cosmetics-personal-care',
-    description: 'Beauty and personal care products',
-    image: '/placeholder-category.jpg',
-    isActive: true,
-    productCount: 34,
-    sortOrder: 4
-  }
-];
-
 interface CategoryFormData {
   name: string;
   nameSwahili: string;
   description: string;
   image: string;
   isActive: boolean;
-  seoTitle: string;
-  seoDescription: string;
 }
 
 export default function CategoriesManager() {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const { 
+    categories, 
+    loading, 
+    error, 
+    createCategory, 
+    updateCategory, 
+    deleteCategory 
+  } = useAdminCategories();
+  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
     nameSwahili: '',
     description: '',
     image: '',
-    isActive: true,
-    seoTitle: '',
-    seoDescription: ''
+    isActive: true
   });
 
   const handleInputChange = (field: keyof CategoryFormData, value: string | boolean) => {
@@ -138,55 +84,56 @@ export default function CategoriesManager() {
       nameSwahili: '',
       description: '',
       image: '',
-      isActive: true,
-      seoTitle: '',
-      seoDescription: ''
+      isActive: true
     });
   };
 
-  const handleSave = () => {
-    if (editingCategory) {
-      // Update existing category
-      setCategories(prev => prev.map(cat => 
-        cat.id === editingCategory.id 
-          ? {
-              ...cat,
-              ...formData,
-              slug: generateSlug(formData.name)
-            }
-          : cat
-      ));
-      setEditingCategory(null);
-    } else {
-      // Add new category
-      const newCategory: Category = {
-        id: Date.now().toString(),
-        ...formData,
-        slug: generateSlug(formData.name),
-        productCount: 0,
-        sortOrder: categories.length + 1
-      };
-      setCategories(prev => [...prev, newCategory]);
-      setIsAddDialogOpen(false);
+  const handleSave = async () => {
+    try {
+      if (editingCategory) {
+        // Update existing category
+        await updateCategory(editingCategory.id, {
+          name: formData.name,
+          name_swahili: formData.nameSwahili,
+          description: formData.description,
+          image_url: formData.image,
+          is_active: formData.isActive
+        });
+        setEditingCategory(null);
+      } else {
+        // Add new category
+        await createCategory({
+          name: formData.name,
+          name_swahili: formData.nameSwahili,
+          description: formData.description,
+          image_url: formData.image,
+          is_active: formData.isActive
+        });
+        setIsAddDialogOpen(false);
+      }
+      resetForm();
+    } catch (error) {
+      // Error is handled in the hook
     }
-    resetForm();
   };
 
-  const handleEdit = (category: Category) => {
+  const handleEdit = (category: any) => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
-      nameSwahili: category.nameSwahili,
-      description: category.description,
-      image: category.image,
-      isActive: category.isActive,
-      seoTitle: category.seoTitle || '',
-      seoDescription: category.seoDescription || ''
+      nameSwahili: category.name_swahili || '',
+      description: category.description || '',
+      image: category.image_url || '',
+      isActive: category.is_active
     });
   };
 
-  const handleDelete = (categoryId: string) => {
-    setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+  const handleDelete = async (categoryId: string) => {
+    try {
+      await deleteCategory(categoryId);
+    } catch (error) {
+      // Error is handled in the hook
+    }
   };
 
   const handleImagesChange = (images: string[]) => {
@@ -250,28 +197,6 @@ export default function CategoriesManager() {
         />
       </div>
 
-      <div className="space-y-4 pt-4 border-t">
-        <h4 className="font-medium">SEO Settings</h4>
-        <div>
-          <Label htmlFor="seoTitle">SEO Title</Label>
-          <Input
-            id="seoTitle"
-            value={formData.seoTitle}
-            onChange={(e) => handleInputChange('seoTitle', e.target.value)}
-            placeholder="SEO optimized title"
-          />
-        </div>
-        <div>
-          <Label htmlFor="seoDescription">SEO Description</Label>
-          <Textarea
-            id="seoDescription"
-            value={formData.seoDescription}
-            onChange={(e) => handleInputChange('seoDescription', e.target.value)}
-            placeholder="SEO meta description"
-            rows={2}
-          />
-        </div>
-      </div>
 
       <div className="flex justify-end gap-2 pt-4">
         <Button
@@ -294,6 +219,26 @@ export default function CategoriesManager() {
       </div>
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Loading categories...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-destructive mb-4">Error loading categories: {error}</p>
+        <Button onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -342,7 +287,7 @@ export default function CategoriesManager() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {categories.filter(cat => cat.isActive).length}
+              {categories.filter(cat => cat.is_active).length}
             </div>
           </CardContent>
         </Card>
@@ -353,7 +298,7 @@ export default function CategoriesManager() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {categories.reduce((sum, cat) => sum + cat.productCount, 0)}
+              {categories.reduce((sum, cat) => sum + cat.product_count, 0)}
             </div>
           </CardContent>
         </Card>
@@ -364,11 +309,11 @@ export default function CategoriesManager() {
         {categories.map((category) => (
           <Card key={category.id} className="overflow-hidden">
             <div className="aspect-video relative">
-              {category.image ? (
-                <img 
-                  src={category.image} 
+              {category.image_url ? (
+                <OptimizedImage 
+                  src={category.image_url} 
                   alt={category.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
                 />
               ) : (
                 <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -376,8 +321,8 @@ export default function CategoriesManager() {
                 </div>
               )}
               <div className="absolute top-2 right-2">
-                <Badge variant={category.isActive ? "default" : "secondary"}>
-                  {category.isActive ? 'Active' : 'Inactive'}
+                <Badge variant={category.is_active ? "default" : "secondary"}>
+                  {category.is_active ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
             </div>
@@ -387,13 +332,13 @@ export default function CategoriesManager() {
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">{category.name}</h3>
                   <span className="text-sm text-muted-foreground">
-                    {category.productCount} products
+                    {category.product_count} products
                   </span>
                 </div>
                 
-                {category.nameSwahili && (
+                {category.name_swahili && (
                   <p className="text-sm text-muted-foreground italic">
-                    {category.nameSwahili}
+                    {category.name_swahili}
                   </p>
                 )}
                 
@@ -423,7 +368,7 @@ export default function CategoriesManager() {
                           <AlertDialogTitle>Delete Category</AlertDialogTitle>
                           <AlertDialogDescription>
                             Are you sure you want to delete "{category.name}"? 
-                            This action cannot be undone and will affect {category.productCount} products.
+                            This action cannot be undone and will affect {category.product_count} products.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
