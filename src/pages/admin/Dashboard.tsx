@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import ProductForm from '@/components/admin/ProductForm';
+import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 
 // Mock data for admin dashboard
 const dashboardData = {
@@ -121,6 +122,7 @@ const getStatusBadge = (status: string) => {
 
 export default function AdminDashboard() {
   const [showProductForm, setShowProductForm] = useState(false);
+  const { data: dashboardData, loading, error } = useAdminDashboard();
 
   const handleProductSubmit = (data: Record<string, unknown> & { images: string[] }) => {
     console.log('Product submitted:', data);
@@ -164,23 +166,99 @@ export default function AdminDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {dashboardData.kpis.map((kpi, index) => (
-          <Card key={index} className="pharmacy-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {kpi.title}
-              </CardTitle>
-              <kpi.icon className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{kpi.value}</div>
-              <p className="text-xs text-success flex items-center gap-1">
-                <TrendingUp size={12} />
-                {kpi.change} from last month
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        {loading ? (
+          // Loading skeleton
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="pharmacy-card animate-pulse">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="h-4 bg-muted rounded w-20"></div>
+                <div className="h-4 w-4 bg-muted rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-muted rounded w-16 mb-2"></div>
+                <div className="h-4 bg-muted rounded w-24"></div>
+              </CardContent>
+            </Card>
+          ))
+        ) : error ? (
+          <div className="col-span-4 text-center text-destructive p-4">
+            Error loading dashboard data: {error}
+          </div>
+        ) : dashboardData ? (
+          <>
+            <Card className="pharmacy-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total Revenue
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">
+                  TSh {dashboardData.totalRevenue.toLocaleString()}
+                </div>
+                <p className="text-xs text-success flex items-center gap-1">
+                  <TrendingUp size={12} />
+                  All time
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="pharmacy-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Orders Today
+                </CardTitle>
+                <ShoppingCart className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">
+                  {dashboardData.ordersToday}
+                </div>
+                <p className="text-xs text-success flex items-center gap-1">
+                  <TrendingUp size={12} />
+                  Today's orders
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="pharmacy-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Active Customers
+                </CardTitle>
+                <Users className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">
+                  {dashboardData.activeCustomers}
+                </div>
+                <p className="text-xs text-success flex items-center gap-1">
+                  <TrendingUp size={12} />
+                  Total customers
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="pharmacy-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Products
+                </CardTitle>
+                <Package className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">
+                  {dashboardData.totalProducts}
+                </div>
+                <p className="text-xs text-success flex items-center gap-1">
+                  <TrendingUp size={12} />
+                  Active products
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -194,21 +272,47 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboardData.recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="font-medium text-foreground">{order.id}</p>
-                      {getStatusBadge(order.status)}
+              {loading ? (
+                // Loading skeleton for recent orders
+                Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg animate-pulse">
+                    <div className="flex-1">
+                      <div className="h-4 bg-muted rounded w-20 mb-2"></div>
+                      <div className="h-3 bg-muted rounded w-32 mb-1"></div>
+                      <div className="h-3 bg-muted rounded w-24"></div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{order.customer}</p>
-                    <p className="text-xs text-muted-foreground">{order.date}</p>
+                    <div className="h-4 bg-muted rounded w-16"></div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-foreground">{order.amount}</p>
-                  </div>
+                ))
+              ) : error ? (
+                <div className="text-center text-muted-foreground p-4">
+                  Unable to load recent orders
                 </div>
-              ))}
+              ) : dashboardData?.recentOrders?.length ? (
+                dashboardData.recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-medium text-foreground">{order.order_number}</p>
+                        {getStatusBadge(order.status)}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{order.customer_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-foreground">
+                        TSh {order.total_amount.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground p-4">
+                  No recent orders found
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -222,24 +326,8 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {dashboardData.lowStockAlerts.map((item, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-foreground">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.category}</p>
-                    </div>
-                    <Badge variant="destructive">
-                      {item.current}/{item.minimum}
-                    </Badge>
-                  </div>
-                  <Progress 
-                    value={(item.current / item.minimum) * 100} 
-                    className="h-2"
-                  />
-                </div>
-              ))}
+            <div className="text-center text-muted-foreground p-4">
+              Low stock alerts feature coming soon
             </div>
           </CardContent>
         </Card>
@@ -250,31 +338,12 @@ export default function AdminDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             Pending Prescription Approvals
-            <Badge variant="secondary">{dashboardData.pendingPrescriptions.length}</Badge>
+            <Badge variant="secondary">0</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {dashboardData.pendingPrescriptions.map((prescription) => (
-              <div key={prescription.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-medium text-foreground">{prescription.id}</p>
-                    <Badge variant="outline">{prescription.submitted}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Patient: {prescription.patient}
-                  </p>
-                  <p className="text-sm font-medium text-foreground">
-                    {prescription.medication}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline">Review</Button>
-                  <Button size="sm">Approve</Button>
-                </div>
-              </div>
-            ))}
+          <div className="text-center text-muted-foreground p-4">
+            Prescription management feature coming soon
           </div>
         </CardContent>
       </Card>
