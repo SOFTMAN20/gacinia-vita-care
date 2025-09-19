@@ -37,6 +37,7 @@ import ProductForm from '@/components/admin/ProductForm';
 import CategoriesManager from '@/components/admin/CategoriesManager';
 import InventoryManager from '@/components/admin/InventoryManager';
 import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 const getStatusBadge = (product: any) => {
   if (!product.in_stock || product.stock_count === 0) {
@@ -85,32 +86,35 @@ export default function AdminProducts() {
         short_description: data.shortDescription,
         category_id: data.category,
         brand: data.brand,
-        sku: data.sku,
-        price: data.retailPrice,
-        original_price: data.originalPrice,
-        wholesale_price: data.wholesalePrice,
+        sku: data.sku || `SKU-${Date.now()}`, // Generate SKU if not provided
+        price: Number(data.retailPrice),
+        original_price: data.originalPrice ? Number(data.originalPrice) : null,
+        wholesale_price: data.wholesalePrice ? Number(data.wholesalePrice) : null,
         image_url: data.images?.[0],
-        images: data.images,
-        stock_count: data.stock,
-        min_stock_level: data.minStock,
-        requires_prescription: data.requiresPrescription,
-        wholesale_available: data.wholesaleAvailable,
-        key_features: data.tags,
-        weight: data.weight?.toString(),
+        images: data.images || [],
+        stock_count: Number(data.stock),
+        min_stock_level: Number(data.minStock) || 5,
+        requires_prescription: Boolean(data.requiresPrescription),
+        wholesale_available: Boolean(data.wholesaleAvailable),
+        key_features: data.tags || [],
+        weight: data.weight ? data.weight.toString() : null,
         is_active: data.status === 'active',
-        featured: data.featured,
+        featured: Boolean(data.featured),
+        in_stock: Number(data.stock) > 0, // Set in_stock based on stock count
       };
 
       if (editingProduct) {
         await updateProduct(editingProduct.id, productData);
+        toast.success('Product updated and customers can now see the changes!');
       } else {
         await createProduct(productData);
+        toast.success('Product created and is now available for customers!');
       }
       
       setShowProductForm(false);
       setEditingProduct(null);
     } catch (error) {
-      // Error handling is done in the hooks
+      console.error('Product submission error:', error);
     }
   };
 

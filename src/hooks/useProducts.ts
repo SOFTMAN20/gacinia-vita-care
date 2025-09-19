@@ -150,36 +150,36 @@ export function useFeaturedProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchFeaturedProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            *,
-            category:categories(*)
-          `)
-          .eq('is_active', true)
-          .eq('featured', true)
-          .order('name')
-          .limit(8);
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          category:categories(*)
+        `)
+        .eq('is_active', true)
+        .eq('featured', true)
+        .order('created_at', { ascending: false })
+        .limit(8);
 
-        if (error) {
-          throw error;
-        }
-
-        setProducts(data || []);
-      } catch (err) {
-        console.error('Error fetching featured products:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch featured products');
-      } finally {
-        setLoading(false);
+      if (error) {
+        throw error;
       }
-    };
 
+      setProducts(data || []);
+    } catch (err) {
+      console.error('Error fetching featured products:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch featured products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchFeaturedProducts();
   }, []);
 
@@ -187,5 +187,6 @@ export function useFeaturedProducts() {
     products,
     loading,
     error,
+    refetch: fetchFeaturedProducts,
   };
 }

@@ -81,9 +81,17 @@ export function useAdminProducts() {
     try {
       setLoading(true);
       
+      // Ensure required fields are set correctly
+      const finalProductData = {
+        ...productData,
+        is_active: productData.is_active !== false, // Default to true if not explicitly false
+        in_stock: productData.stock_count > 0, // Set based on stock count
+        featured: Boolean(productData.featured), // Ensure boolean
+      };
+      
       const { data, error } = await supabase
         .from('products')
-        .insert([productData])
+        .insert([finalProductData])
         .select(`
           *,
           category:categories(*)
@@ -95,7 +103,7 @@ export function useAdminProducts() {
       }
 
       setProducts(prev => [data, ...prev]);
-      toast.success('Product created successfully');
+      toast.success('Product created successfully and is now live!');
       return data;
     } catch (err) {
       console.error('Error creating product:', err);
