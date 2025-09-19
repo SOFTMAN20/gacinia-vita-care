@@ -177,7 +177,7 @@ export default function CategoriesManager() {
       <div>
         <Label htmlFor="image">Category Image</Label>
         <ImageUploader
-          bucket="category-images"
+          bucket="categories-images"
           maxFiles={1}
           currentImages={formData.image ? [formData.image] : []}
           onImagesChange={handleImagesChange}
