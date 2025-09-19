@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { CartItemExpiry } from './CartItemExpiry';
 
 export function CartDrawer() {
   const { state, removeItem, updateQuantity, setCartOpen } = useCart();
@@ -69,11 +70,14 @@ export function CartDrawer() {
                           </Button>
                         </div>
 
-                        {item.product.requires_prescription && (
-                          <Badge variant="outline" className="text-xs">
-                            Prescription Required
-                          </Badge>
-                        )}
+                         <div className="flex gap-2 flex-wrap">
+                           {item.product.requires_prescription && (
+                             <Badge variant="outline" className="text-xs">
+                               Prescription Required
+                             </Badge>
+                           )}
+                           <CartItemExpiry expiresAt={item.expiresAt} />
+                         </div>
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center border rounded">

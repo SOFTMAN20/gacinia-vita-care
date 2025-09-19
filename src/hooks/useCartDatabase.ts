@@ -7,10 +7,23 @@ import { Product } from '@/hooks/useProducts';
 export const useCartDatabase = () => {
   const { user } = useAuth();
 
+  const cleanupExpiredItems = async () => {
+    if (!user) return;
+    
+    try {
+      await supabase.rpc('cleanup_expired_cart_items');
+    } catch (error) {
+      console.error('Error cleaning up expired cart items:', error);
+    }
+  };
+
   const loadCartFromDatabase = async (): Promise<CartItem[]> => {
     if (!user) return [];
 
     try {
+      // Clean up expired items first
+      await cleanupExpiredItems();
+
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
@@ -18,9 +31,11 @@ export const useCartDatabase = () => {
           product_id,
           quantity,
           created_at,
+          expires_at,
           products (*)
         `)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .gt('expires_at', new Date().toISOString());
 
       if (error) {
         console.error('Error loading cart from database:', error);
@@ -32,7 +47,8 @@ export const useCartDatabase = () => {
         product: item.products as Product,
         quantity: item.quantity,
         addedAt: new Date(item.created_at),
-        prescriptionUploaded: !item.products?.requires_prescription
+        prescriptionUploaded: !item.products?.requires_prescription,
+        expiresAt: new Date(item.expires_at)
       })) || [];
     } catch (error) {
       console.error('Error loading cart from database:', error);
