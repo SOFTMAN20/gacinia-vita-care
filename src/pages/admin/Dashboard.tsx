@@ -320,14 +320,63 @@ export default function AdminDashboard() {
         {/* Low Stock Alerts */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-warning">
-              <AlertTriangle size={20} />
-              Low Stock Alerts
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-warning">
+                <AlertTriangle size={20} />
+                Low Stock Alerts
+              </div>
+              <Badge variant="destructive">
+                {loading ? '...' : error ? '0' : dashboardData?.lowStockProducts?.length || 0}
+              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center text-muted-foreground p-4">
-              Low stock alerts feature coming soon
+            <div className="space-y-4">
+              {loading ? (
+                // Loading skeleton for low stock alerts
+                Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg animate-pulse">
+                    <div className="flex-1">
+                      <div className="h-4 bg-muted rounded w-32 mb-2"></div>
+                      <div className="h-3 bg-muted rounded w-24 mb-1"></div>
+                      <div className="h-2 bg-muted rounded w-full"></div>
+                    </div>
+                  </div>
+                ))
+              ) : error ? (
+                <div className="text-center text-muted-foreground p-4">
+                  Unable to load low stock alerts
+                </div>
+              ) : dashboardData?.lowStockProducts?.length ? (
+                dashboardData.lowStockProducts.map((product) => {
+                  const stockPercentage = (product.stock_count / product.min_stock_level) * 100;
+                  return (
+                    <div key={product.id} className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex-1">
+                          <p className="font-medium text-foreground">{product.name}</p>
+                          <p className="text-sm text-muted-foreground">{product.category}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-warning">
+                            {product.stock_count} / {product.min_stock_level}
+                          </p>
+                        </div>
+                      </div>
+                      <Progress 
+                        value={stockPercentage} 
+                        className="h-2"
+                        aria-label={`Stock level: ${product.stock_count} out of ${product.min_stock_level}`}
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center text-muted-foreground p-4">
+                  <CheckCircle className="mx-auto h-8 w-8 text-success mb-2" />
+                  <p>All products are well stocked!</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
