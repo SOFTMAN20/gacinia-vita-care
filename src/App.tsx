@@ -1,7 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -27,18 +25,14 @@ import AdminOrders from "./pages/admin/Orders";
 import AdminCustomers from "./pages/admin/Customers";
 import "./i18n";
 
-const queryClient = new QueryClient();
-
 const App = () => (
   <AppErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <AuthProvider>
-          <UserProvider>
-            <CartProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <UserProvider>
+          <CartProvider>
             <TooltipProvider>
               <Toaster />
-              <Sonner />
               <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -86,9 +80,8 @@ const App = () => (
             </TooltipProvider>
           </CartProvider>
         </UserProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </QueryClientProvider>
+      </AuthProvider>
+    </LanguageProvider>
   </AppErrorBoundary>
 );
 

@@ -18,8 +18,10 @@ import {
 import { CartIcon } from '@/components/cart/CartIcon';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { LanguageToggle } from '@/components/ui/language-toggle';
+import { ConnectionStatus } from '@/components/ui/connection-status';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useRealtimeProducts } from '@/hooks/useRealtimeProducts';
 
 interface NavbarProps {
   cartItemCount?: number;
@@ -32,6 +34,9 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const { language } = useLanguage();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  
+  // Real-time connection status
+  const realtimeStatus = useRealtimeProducts();
 
   const menuItems = [
     { name: t('nav.medicines'), href: '/products?category=prescription-medicines,over-the-counter' },
@@ -111,6 +116,15 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
+              {/* Connection Status */}
+              <ConnectionStatus
+                status={realtimeStatus.status}
+                lastConnected={realtimeStatus.lastConnected}
+                retryCount={realtimeStatus.retryCount}
+                error={realtimeStatus.error}
+                onReconnect={realtimeStatus.reconnect}
+              />
+
               {/* Language Toggle */}
               <LanguageToggle />
 
