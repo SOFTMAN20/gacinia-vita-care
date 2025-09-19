@@ -22,7 +22,7 @@ interface AuthContextType {
     role?: 'admin' | 'customer';
   }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
   hasRole: (role: 'admin' | 'customer') => boolean;
 }
 
@@ -149,13 +149,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-    }
-    return { error };
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+    
+    // Redirect to products page after logout
+    window.location.href = '/products';
   };
 
   const hasRole = (role: 'admin' | 'customer') => {
