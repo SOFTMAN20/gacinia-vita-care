@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
+import { useOptimisticProducts } from './useOptimisticProducts';
 
 export type AdminProduct = Tables<'products'> & {
   category?: Tables<'categories'>;
@@ -45,6 +46,8 @@ export function useAdminProducts() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const optimistic = useOptimisticProducts();
 
   useEffect(() => {
     fetchProducts();
@@ -78,15 +81,12 @@ export function useAdminProducts() {
   };
 
   const createProduct = async (productData: CreateProductData) => {
-    try {
-      setLoading(true);
-      
-      // Ensure required fields are set correctly
+    return optimistic.addProductOptimistic(productData, async () => {
       const finalProductData = {
         ...productData,
-        is_active: productData.is_active !== false, // Default to true if not explicitly false
-        in_stock: productData.stock_count > 0, // Set based on stock count
-        featured: Boolean(productData.featured), // Ensure boolean
+        is_active: productData.is_active !== false,
+        in_stock: productData.stock_count > 0,
+        featured: Boolean(productData.featured),
       };
       
       const { data, error } = await supabase
@@ -98,28 +98,16 @@ export function useAdminProducts() {
         `)
         .single();
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
+      
+      // Update local state
       setProducts(prev => [data, ...prev]);
-      toast.success('Product created successfully and is now live!');
       return data;
-    } catch (err) {
-      console.error('Error creating product:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create product';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const updateProduct = async (id: string, productData: Partial<CreateProductData>) => {
-    try {
-      setLoading(true);
-      
+    return optimistic.updateProductOptimistic(id, productData, async () => {
       const { data, error } = await supabase
         .from('products')
         .update(productData)
@@ -130,56 +118,32 @@ export function useAdminProducts() {
         `)
         .single();
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
+      
+      // Update local state
       setProducts(prev => prev.map(p => p.id === id ? data : p));
-      toast.success('Product updated successfully');
       return data;
-    } catch (err) {
-      console.error('Error updating product:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update product';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const deleteProduct = async (id: string) => {
-    try {
-      setLoading(true);
-      
+    return optimistic.deleteProductOptimistic(id, async () => {
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
+      
+      // Update local state
       setProducts(prev => prev.filter(p => p.id !== id));
-      toast.success('Product deleted successfully');
-    } catch (err) {
-      console.error('Error deleting product:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete product';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const toggleProductStatus = async (id: string, isActive: boolean) => {
-    try {
-      await updateProduct(id, { is_active: isActive });
-    } catch (err) {
-      // Error handling is done in updateProduct
-    }
+    return optimistic.toggleProductStatusOptimistic(id, isActive, async () => {
+      return updateProduct(id, { is_active: isActive });
+    });
   };
 
   return {
