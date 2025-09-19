@@ -17,12 +17,21 @@ export interface RecentOrder {
   created_at: string;
 }
 
+export interface LowStockProduct {
+  id: string;
+  name: string;
+  current_stock: number;
+  min_stock_level: number;
+  category_name: string;
+}
+
 export interface DashboardData {
   totalRevenue: number;
   ordersToday: number;
   activeCustomers: number;
   totalProducts: number;
   recentOrders: RecentOrder[];
+  lowStockProducts: LowStockProduct[];
 }
 
 export const useAdminDashboard = () => {
@@ -46,7 +55,8 @@ export const useAdminDashboard = () => {
         ordersTodayResult,
         activeCustomersResult,
         totalProductsResult,
-        recentOrdersResult
+        recentOrdersResult,
+        lowStockResult
       ] = await Promise.all([
         // Total revenue from all orders
         supabase
@@ -86,7 +96,26 @@ export const useAdminDashboard = () => {
             )
           `)
           .order('created_at', { ascending: false })
-          .limit(5)
+          .limit(5),
+        
+        // Low stock products
+        supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            stock_count,
+            min_stock_level,
+            categories!products_category_id_fkey (
+              name
+            )
+          `)
+          .eq('is_active', true)
+          .not('stock_count', 'is', null)
+          .not('min_stock_level', 'is', null)
+          .filter('stock_count', 'lte', 'min_stock_level')
+          .order('stock_count', { ascending: true })
+          .limit(10)
       ]);
 
       // Check for errors
@@ -95,6 +124,7 @@ export const useAdminDashboard = () => {
       if (activeCustomersResult.error) throw activeCustomersResult.error;
       if (totalProductsResult.error) throw totalProductsResult.error;
       if (recentOrdersResult.error) throw recentOrdersResult.error;
+      if (lowStockResult.error) throw lowStockResult.error;
 
       // Calculate total revenue
       const totalRevenue = totalRevenueResult.data?.reduce(
@@ -112,12 +142,22 @@ export const useAdminDashboard = () => {
         created_at: order.created_at
       })) || [];
 
+      // Format low stock products
+      const lowStockProducts: LowStockProduct[] = lowStockResult.data?.map(product => ({
+        id: product.id,
+        name: product.name,
+        current_stock: product.stock_count || 0,
+        min_stock_level: product.min_stock_level || 5,
+        category_name: product.categories?.name || 'Uncategorized'
+      })) || [];
+
       setData({
         totalRevenue,
         ordersToday: ordersTodayResult.count || 0,
         activeCustomers: activeCustomersResult.count || 0,
         totalProducts: totalProductsResult.count || 0,
-        recentOrders
+        recentOrders,
+        lowStockProducts
       });
 
     } catch (err) {

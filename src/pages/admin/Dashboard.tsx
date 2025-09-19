@@ -323,12 +323,60 @@ export default function AdminDashboard() {
             <CardTitle className="flex items-center gap-2 text-warning">
               <AlertTriangle size={20} />
               Low Stock Alerts
+              {dashboardData?.lowStockProducts?.length ? (
+                <Badge variant="destructive">{dashboardData.lowStockProducts.length}</Badge>
+              ) : (
+                <Badge variant="secondary">0</Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center text-muted-foreground p-4">
-              Low stock alerts feature coming soon
-            </div>
+            {loading ? (
+              // Loading skeleton for low stock alerts
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg animate-pulse">
+                    <div className="flex-1">
+                      <div className="h-4 bg-muted rounded w-32 mb-2"></div>
+                      <div className="h-3 bg-muted rounded w-24"></div>
+                    </div>
+                    <div className="h-6 bg-muted rounded w-16"></div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center text-muted-foreground p-4">
+                Unable to load low stock alerts
+              </div>
+            ) : dashboardData?.lowStockProducts?.length ? (
+              <div className="space-y-3">
+                {dashboardData.lowStockProducts.map((product) => (
+                  <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg bg-warning/10">
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{product.name}</p>
+                      <p className="text-sm text-muted-foreground">{product.category_name}</p>
+                      <p className="text-xs text-warning">
+                        Current: {product.current_stock} / Min: {product.min_stock_level}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <Progress 
+                        value={(product.current_stock / product.min_stock_level) * 100} 
+                        className="w-20 h-2 mb-1"
+                      />
+                      <Badge variant="destructive" className="text-xs">
+                        Low Stock
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground p-4">
+                <CheckCircle className="mx-auto h-8 w-8 text-success mb-2" />
+                <p>All products are well stocked!</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
