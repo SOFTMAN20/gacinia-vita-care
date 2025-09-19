@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
+import { useCart } from '@/contexts/CartContext';
 
 interface PurchaseOptionsProps {
   product: Product;
@@ -17,6 +18,7 @@ export function PurchaseOptions({ product }: PurchaseOptionsProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { toast } = useToast();
+  const { addItem } = useCart();
 
   const maxQuantity = product.stock_count || 99;
   const totalPrice = product.price * quantity;
@@ -39,14 +41,24 @@ export function PurchaseOptions({ product }: PurchaseOptionsProps) {
     }
 
     setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    toast({
-      title: "Added to cart",
-      description: `${product.name} (${quantity}) added to your cart`,
-    });
-    setIsAddingToCart(false);
+    try {
+      // Add to cart using the cart context
+      addItem(product, quantity);
+      
+      toast({
+        title: "Added to cart",
+        description: `${product.name} (${quantity}) added to your cart`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   return (

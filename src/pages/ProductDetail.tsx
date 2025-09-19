@@ -7,6 +7,7 @@ import { PurchaseOptions } from '@/components/product/PurchaseOptions';
 import { ProductReviews } from '@/components/product/ProductReviews';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { useProducts } from '@/hooks/useProducts';
+import { useCart } from '@/contexts/CartContext';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { products, loading } = useProducts();
+  const { state } = useCart();
   
   // Find the product by ID
   const product = products?.find(p => p.id === id);
@@ -21,7 +23,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar cartItemCount={0} />
+        <Navbar cartItemCount={state.totalItems} />
         <main className="container mx-auto px-4 py-6">
           <div className="grid lg:grid-cols-12 gap-8">
             <div className="lg:col-span-5">
@@ -59,7 +61,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar cartItemCount={0} />
+      <Navbar cartItemCount={state.totalItems} />
       
       <main className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
