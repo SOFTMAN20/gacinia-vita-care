@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
+import { useCartItems } from '@/hooks/useCartItems';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface CartItem {
   id: string;
@@ -147,10 +149,10 @@ const initialState: CartState = {
 
 interface CartContextType {
   state: CartState;
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
+  addItem: (product: Product, quantity?: number) => Promise<void>;
+  removeItem: (productId: string) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   toggleCart: () => void;
   setCartOpen: (open: boolean) => void;
   applyDiscount: (amount: number) => void;
@@ -161,26 +163,49 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { cartItems, addCartItem, updateCartItem, removeCartItem, clearCart: clearBackendCart, loading } = useCartItems();
 
-  // Load cart from localStorage on mount
+  // Sync backend cart items with local state
   useEffect(() => {
-    const savedCart = localStorage.getItem('gacinia-cart');
-    if (savedCart) {
-      try {
-        const cartItems = JSON.parse(savedCart);
-        dispatch({ type: 'LOAD_CART', payload: cartItems });
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+    if (cartItems.length > 0) {
+      const transformedItems = cartItems.map(item => ({
+        id: item.product_id,
+        product: item.product as Product,
+        quantity: item.quantity,
+        addedAt: new Date(item.created_at),
+        prescriptionUploaded: !item.product?.requires_prescription
+      }));
+      dispatch({ type: 'LOAD_CART', payload: transformedItems });
+    } else if (!loading && user) {
+      // Clear cart if no items and user is logged in
+      dispatch({ type: 'CLEAR_CART' });
+    }
+  }, [cartItems, loading, user]);
+
+  // Load cart from localStorage for guest users
+  useEffect(() => {
+    if (!user) {
+      const savedCart = localStorage.getItem('gacinia-cart');
+      if (savedCart) {
+        try {
+          const cartItems = JSON.parse(savedCart);
+          dispatch({ type: 'LOAD_CART', payload: cartItems });
+        } catch (error) {
+          console.error('Error loading cart from localStorage:', error);
+        }
       }
     }
-  }, []);
+  }, [user]);
 
-  // Save cart to localStorage whenever cart changes
+  // Save cart to localStorage for guest users
   useEffect(() => {
-    localStorage.setItem('gacinia-cart', JSON.stringify(state.items));
-  }, [state.items]);
+    if (!user) {
+      localStorage.setItem('gacinia-cart', JSON.stringify(state.items));
+    }
+  }, [state.items, user]);
 
-  const addItem = (product: Product, quantity: number = 1) => {
+  const addItem = async (product: Product, quantity: number = 1) => {
     if (!product.in_stock) {
       toast({
         title: "Out of Stock",
@@ -190,35 +215,98 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
-    toast({
-      title: "Added to Cart",
-      description: `${quantity}x ${product.name} added to your cart.`,
-    });
-  };
-
-  const removeItem = (productId: string) => {
-    const item = state.items.find(item => item.id === productId);
-    dispatch({ type: 'REMOVE_ITEM', payload: productId });
-    
-    if (item) {
+    try {
+      if (user) {
+        // For authenticated users, use backend
+        await addCartItem(product.id, quantity);
+      } else {
+        // For guest users, use local state
+        dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
+      }
+      
       toast({
-        title: "Removed from Cart",
-        description: `${item.product.name} removed from your cart.`,
+        title: "Added to Cart",
+        description: `${quantity}x ${product.name} added to your cart.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
+  const removeItem = async (productId: string) => {
+    const item = state.items.find(item => item.id === productId);
+    
+    try {
+      if (user) {
+        // Find the cart item by product ID
+        const cartItem = cartItems.find(ci => ci.product_id === productId);
+        if (cartItem) {
+          await removeCartItem(cartItem.id);
+        }
+      } else {
+        // For guest users, use local state
+        dispatch({ type: 'REMOVE_ITEM', payload: productId });
+      }
+      
+      if (item) {
+        toast({
+          title: "Removed from Cart",
+          description: `${item.product.name} removed from your cart.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove item from cart.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const clearCart = () => {
-    dispatch({ type: 'CLEAR_CART' });
-    toast({
-      title: "Cart Cleared",
-      description: "All items have been removed from your cart.",
-    });
+  const updateQuantity = async (productId: string, quantity: number) => {
+    try {
+      if (user) {
+        // Find the cart item by product ID
+        const cartItem = cartItems.find(ci => ci.product_id === productId);
+        if (cartItem) {
+          await updateCartItem(cartItem.id, quantity);
+        }
+      } else {
+        // For guest users, use local state
+        dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update item quantity.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      if (user) {
+        await clearBackendCart();
+      } else {
+        dispatch({ type: 'CLEAR_CART' });
+      }
+      
+      toast({
+        title: "Cart Cleared",
+        description: "All items have been removed from your cart.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to clear cart.",
+        variant: "destructive",
+      });
+    }
   };
 
   const toggleCart = () => {
