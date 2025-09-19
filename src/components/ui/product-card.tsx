@@ -158,8 +158,11 @@ export function ProductCard({
         <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-200 transform translate-y-0 md:translate-y-2 md:group-hover:translate-y-0">
           <Button
             onClick={() => {
-              addItem(product, 1);
-              onAddToCart?.(product);
+              if (onAddToCart) {
+                onAddToCart(product);
+              } else {
+                addItem(product, 1);
+              }
             }}
             disabled={!product.in_stock}
             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
