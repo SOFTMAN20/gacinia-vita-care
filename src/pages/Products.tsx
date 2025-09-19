@@ -19,7 +19,7 @@ const Products = () => {
   const { category } = useParams();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
-  const { addItem } = useCart();
+  const { addItem, state } = useCart();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
@@ -152,8 +152,7 @@ const Products = () => {
   }, [products, filters, sortBy]);
 
   const handleAddToCart = (product: Product) => {
-    // ProductCard component already handles addItem, so we don't need to call it here
-    console.log('Product added to cart:', product);
+    addItem(product, 1);
   };
 
   const handleQuickView = (product: Product) => {
@@ -179,7 +178,7 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar cartItemCount={0} />
+      <Navbar cartItemCount={state.totalItems} />
       
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
