@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
   Edit3, 
@@ -136,11 +136,11 @@ export default function CategoriesManager() {
     }
   };
 
-  const handleImagesChange = useCallback((images: string[]) => {
+  const handleImagesChange = (images: string[]) => {
     handleInputChange('image', images[0] || '');
-  }, []);
+  };
 
-  const CategoryForm = useCallback(() => (
+  const CategoryForm = () => (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -217,7 +217,7 @@ export default function CategoriesManager() {
         </Button>
       </div>
     </div>
-  ), [formData, editingCategory, resetForm, handleSave, handleInputChange, handleImagesChange]);
+  );
 
   if (loading) {
     return (
