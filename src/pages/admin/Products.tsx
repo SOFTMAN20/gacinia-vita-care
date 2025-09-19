@@ -89,7 +89,7 @@ export default function AdminProducts() {
         sku: data.sku || `SKU-${Date.now()}`, // Generate SKU if not provided
         price: Number(data.retailPrice),
         original_price: data.originalPrice ? Number(data.originalPrice) : null,
-        wholesale_price: data.wholesalePrice ? Number(data.wholesalePrice) : null,
+        wholesale_price: Number(data.wholesalePrice),
         image_url: data.images?.[0],
         images: data.images || [],
         stock_count: Number(data.stock),
