@@ -196,6 +196,10 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                 to={item.href}
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm px-2 py-1"
                 role="menuitem"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(item.href);
+                }}
               >
                 {item.name}
               </Link>
@@ -224,7 +228,11 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                     key={item.name}
                     to={item.href}
                     className="block py-3 px-2 text-foreground hover:text-primary transition-colors touch-target rounded-lg hover:bg-muted"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsMenuOpen(false);
+                      navigate(item.href);
+                    }}
                   >
                     {item.name}
                   </Link>
