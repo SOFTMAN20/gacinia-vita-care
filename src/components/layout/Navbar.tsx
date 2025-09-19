@@ -39,9 +39,9 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const realtimeStatus = useRealtimeProducts();
 
   const menuItems = [
-    { name: t('nav.medicines'), href: '/products?category=prescription-medicines,over-the-counter' },
+    { name: t('nav.medicines'), href: '/products?category=prescription-medicines' },
     { name: t('nav.cosmetics'), href: '/products?category=cosmetics-personal-care' },
-    { name: t('nav.equipment'), href: '/products?category=medical-equipment,first-aid-wellness' },
+    { name: t('nav.equipment'), href: '/products?category=medical-equipment' },
     { name: t('nav.wholesale'), href: '/products?wholesale=true' },
     { name: t('nav.about'), href: '/about' },
     { name: t('nav.contact'), href: '/contact' },
