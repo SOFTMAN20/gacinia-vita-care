@@ -69,7 +69,6 @@ const Auth = () => {
         } else {
           setError(error.message);
         }
-        setLoading(false);
         return;
       }
 
@@ -81,6 +80,7 @@ const Auth = () => {
     } catch (error: any) {
       console.error('Login error:', error);
       setError('An unexpected error occurred');
+    } finally {
       setLoading(false);
     }
   };
