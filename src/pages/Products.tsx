@@ -60,7 +60,7 @@ const Products = () => {
     
     // Handle category filtering
     if (categoryParam) {
-      const categories = categoryParam.split(',').map(cat => cat.trim());
+      const categories = categoryParam.split(',');
       newFilters.categories = categories;
     } else if (category) {
       newFilters.categories = [category];
@@ -92,8 +92,7 @@ const Products = () => {
     } else if (wholesaleParam === 'true') {
       return 'Wholesale Products';
     } else if (categoryParam) {
-      const categorySlug = categoryParam.split(',')[0].trim(); // Take first category for title
-      const category = categories.find(cat => cat.slug === categorySlug);
+      const category = categories.find(cat => cat.slug === categoryParam);
       return category ? category.name : 'Products';
     }
     

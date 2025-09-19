@@ -17,7 +17,6 @@ export type Database = {
       cart_items: {
         Row: {
           created_at: string
-          expires_at: string | null
           id: string
           product_id: string
           quantity: number
@@ -26,7 +25,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          expires_at?: string | null
           id?: string
           product_id: string
           quantity?: number
@@ -35,7 +33,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          expires_at?: string | null
           id?: string
           product_id?: string
           quantity?: number
@@ -359,10 +356,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_cart_items: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
       create_user_profile: {
         Args: {
           user_email: string

@@ -3,14 +3,12 @@ import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCartDatabase } from '@/hooks/useCartDatabase';
-import { useCartCleanup } from '@/hooks/useCartCleanup';
 
 export interface CartItem {
   id: string;
   product: Product;
   quantity: number;
   addedAt: Date;
-  expiresAt?: Date;
   prescriptionUploaded?: boolean;
 }
 
@@ -175,8 +173,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearCartFromDatabase
   } = useCartDatabase();
 
-  // Initialize cart cleanup for authenticated users
-  useCartCleanup();
+  // Load cart from database when user logs in, or from localStorage for guests
   useEffect(() => {
     const loadCart = async () => {
       if (user) {
