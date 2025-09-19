@@ -144,18 +144,18 @@ export default function CategoriesManager() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="name">Category Name *</Label>
+          <Label htmlFor="category-name">Category Name *</Label>
           <Input
-            id="name"
+            id="category-name"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             placeholder="Enter category name"
           />
         </div>
         <div>
-          <Label htmlFor="nameSwahili">Name (Kiswahili)</Label>
+          <Label htmlFor="category-name-swahili">Name (Kiswahili)</Label>
           <Input
-            id="nameSwahili"
+            id="category-name-swahili"
             value={formData.nameSwahili}
             onChange={(e) => handleInputChange('nameSwahili', e.target.value)}
             placeholder="Jina la jamii kwa Kiswahili"
@@ -164,9 +164,9 @@ export default function CategoriesManager() {
       </div>
 
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="category-description">Description</Label>
         <Textarea
-          id="description"
+          id="category-description"
           value={formData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
           placeholder="Category description"
@@ -177,7 +177,7 @@ export default function CategoriesManager() {
       <div>
         <Label htmlFor="image">Category Image</Label>
         <ImageUploader
-          bucket="categories-images"
+          bucket="category-images"
           maxFiles={1}
           currentImages={formData.image ? [formData.image] : []}
           onImagesChange={handleImagesChange}
@@ -196,7 +196,6 @@ export default function CategoriesManager() {
           onCheckedChange={(checked) => handleInputChange('isActive', checked)}
         />
       </div>
-
 
       <div className="flex justify-end gap-2 pt-4">
         <Button
