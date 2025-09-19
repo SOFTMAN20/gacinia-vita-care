@@ -4,8 +4,72 @@ import { Tables } from '@/integrations/supabase/types';
 
 export type Category = Tables<'categories'>;
 
+// Fallback categories for when database is not available
+const FALLBACK_CATEGORIES: Category[] = [
+  {
+    id: '1',
+    name: 'Prescription Medicines',
+    name_swahili: 'Dawa za Prescription',
+    slug: 'prescription-medicines',
+    description: 'Medicines requiring valid prescription',
+    image_url: '/placeholder-category.jpg',
+    is_active: true,
+    sort_order: 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '2',
+    name: 'Over-the-Counter',
+    name_swahili: 'Dawa za Kawaida',
+    slug: 'over-the-counter',
+    description: 'Non-prescription medicines',
+    image_url: '/placeholder-category.jpg',
+    is_active: true,
+    sort_order: 2,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '3',
+    name: 'Cosmetics & Personal Care',
+    name_swahili: 'Vipodozi na Mahitaji ya Kibinafsi',
+    slug: 'cosmetics-personal-care',
+    description: 'Beauty and personal care products',
+    image_url: '/placeholder-category.jpg',
+    is_active: true,
+    sort_order: 3,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '4',
+    name: 'Medical Equipment',
+    name_swahili: 'Vifaa vya Kidaktari',
+    slug: 'medical-equipment',
+    description: 'Medical devices and equipment',
+    image_url: '/placeholder-category.jpg',
+    is_active: true,
+    sort_order: 4,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '5',
+    name: 'First Aid & Wellness',
+    name_swahili: 'Huduma za Kwanza na Afya',
+    slug: 'first-aid-wellness',
+    description: 'First aid supplies and wellness products',
+    image_url: '/placeholder-category.jpg',
+    is_active: true,
+    sort_order: 5,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
 export function useCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(FALLBACK_CATEGORIES);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,10 +92,14 @@ export function useCategories() {
         throw error;
       }
 
-      setCategories(data || []);
+      // Use database data if available, otherwise keep fallback
+      if (data && data.length > 0) {
+        setCategories(data);
+      }
     } catch (err) {
       console.error('Error fetching categories:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch categories');
+      // Keep fallback categories on error
     } finally {
       setLoading(false);
     }
