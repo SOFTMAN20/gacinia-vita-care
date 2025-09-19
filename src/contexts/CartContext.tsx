@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCartDatabase } from '@/hooks/useCartDatabase';
 
 export interface CartItem {
   id: string;
@@ -149,10 +147,10 @@ const initialState: CartState = {
 
 interface CartContextType {
   state: CartState;
-  addItem: (product: Product, quantity?: number) => Promise<void>;
-  removeItem: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, quantity: number) => Promise<void>;
-  clearCart: () => Promise<void>;
+  addItem: (product: Product, quantity?: number) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
   toggleCart: () => void;
   setCartOpen: (open: boolean) => void;
   applyDiscount: (amount: number) => void;
@@ -163,69 +161,26 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const {
-    loadCartFromDatabase,
-    saveCartToDatabase,
-    addItemToDatabase,
-    removeItemFromDatabase,
-    updateItemQuantityInDatabase,
-    clearCartFromDatabase
-  } = useCartDatabase();
 
-  // Load cart from database when user logs in, or from localStorage for guests
+  // Load cart from localStorage on mount
   useEffect(() => {
-    const loadCart = async () => {
-      if (user) {
-        // Load from database for authenticated users
-        const cartItems = await loadCartFromDatabase();
-        if (cartItems.length > 0) {
-          dispatch({ type: 'LOAD_CART', payload: cartItems });
-        } else {
-          // If no database cart, try to migrate localStorage cart to database
-          const savedCart = localStorage.getItem('gacinia-cart');
-          if (savedCart) {
-            try {
-              const cartItems = JSON.parse(savedCart);
-              if (cartItems.length > 0) {
-                dispatch({ type: 'LOAD_CART', payload: cartItems });
-                await saveCartToDatabase(cartItems);
-                localStorage.removeItem('gacinia-cart');
-              }
-            } catch (error) {
-              console.error('Error migrating cart from localStorage:', error);
-            }
-          }
-        }
-      } else {
-        // Load from localStorage for guests
-        const savedCart = localStorage.getItem('gacinia-cart');
-        if (savedCart) {
-          try {
-            const cartItems = JSON.parse(savedCart);
-            dispatch({ type: 'LOAD_CART', payload: cartItems });
-          } catch (error) {
-            console.error('Error loading cart from localStorage:', error);
-          }
-        }
+    const savedCart = localStorage.getItem('gacinia-cart');
+    if (savedCart) {
+      try {
+        const cartItems = JSON.parse(savedCart);
+        dispatch({ type: 'LOAD_CART', payload: cartItems });
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
       }
-    };
-
-    loadCart();
-  }, [user, loadCartFromDatabase, saveCartToDatabase]);
-
-  // Save cart to database or localStorage based on auth status
-  useEffect(() => {
-    if (user) {
-      // Save to database for authenticated users
-      saveCartToDatabase(state.items);
-    } else {
-      // Save to localStorage for guests
-      localStorage.setItem('gacinia-cart', JSON.stringify(state.items));
     }
-  }, [state.items, user, saveCartToDatabase]);
+  }, []);
 
-  const addItem = async (product: Product, quantity: number = 1) => {
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    localStorage.setItem('gacinia-cart', JSON.stringify(state.items));
+  }, [state.items]);
+
+  const addItem = (product: Product, quantity: number = 1) => {
     if (!product.in_stock) {
       toast({
         title: "Out of Stock",
@@ -236,26 +191,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
-    
-    // Sync with database if user is authenticated
-    if (user) {
-      await addItemToDatabase(product.id, quantity);
-    }
-    
     toast({
       title: "Added to Cart",
       description: `${quantity}x ${product.name} added to your cart.`,
     });
   };
 
-  const removeItem = async (productId: string) => {
+  const removeItem = (productId: string) => {
     const item = state.items.find(item => item.id === productId);
     dispatch({ type: 'REMOVE_ITEM', payload: productId });
-    
-    // Sync with database if user is authenticated
-    if (user) {
-      await removeItemFromDatabase(productId);
-    }
     
     if (item) {
       toast({
@@ -265,23 +209,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateQuantity = async (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
-    
-    // Sync with database if user is authenticated
-    if (user) {
-      await updateItemQuantityInDatabase(productId, quantity);
-    }
   };
 
-  const clearCart = async () => {
+  const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
-    
-    // Sync with database if user is authenticated
-    if (user) {
-      await clearCartFromDatabase();
-    }
-    
     toast({
       title: "Cart Cleared",
       description: "All items have been removed from your cart.",
