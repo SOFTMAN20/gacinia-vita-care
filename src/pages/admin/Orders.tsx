@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   Search, 
   Filter, 
@@ -11,7 +11,8 @@ import {
   Package,
   Calendar,
   DollarSign,
-  MoreHorizontal
+  MoreHorizontal,
+  Loader2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -40,82 +41,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAdminOrders, type AdminOrder } from '@/hooks/useAdminOrders';
 
-interface Order {
-  id: string;
-  orderNumber: string;
-  customer: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-  items: Array<{
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
-  }>;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
-  total: number;
-  createdAt: string;
-  deliveryAddress: string;
-}
-
-const mockOrders: Order[] = [
-  {
-    id: '1',
-    orderNumber: 'ORD-001',
-    customer: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+255 123 456 789'
-    },
-    items: [
-      { id: '1', name: 'Panadol Extra', quantity: 2, price: 2500 },
-      { id: '2', name: 'Vitamin C', quantity: 1, price: 15000 }
-    ],
-    status: 'processing',
-    paymentStatus: 'paid',
-    total: 20000,
-    createdAt: '2024-01-15T10:30:00Z',
-    deliveryAddress: 'Mbeya, Tanzania'
-  },
-  {
-    id: '2',
-    orderNumber: 'ORD-002',
-    customer: {
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+255 987 654 321'
-    },
-    items: [
-      { id: '3', name: 'Blood Pressure Monitor', quantity: 1, price: 85000 }
-    ],
-    status: 'shipped',
-    paymentStatus: 'paid',
-    total: 85000,
-    createdAt: '2024-01-14T14:20:00Z',
-    deliveryAddress: 'Dar es Salaam, Tanzania'
-  },
-  {
-    id: '3',
-    orderNumber: 'ORD-003',
-    customer: {
-      name: 'Ahmed Hassan',
-      email: 'ahmed@example.com',
-      phone: '+255 555 111 222'
-    },
-    items: [
-      { id: '4', name: 'Face Cream', quantity: 3, price: 8000 }
-    ],
-    status: 'pending',
-    paymentStatus: 'pending',
-    total: 24000,
-    createdAt: '2024-01-15T16:45:00Z',
-    deliveryAddress: 'Mwanza, Tanzania'
-  }
-];
 
 const statusConfig = {
   pending: { label: 'Pending', variant: 'secondary' as const, icon: Clock },
@@ -134,32 +61,34 @@ const paymentStatusConfig = {
 };
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const { orders, loading, error, updateOrderStatus } = useAdminOrders();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    const matchesPayment = paymentFilter === 'all' || order.paymentStatus === paymentFilter;
-    
-    return matchesSearch && matchesStatus && matchesPayment;
-  });
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      const customerName = order.profiles?.full_name || 'Unknown Customer';
+      const orderNumber = order.order_number || '';
+      
+      const matchesSearch = orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           customerName.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+      const matchesPayment = paymentFilter === 'all' || order.payment_status === paymentFilter;
+      
+      return matchesSearch && matchesStatus && matchesPayment;
+    });
+  }, [orders, searchTerm, statusFilter, paymentFilter]);
 
-  const handleStatusUpdate = (orderId: string, newStatus: Order['status']) => {
-    setOrders(prev => prev.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ));
+  const handleStatusUpdate = (orderId: string, newStatus: AdminOrder['status']) => {
+    updateOrderStatus(orderId, newStatus);
   };
 
-  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total_amount, 0);
   const todayOrders = orders.filter(order => {
     const today = new Date().toDateString();
-    const orderDate = new Date(order.createdAt).toDateString();
+    const orderDate = new Date(order.created_at).toDateString();
     return today === orderDate;
   }).length;
 
@@ -214,110 +143,135 @@ export default function OrdersPage() {
         </div>
       </CardHeader>
       <CardContent className="p-3 sm:p-6">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order #</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredOrders.map((order) => {
-                const StatusIcon = statusConfig[order.status].icon;
-                return (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.orderNumber}</TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{order.customer.name}</div>
-                        <div className="text-sm text-muted-foreground">{order.customer.email}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {order.items.length} item{order.items.length > 1 ? 's' : ''}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={statusConfig[order.status].variant} className="flex items-center gap-1 w-fit">
-                        <StatusIcon className="w-3 h-3" />
-                        {statusConfig[order.status].label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={paymentStatusConfig[order.paymentStatus].variant}>
-                        {paymentStatusConfig[order.paymentStatus].label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      TSh {order.total.toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(order.id, 'confirmed')}
-                            disabled={order.status !== 'pending'}
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Confirm Order
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(order.id, 'processing')}
-                            disabled={order.status !== 'confirmed'}
-                          >
-                            <Package className="w-4 h-4 mr-2" />
-                            Start Processing
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(order.id, 'shipped')}
-                            disabled={order.status !== 'processing'}
-                          >
-                            <Truck className="w-4 h-4 mr-2" />
-                            Mark as Shipped
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(order.id, 'delivered')}
-                            disabled={order.status !== 'shipped'}
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Mark as Delivered
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(order.id, 'cancelled')}
-                            disabled={['delivered', 'cancelled'].includes(order.status)}
-                          >
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Cancel Order
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin mr-2" />
+            <span>Loading orders...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <p className="text-destructive">Error loading orders: {error}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order #</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Payment</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredOrders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8">
+                      No orders found
                     </TableCell>
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+                ) : (
+                  filteredOrders.map((order) => {
+                    const StatusIcon = statusConfig[order.status].icon;
+                    const customerName = order.profiles?.full_name || 'Unknown Customer';
+                    const customerPhone = order.profiles?.phone || '';
+                    const itemsCount = order.order_items?.length || 0;
+                    
+                    return (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.order_number}</TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{customerName}</div>
+                            {customerPhone && (
+                              <div className="text-sm text-muted-foreground">{customerPhone}</div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            {itemsCount} item{itemsCount !== 1 ? 's' : ''}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={statusConfig[order.status].variant} className="flex items-center gap-1 w-fit">
+                            <StatusIcon className="w-3 h-3" />
+                            {statusConfig[order.status].label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={paymentStatusConfig[order.payment_status].variant}>
+                            {paymentStatusConfig[order.payment_status].label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          TSh {order.total_amount.toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Eye className="w-4 h-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleStatusUpdate(order.id, 'confirmed')}
+                                disabled={order.status !== 'pending'}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Confirm Order
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleStatusUpdate(order.id, 'processing')}
+                                disabled={order.status !== 'confirmed'}
+                              >
+                                <Package className="w-4 h-4 mr-2" />
+                                Start Processing
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleStatusUpdate(order.id, 'shipped')}
+                                disabled={order.status !== 'processing'}
+                              >
+                                <Truck className="w-4 h-4 mr-2" />
+                                Mark as Shipped
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleStatusUpdate(order.id, 'delivered')}
+                                disabled={order.status !== 'shipped'}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Mark as Delivered
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleStatusUpdate(order.id, 'cancelled')}
+                                disabled={['delivered', 'cancelled'].includes(order.status)}
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Cancel Order
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

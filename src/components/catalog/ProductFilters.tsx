@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { categories, brands } from '@/data/products';
+import { useCategories } from '@/hooks/useCategories';
 
 export interface FilterState {
   categories: string[];
@@ -29,6 +29,7 @@ export function ProductFilters({
   onClearFilters,
   isMobile = false 
 }: ProductFiltersProps) {
+  const { categories } = useCategories();
   const [openSections, setOpenSections] = useState({
     categories: true,
     brands: true,
@@ -36,6 +37,12 @@ export function ProductFilters({
     availability: true,
     special: true
   });
+
+  // Mock brands for now - in real app would come from API
+  const brands = [
+    'Panadol', 'Cipla', 'GSK', 'Pfizer', 'Johnson & Johnson', 'Unilever',
+    'Nivea', 'L\'Oreal', 'Beiersdorf', 'Abbott', 'Roche', 'Novartis'
+  ];
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -130,7 +137,6 @@ export function ProductFilters({
                   className="text-sm cursor-pointer flex-1 flex justify-between"
                 >
                   <span>{category.name}</span>
-                  <span className="text-muted-foreground">({category.count})</span>
                 </label>
               </div>
             ))}

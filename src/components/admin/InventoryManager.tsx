@@ -12,6 +12,7 @@ import {
   Search,
   Filter
 } from 'lucide-react';
+import { useInventoryData } from '@/hooks/useInventoryData';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -151,9 +152,9 @@ const mockStockMovements: StockMovement[] = [
 ];
 
 export default function InventoryManager() {
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(mockInventoryItems);
+  const { stats: realStats, inventoryItems: realInventoryItems, loading, error } = useInventoryData();
   const [stockMovements, setStockMovements] = useState<StockMovement[]>(mockStockMovements);
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isAdjustmentDialogOpen, setIsAdjustmentDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -167,11 +168,8 @@ export default function InventoryManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const getStockStatus = (item: InventoryItem) => {
-    if (item.currentStock === 0) return 'out_of_stock';
-    if (item.currentStock <= item.minStock) return 'low_stock';
-    if (item.currentStock <= item.reorderLevel) return 'reorder';
-    return 'in_stock';
+  const getStockStatus = (item: any) => {
+    return item.status || 'in_stock';
   };
 
   const getStatusBadge = (status: string) => {
@@ -200,8 +198,8 @@ export default function InventoryManager() {
     }
   };
 
-  const filteredItems = inventoryItems.filter(item => {
-    const matchesSearch = item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredItems = realInventoryItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.sku.toLowerCase().includes(searchTerm.toLowerCase());
     const status = getStockStatus(item);
     const matchesFilter = filterStatus === 'all' || status === filterStatus;
@@ -213,8 +211,8 @@ export default function InventoryManager() {
 
     const newMovement: StockMovement = {
       id: Date.now().toString(),
-      productId: selectedItem.productId,
-      productName: selectedItem.productName,
+      productId: selectedItem.id,
+      productName: selectedItem.name,
       type: adjustmentData.type,
       quantity: adjustmentData.type === 'out' ? -Math.abs(adjustmentData.quantity) : Math.abs(adjustmentData.quantity),
       reason: adjustmentData.reason,
@@ -225,15 +223,9 @@ export default function InventoryManager() {
 
     setStockMovements(prev => [newMovement, ...prev]);
 
-    setInventoryItems(prev => prev.map(item => 
-      item.id === selectedItem.id 
-        ? { 
-            ...item, 
-            currentStock: Math.max(0, item.currentStock + newMovement.quantity),
-            lastRestocked: adjustmentData.type === 'in' ? newMovement.date : item.lastRestocked
-          }
-        : item
-    ));
+    // Note: In a real app, you would update the database here
+    // For now, we just update the stock movements list
+    console.log('Stock adjustment:', newMovement);
 
     setIsAdjustmentDialogOpen(false);
     setSelectedItem(null);
@@ -248,29 +240,27 @@ export default function InventoryManager() {
       'SKU',
       'Current Stock',
       'Min Stock',
-      'Max Stock',
-      'Reorder Level',
-      'Unit Cost (TSh)',
+      'Category',
+      'Price (TSh)',
       'Location',
       'Supplier',
-      'Last Restocked',
+      'Last Updated',
       'Expiry Date',
       'Batch Number',
       'Status'
     ];
 
-    const csvData = inventoryItems.map(item => [
-      item.productId,
-      item.productName,
+    const csvData = realInventoryItems.map(item => [
+      item.id,
+      item.name,
       item.sku,
       item.currentStock,
       item.minStock,
-      item.maxStock,
-      item.reorderLevel,
-      item.unitCost,
-      item.location,
-      item.supplier,
-      item.lastRestocked,
+      item.category,
+      item.price,
+      item.location || 'Main Store',
+      item.supplier || 'Various',
+      item.lastUpdated,
       item.expiryDate || '',
       item.batchNumber || '',
       getStockStatus(item)
@@ -348,24 +338,8 @@ export default function InventoryManager() {
           batchNumber: row[12] || undefined,
         }));
 
-      // Update existing items or add new ones
-      setInventoryItems(prev => {
-        const updated = [...prev];
-        importedItems.forEach(importedItem => {
-          const existingIndex = updated.findIndex(item => 
-            item.sku === importedItem.sku || item.productId === importedItem.productId
-          );
-          
-          if (existingIndex >= 0) {
-            // Update existing item
-            updated[existingIndex] = { ...updated[existingIndex], ...importedItem, id: updated[existingIndex].id };
-          } else {
-            // Add new item
-            updated.push(importedItem);
-          }
-        });
-        return updated;
-      });
+      // Note: In a real app, you would update the database here
+      console.log('Import completed:', importedItems);
 
       setIsImportDialogOpen(false);
       setImportFile(null);
@@ -375,13 +349,26 @@ export default function InventoryManager() {
     reader.readAsText(importFile);
   };
 
-  const stats = {
-    totalItems: inventoryItems.length,
-    lowStock: inventoryItems.filter(item => getStockStatus(item) === 'low_stock').length,
-    outOfStock: inventoryItems.filter(item => getStockStatus(item) === 'out_of_stock').length,
-    reorderLevel: inventoryItems.filter(item => getStockStatus(item) === 'reorder').length,
-    totalValue: inventoryItems.reduce((sum, item) => sum + (item.currentStock * item.unitCost), 0)
-  };
+  const stats = realStats;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-destructive mb-4">{error}</p>
+        <button onClick={() => window.location.reload()} className="btn-primary">
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -492,9 +479,9 @@ export default function InventoryManager() {
                 <TableHead>SKU</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Current Stock</TableHead>
-                <TableHead>Min/Max</TableHead>
+                <TableHead>Min/Category</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Last Restocked</TableHead>
+                <TableHead>Last Updated</TableHead>
                 <TableHead>Expiry</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -506,12 +493,12 @@ export default function InventoryManager() {
                   <TableRow key={item.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{item.productName}</div>
-                        <div className="text-sm text-muted-foreground">{item.supplier}</div>
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-sm text-muted-foreground">{item.supplier || 'Various'}</div>
                       </div>
                     </TableCell>
                     <TableCell className="font-mono text-sm">{item.sku}</TableCell>
-                    <TableCell>{item.location}</TableCell>
+                    <TableCell>{item.location || 'Main Store'}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {getStatusIcon(status)}
@@ -521,11 +508,11 @@ export default function InventoryManager() {
                     <TableCell>
                       <div className="text-sm">
                         <div>Min: {item.minStock}</div>
-                        <div>Max: {item.maxStock}</div>
+                        <div>Category: {item.category}</div>
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(status)}</TableCell>
-                    <TableCell>{item.lastRestocked}</TableCell>
+                    <TableCell>{new Date(item.lastUpdated).toLocaleDateString()}</TableCell>
                     <TableCell>
                       {item.expiryDate && (
                         <div className="text-sm">

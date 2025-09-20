@@ -22,7 +22,7 @@ interface AuthContextType {
     role?: 'admin' | 'customer';
   }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error: any }>;
   hasRole: (role: 'admin' | 'customer') => boolean;
 }
 
@@ -74,16 +74,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
+        // If profile doesn't exist or there's an RLS error, still allow login
+        // User can still access the app, just without profile data
         return;
       }
 
-      setProfile(data);
+      if (data) {
+        setProfile(data);
+      } else {
+        console.log('No profile found for user, they may need to complete setup');
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      // Don't block login if profile fetch fails
     }
   };
 
@@ -93,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -106,6 +113,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     });
+
+    // If signup is successful and user is created, call edge function to create profile
+    if (data.user && !error) {
+      try {
+        const { error: profileError } = await supabase.functions.invoke('create-profile', {
+          body: {
+            userId: data.user.id,
+            email: email,
+            fullName: userData.full_name,
+            role: userData.role || 'customer'
+          }
+        });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        } else {
+          console.log('Profile created successfully via edge function');
+        }
+      } catch (profileError) {
+        console.error('Error calling create-profile function:', profileError);
+      }
+    }
     
     return { error };
   };
@@ -120,10 +149,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setProfile(null);
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+    }
+    return { error };
   };
 
   const hasRole = (role: 'admin' | 'customer') => {

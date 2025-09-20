@@ -63,15 +63,7 @@ interface ProductFormProps {
   isLoading?: boolean;
 }
 
-const categories = [
-  'Pain Relief',
-  'Antibiotics',
-  'Medical Equipment',
-  'Supplements',
-  'Cosmetics',
-  'First Aid',
-  'Prescription Medicines'
-];
+import { useCategories } from '@/hooks/useCategories';
 
 const brands = [
   'Panadol',
@@ -86,6 +78,7 @@ const brands = [
 export default function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductFormProps) {
   const [images, setImages] = useState<string[]>(product?.images || []);
   const [currentTag, setCurrentTag] = useState('');
+  const { categories } = useCategories();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -428,8 +421,8 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                           </FormControl>
                           <SelectContent>
                             {categories.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

@@ -12,6 +12,8 @@ import {
   Archive,
   FolderTree
 } from 'lucide-react';
+import { useAdminProducts, CreateProductData } from '@/hooks/useAdminProducts';
+import { useCategories } from '@/hooks/useCategories';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,71 +36,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProductForm from '@/components/admin/ProductForm';
 import CategoriesManager from '@/components/admin/CategoriesManager';
 import InventoryManager from '@/components/admin/InventoryManager';
+import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
-// Mock product data
-const mockProducts = [
-  {
-    id: 'PRD-001',
-    name: 'Panadol Extra',
-    sku: 'PND-EXT-500',
-    category: 'Pain Relief',
-    price: 2500,
-    stock: 150,
-    minStock: 20,
-    status: 'active',
-    lastUpdated: '2024-01-10'
-  },
-  {
-    id: 'PRD-002',
-    name: 'Amoxicillin 500mg',
-    sku: 'AMX-500-CAP',
-    category: 'Antibiotics',
-    price: 800,
-    stock: 8,
-    minStock: 50,
-    status: 'active',
-    lastUpdated: '2024-01-09'
-  },
-  {
-    id: 'PRD-003',
-    name: 'Blood Pressure Monitor',
-    sku: 'BPM-DIG-001',
-    category: 'Medical Equipment',
-    price: 85000,
-    stock: 12,
-    minStock: 5,
-    status: 'active',
-    lastUpdated: '2024-01-08'
-  },
-  {
-    id: 'PRD-004',
-    name: 'Vitamin C 1000mg',
-    sku: 'VIT-C-1000',
-    category: 'Supplements',
-    price: 1500,
-    stock: 0,
-    minStock: 30,
-    status: 'out_of_stock',
-    lastUpdated: '2024-01-07'
-  },
-  {
-    id: 'PRD-005',
-    name: 'Face Moisturizer SPF 30',
-    sku: 'COS-MOIST-SPF30',
-    category: 'Cosmetics',
-    price: 12000,
-    stock: 45,
-    minStock: 10,
-    status: 'active',
-    lastUpdated: '2024-01-06'
-  }
-];
-
-const getStatusBadge = (status: string, stock: number, minStock: number) => {
-  if (status === 'out_of_stock' || stock === 0) {
+const getStatusBadge = (product: any) => {
+  if (!product.in_stock || product.stock_count === 0) {
     return <Badge variant="destructive">Out of Stock</Badge>;
   }
-  if (stock <= minStock) {
+  if (product.stock_count <= product.min_stock_level) {
     return <Badge variant="secondary">Low Stock</Badge>;
   }
   return <Badge variant="default">In Stock</Badge>;
@@ -120,20 +65,57 @@ export default function AdminProducts() {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  
+  const { products, loading, error, createProduct, updateProduct, deleteProduct } = useAdminProducts();
+  const { categories } = useCategories();
 
-  const categories = ['all', 'Pain Relief', 'Antibiotics', 'Medical Equipment', 'Supplements', 'Cosmetics'];
+  const categoryOptions = ['all', ...categories.map(cat => cat.name)];
 
-  const filteredProducts = mockProducts.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+                         (product.sku || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || product.category?.name === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleProductSubmit = (data: any) => {
-    console.log('Product submitted:', data);
-    setShowProductForm(false);
-    setEditingProduct(null);
+  const handleProductSubmit = async (data: any) => {
+    try {
+      const productData: CreateProductData = {
+        name: data.name,
+        description: data.description,
+        short_description: data.shortDescription,
+        category_id: data.category,
+        brand: data.brand,
+        sku: data.sku || `SKU-${Date.now()}`, // Generate SKU if not provided
+        price: Number(data.retailPrice),
+        original_price: data.originalPrice ? Number(data.originalPrice) : null,
+        wholesale_price: Number(data.wholesalePrice),
+        image_url: data.images?.[0],
+        images: data.images || [],
+        stock_count: Number(data.stock),
+        min_stock_level: Number(data.minStock) || 5,
+        requires_prescription: Boolean(data.requiresPrescription),
+        wholesale_available: Boolean(data.wholesaleAvailable),
+        key_features: data.tags || [],
+        weight: data.weight ? data.weight.toString() : null,
+        is_active: data.status === 'active',
+        featured: Boolean(data.featured),
+        in_stock: Number(data.stock) > 0, // Set in_stock based on stock count
+      };
+
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, productData);
+        toast.success('Product updated and customers can now see the changes!');
+      } else {
+        await createProduct(productData);
+        toast.success('Product created and is now available for customers!');
+      }
+      
+      setShowProductForm(false);
+      setEditingProduct(null);
+    } catch (error) {
+      console.error('Product submission error:', error);
+    }
   };
 
   const handleBulkAction = (action: string) => {
@@ -166,7 +148,27 @@ export default function AdminProducts() {
           setShowProductForm(false);
           setEditingProduct(null);
         }}
+        isLoading={loading}
       />
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-destructive mb-4">{error}</p>
+        <Button onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </div>
     );
   }
 
@@ -232,7 +234,7 @@ export default function AdminProducts() {
             <Package className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockProducts.length}</div>
+            <div className="text-2xl font-bold">{products.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -242,7 +244,7 @@ export default function AdminProducts() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockProducts.filter(p => p.status === 'active' && p.stock > 0).length}
+              {products.filter(p => p.is_active && p.stock_count > 0).length}
             </div>
           </CardContent>
         </Card>
@@ -253,7 +255,7 @@ export default function AdminProducts() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockProducts.filter(p => p.stock > 0 && p.stock <= p.minStock).length}
+              {products.filter(p => p.stock_count > 0 && p.stock_count <= p.min_stock_level).length}
             </div>
           </CardContent>
         </Card>
@@ -264,7 +266,7 @@ export default function AdminProducts() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockProducts.filter(p => p.stock === 0).length}
+              {products.filter(p => p.stock_count === 0).length}
             </div>
           </CardContent>
         </Card>
@@ -292,12 +294,12 @@ export default function AdminProducts() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {categories.map((category) => (
+                  {categoryOptions.map((category) => (
                     <DropdownMenuItem
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
+                      key={typeof category === 'string' ? category : category}
+                      onClick={() => setSelectedCategory(typeof category === 'string' ? category : category)}
                     >
-                      {category === 'all' ? 'All Categories' : category}
+                      {typeof category === 'string' ? (category === 'all' ? 'All Categories' : category) : category}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -341,19 +343,19 @@ export default function AdminProducts() {
                   <TableCell>
                     <div className="font-medium">{product.name}</div>
                   </TableCell>
-                  <TableCell className="font-mono text-sm">{product.sku}</TableCell>
-                  <TableCell>{product.category}</TableCell>
+                  <TableCell className="font-mono text-sm">{product.sku || '-'}</TableCell>
+                  <TableCell>{product.category?.name || '-'}</TableCell>
                   <TableCell>TSh {product.price.toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {getStockIndicator(product.stock, product.minStock)}
-                      <span>{product.stock}</span>
+                      {getStockIndicator(product.stock_count, product.min_stock_level)}
+                      <span>{product.stock_count}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    {getStatusBadge(product.status, product.stock, product.minStock)}
+                    {getStatusBadge(product)}
                   </TableCell>
-                  <TableCell>{product.lastUpdated}</TableCell>
+                  <TableCell>{new Date(product.updated_at).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -367,13 +369,43 @@ export default function AdminProducts() {
                           View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => {
-                          setEditingProduct(product);
+                          const formData = {
+                            name: product.name,
+                            nameSwahili: '',
+                            description: product.description || '',
+                            shortDescription: product.short_description || '',
+                            category: product.category_id,
+                            brand: product.brand || '',
+                            sku: product.sku || '',
+                            retailPrice: product.price,
+                            originalPrice: product.original_price || 0,
+                            wholesalePrice: product.wholesale_price || 0,
+                            stock: product.stock_count,
+                            minStock: product.min_stock_level,
+                            weight: product.weight ? parseFloat(product.weight) : 0,
+                            requiresPrescription: product.requires_prescription,
+                            wholesaleAvailable: product.wholesale_available,
+                            featured: product.featured,
+                            status: product.is_active ? 'active' : 'inactive',
+                            seoTitle: '',
+                            seoDescription: '',
+                            tags: product.key_features || [],
+                            images: product.images || []
+                          };
+                          setEditingProduct({ ...product, ...formData });
                           setShowProductForm(true);
                         }}>
                           <Edit3 className="w-4 h-4 mr-2" />
                           Edit Product
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => {
+                            if (confirm('Are you sure you want to delete this product?')) {
+                              deleteProduct(product.id);
+                            }
+                          }}
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete Product
                         </DropdownMenuItem>
@@ -396,6 +428,7 @@ export default function AdminProducts() {
         <InventoryManager />
       </TabsContent>
       </Tabs>
+      <Toaster />
     </div>
   );
 }

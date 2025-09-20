@@ -5,37 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { ShareProduct } from './share-product';
-
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  images?: string[];
-  category: string;
-  brand?: string;
-  inStock: boolean;
-  stockCount?: number;
-  requiresPrescription?: boolean;
-  wholesaleAvailable?: boolean;
-  wholesalePrice?: number;
-  rating?: number;
-  reviewCount?: number;
-  description?: string;
-  keyFeatures?: string[];
-  technicalSpecs?: Record<string, string>;
-  usageInstructions?: string;
-  dosage?: string;
-  ingredients?: string;
-  storageRequirements?: string;
-  expiryDate?: string;
-  batchNumber?: string;
-  manufacturer?: string;
-  sku?: string;
-  weight?: string;
-  dimensions?: string;
-}
+import { Product } from '@/hooks/useProducts';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -45,8 +16,6 @@ interface ProductCardProps {
   onToggleWishlist?: (product: Product) => void;
   isWishlisted?: boolean;
 }
-
-import { useCart } from '@/contexts/CartContext';
 
 export function ProductCard({ 
   product, 
@@ -58,11 +27,11 @@ export function ProductCard({
 }: ProductCardProps) {
   const { addItem } = useCart();
   const navigate = useNavigate();
-  const discountPercentage = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercentage = product.original_price 
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0;
 
-  const isLowStock = product.stockCount !== undefined && product.stockCount <= 5 && product.stockCount > 0;
+  const isLowStock = product.stock_count !== undefined && product.stock_count <= 5 && product.stock_count > 0;
 
   const handleImageClick = () => {
     navigate(`/products/${product.id}`);
@@ -76,7 +45,7 @@ export function ProductCard({
       {/* Image Container */}
       <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 p-4 cursor-pointer" onClick={handleImageClick}>
         <img
-          src={product.image}
+          src={product.image_url || '/placeholder.svg'}
           alt={product.name}
           className="object-contain w-full h-full transition-transform duration-300 hover:scale-105"
           loading="lazy"
@@ -89,7 +58,7 @@ export function ProductCard({
               SAVE
             </Badge>
           )}
-          {product.requiresPrescription && (
+          {product.requires_prescription && (
             <Badge variant="outline" className="text-xs bg-orange-50 text-orange-600 border-orange-200 rounded-full">
               Rx
             </Badge>
@@ -134,7 +103,7 @@ export function ProductCard({
         </div>
 
         {/* Stock Status Overlay */}
-        {!product.inStock && (
+        {!product.in_stock && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
             <Badge variant="destructive" className="text-sm bg-red-500 text-white">
               Out of Stock
@@ -159,9 +128,9 @@ export function ProductCard({
             <span className="font-bold text-lg text-gray-900">
               TZS {product.price.toLocaleString()}
             </span>
-            {product.originalPrice && (
+            {product.original_price && (
               <span className="text-sm text-gray-400 line-through">
-                TZS {product.originalPrice.toLocaleString()}
+                TZS {product.original_price.toLocaleString()}
               </span>
             )}
           </div>
@@ -181,7 +150,7 @@ export function ProductCard({
         {isLowStock && (
           <div className="flex items-center gap-1 text-xs text-orange-600">
             <AlertCircle size={12} />
-            <span>Only {product.stockCount} left</span>
+            <span>Only {product.stock_count} left</span>
           </div>
         )}
 
@@ -189,10 +158,13 @@ export function ProductCard({
         <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-200 transform translate-y-0 md:translate-y-2 md:group-hover:translate-y-0">
           <Button
             onClick={() => {
-              addItem(product, 1);
-              onAddToCart?.(product);
+              if (onAddToCart) {
+                onAddToCart(product);
+              } else {
+                addItem(product, 1);
+              }
             }}
-            disabled={!product.inStock}
+            disabled={!product.in_stock}
             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
             size="sm"
           >

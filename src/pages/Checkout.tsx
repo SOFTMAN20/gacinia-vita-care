@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useOrders } from '@/hooks/useOrders';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   CheckCircle, 
   MapPin, 
@@ -46,9 +48,11 @@ interface PaymentInfo {
 }
 
 const Checkout = () => {
-  const { state } = useCart();
+  const { state, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { createOrder, loading: orderLoading } = useOrders();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('review');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
@@ -101,21 +105,58 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to place an order.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+
     setIsProcessing(true);
     
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Generate order number
-    const orderNum = `GCN${Date.now().toString().slice(-6)}`;
-    setOrderNumber(orderNum);
-    setCurrentStep('confirmation');
-    setIsProcessing(false);
+    try {
+      // Prepare order data
+      const orderData = {
+        payment_method: paymentInfo.method,
+        subtotal: state.subtotal,
+        tax_amount: state.tax,
+        delivery_fee: state.deliveryFee,
+        discount_amount: state.discount,
+        total_amount: state.total + (paymentInfo.method === 'cod' ? 2000 : 0),
+        delivery_address: deliveryInfo,
+        notes: deliveryInfo.instructions,
+        items: state.items.map(item => ({
+          product_id: item.product.id,
+          quantity: item.quantity,
+          unit_price: item.product.price,
+          total_price: item.product.price * item.quantity
+        }))
+      };
 
-    toast({
-      title: "Order Placed Successfully!",
-      description: `Your order #${orderNum} has been confirmed.`,
-    });
+      const order = await createOrder(orderData);
+      setOrderNumber(order.order_number || `GCN${Date.now().toString().slice(-6)}`);
+      setCurrentStep('confirmation');
+      
+      // Clear cart after successful order
+      await clearCart();
+
+      toast({
+        title: "Order Placed Successfully!",
+        description: `Your order #${order.order_number} has been confirmed.`,
+      });
+    } catch (error) {
+      console.error('Error placing order:', error);
+      toast({
+        title: "Order Failed",
+        description: "There was an error placing your order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const isStepValid = (step: CheckoutStep) => {
@@ -148,7 +189,7 @@ const Checkout = () => {
                 {state.items.map((item) => (
                   <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
                     <img
-                      src={item.product.image}
+                      src={item.product.image_url}
                       alt={item.product.name}
                       className="w-16 h-16 object-cover rounded"
                     />
@@ -157,7 +198,7 @@ const Checkout = () => {
                       <p className="text-sm text-muted-foreground">
                         Quantity: {item.quantity}
                       </p>
-                      {item.product.requiresPrescription && (
+                      {item.product.requires_prescription && (
                         <Badge variant="outline" className="mt-1">
                           <AlertTriangle size={12} className="mr-1" />
                           Prescription Required

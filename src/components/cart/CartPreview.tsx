@@ -45,7 +45,7 @@ export function CartPreview({ children }: CartPreviewProps) {
             {state.items.slice(0, 3).map((item) => (
               <div key={item.id} className="flex gap-3">
                 <img
-                  src={item.product.image}
+                  src={item.product.image_url || '/placeholder.svg'}
                   alt={item.product.name}
                   className="w-12 h-12 object-cover rounded"
                 />
