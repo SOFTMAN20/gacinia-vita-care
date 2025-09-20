@@ -1,0 +1,855 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+
+# ROLE & EXPERTISE
+You are an expert **full-stack developer** with deep specialization in:
+- **React** ecosystem (Hooks, Context, Custom Hooks, Performance Optimization)
+- **TailwindCSS** (Responsive Design, Custom Configurations, Component Patterns)
+- **E-commerce Architecture** (Product Management, Cart Logic, User Flows)
+- **Healthcare/Pharmacy Systems** (Regulatory Compliance, Prescription Handling)
+- **Multi-language Applications** (i18n best practices)
+
+Your mission: Build a production-ready **frontend web application for Gacinia Pharmacy & Medical Supplies** that serves both retail customers and wholesale clients (hospitals/clinics) with bilingual support.
+
+---
+
+# BUSINESS CONTEXT
+
+## Company Profile
+- **Name**: Gacinia Pharmacy & Medical Supplies
+- **Location**: Mbeya, Esso – Near Highway, Tanzania
+- **Business Model**: Hybrid retail + wholesale pharmacy
+- **Target Markets**: 
+  - B2C: Individual customers seeking medicines, cosmetics, wellness products
+  - B2B: Hospitals, clinics, health centers requiring bulk medical supplies
+- **Languages**: English & Kiswahili (equal importance)
+
+## Core Business Requirements
+- **Regulatory Compliance**: Prescription validation for controlled substances
+- **Inventory Management**: Real-time stock tracking, low-stock alerts
+- **Dual Pricing**: Retail vs wholesale price tiers
+- **Location-Based**: Delivery within Mbeya region + pickup options
+- **Trust Factors**: Professional healthcare appearance, secure transactions
+
+---
+
+# TECHNICAL ARCHITECTURE
+
+## Core Stack
+- **Framework**: React 18+ with Vite (for fast development & building)
+- **Styling**: TailwindCSS 3+ (with custom healthcare theme)
+- **UI Components**: shadcn/ui (consistent, accessible components)
+- **Icons**: Lucide-react (modern, lightweight icon library)
+- **Routing**: React Router v6 (with nested routes & lazy loading)
+
+## State Management Strategy
+- **Global State**: Context API + useReducer (for cart, user, language)
+- **Server State**: React Query/TanStack Query (for API data management)
+- **Local State**: useState/useReducer (for form handling, UI states)
+
+## Development Tools
+- **TypeScript**: Strongly recommended for type safety
+- **ESLint + Prettier**: Code quality and formatting
+- **Mock Data**: JSON files for realistic product/order data
+
+---
+
+# DETAILED PAGE SPECIFICATIONS
+
+## 1. Landing/Home Page
+### Header Components
+- **Logo**: Gacinia branding with medical cross icon
+- **Search**: Intelligent search with suggestions (medicines, brands, categories)
+- **Language Toggle**: EN/SW with flag icons, persistent preference
+- **Account Menu**: Login/Register/Profile dropdown
+- **Cart Icon**: Item count badge, mini-cart preview on hover
+- **Navigation**: Main categories + Wholesale portal link
+
+### Content Sections
+- **Hero Banner**: 
+  - Rotating slides (New arrivals, Wholesale offers, Health tips)
+  - CTA buttons: "Shop Now" + "Wholesale Portal"
+- **Quick Categories**: 
+  - Visual cards for Medicines, Cosmetics, Equipment, Wholesale
+  - Each with representative icons and product counts
+- **Featured Products**: 
+  - 8-12 products in responsive grid
+  - "Add to Cart" quick actions
+- **Trust Indicators**: 
+  - Licensed pharmacy badge, secure payment icons
+  - Customer testimonials/reviews
+- **Location/Contact**: 
+  - Mbeya address, phone, WhatsApp, social media
+  - Operating hours, delivery info
+
+## 2. Product Catalog
+### Advanced Filtering
+- **Categories**: Hierarchical (Medicine > Pain Relief > Tablets)
+- **Price Range**: Slider with min/max inputs
+- **Brand**: Multi-select with search
+- **Availability**: In stock, Out of stock, Pre-order
+- **Special Filters**: Prescription required, Wholesale available
+- **Applied Filters**: Clear indication with remove options
+
+### Product Display
+- **View Options**: Grid (2-4 columns) vs List view
+- **Sorting**: Relevance, Price (Low-High), Newest, Best-selling, A-Z
+- **Product Cards**: Image, title, price, stock status, quick add
+- **Pagination**: Load more or traditional page numbers
+
+## 3. Product Detail Page
+### Product Information
+- **Image Gallery**: Main image + thumbnails, zoom functionality
+- **Product Details**: 
+  - Full description, ingredients/composition
+  - Dosage instructions, side effects, storage
+  - Manufacturer, expiry date, batch info
+- **Pricing**: 
+  - Retail price, wholesale price (if applicable)
+  - Bulk discount tiers
+- **Stock Management**: 
+  - Real-time availability
+  - Quantity selector with max limits
+  - Low stock warnings
+
+### User Actions
+- **Add to Cart**: Quantity selection, prescription upload if needed
+- **Buy Now**: Direct checkout flow
+- **Wishlist**: Save for later functionality
+- **Share**: Social media sharing options
+- **Related Products**: "Customers also bought" section
+
+## 4. Shopping Cart & Checkout
+### Cart Management
+- **Item Display**: Product image, name, price, quantity controls
+- **Calculations**: Subtotal, taxes, delivery fees, total
+- **Actions**: Update quantities, remove items, save for later
+- **Promo Codes**: Discount application with validation
+
+### Checkout Process
+- **User Information**: 
+  - Contact details (name, phone, email)
+  - Delivery address with GPS coordinates option
+- **Delivery Options**: 
+  - Home delivery, pharmacy pickup
+  - Delivery time slots, express options
+- **Payment Methods**: 
+  - Mobile money (M-Pesa, Tigo Pesa, Airtel Money)
+  - Bank transfer, Cash on delivery
+- **Order Review**: Final confirmation before submission
+
+## 5. User Dashboard
+### Account Management
+- **Profile**: Personal info, contact details, preferences
+- **Order History**: 
+  - Order status tracking (Placed, Confirmed, Packed, Delivered)
+  - Reorder functionality, invoice downloads
+- **Prescriptions**: 
+  - Uploaded prescriptions with status
+  - Prescription renewal reminders
+- **Wishlist**: Saved products with price change alerts
+- **Addresses**: Multiple delivery addresses management
+
+## 6. Admin Dashboard (Frontend Structure)
+### Navigation Structure
+- **Sidebar Menu**: 
+  - Dashboard, Products, Orders, Customers
+  - Suppliers, Inventory, Reports, Settings
+
+### Dashboard Widgets
+- **Sales Overview**: Revenue charts, order statistics
+- **Quick Actions**: Add product, process order, check inventory
+- **Alerts**: Low stock, pending orders, system notifications
+- **Recent Activity**: Latest orders, customer registrations
+
+---
+
+# DESIGN SYSTEM & UI GUIDELINES
+
+## Color Palette
+```css
+Primary Green: #28A745 (trust, health, nature)
+Primary Dark: #1e7e34
+Primary Light: #d4edda
+
+Secondary Blue: #007BFF (professional, reliable)
+Secondary Dark: #0056b3
+Secondary Light: #cce5ff
+
+Accent Gold: #FFD700 (premium, value)
+Accent Dark: #b8860b
+Accent Light: #fff9c4
+
+Neutrals:
+- Background: #F8F9FA
+- Surface: #FFFFFF
+- Text Primary: #212529
+- Text Secondary: #6C757D
+- Border: #DEE2E6
+- Error: #DC3545
+- Success: #28A745
+- Warning: #FFC107
+```
+
+## Typography Scale
+```css
+Headings: 'Poppins', sans-serif (600, 700)
+Body: 'Inter', sans-serif (400, 500, 600)
+
+Scale:
+- h1: 2.5rem (40px)
+- h2: 2rem (32px)
+- h3: 1.75rem (28px)
+- h4: 1.5rem (24px)
+- h5: 1.25rem (20px)
+- h6: 1.125rem (18px)
+- body: 1rem (16px)
+- small: 0.875rem (14px)
+```
+
+## Component Design Principles
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Mobile-First**: Progressive enhancement from 320px up
+- **Touch-Friendly**: 44px minimum touch targets
+- **Loading States**: Skeleton screens, spinners, progress indicators
+- **Error Handling**: Clear, actionable error messages
+
+---
+
+# PROJECT STRUCTURE & DEVELOPMENT PHASES
+
+## Folder Architecture
+```
+src/
+├── components/           # Reusable UI components
+│   ├── ui/              # shadcn/ui components
+│   ├── forms/           # Form components
+│   ├── layout/          # Layout components
+│   └── common/          # Shared components
+├── pages/               # Page components
+├── hooks/               # Custom React hooks
+├── contexts/            # React contexts
+├── utils/               # Utility functions
+├── data/                # Mock data & constants
+├── styles/              # Global styles
+├── types/               # TypeScript types
+└── lib/                 # Third-party configurations
+```
+
+## Development Phases
+
+### Phase 1: Foundation (Week 1)
+1. **Project Setup**
+   - Initialize Vite + React + TypeScript
+   - Configure TailwindCSS with custom theme
+   - Set up shadcn/ui components
+   - Create folder structure
+
+2. **Core Components**
+   - Layout components (Navbar, Footer, Sidebar)
+   - UI primitives (Button, Input, Card, Modal)
+   - Routing setup with React Router
+
+### Phase 2: Core Pages (Week 2-3)
+3. **Home Page Implementation**
+   - Hero section with carousel
+   - Category showcase
+   - Featured products grid
+   - Responsive design
+
+4. **Product Pages**
+   - Catalog with filtering/sorting
+   - Product detail page
+   - Related products functionality
+
+### Phase 3: E-commerce Functionality (Week 3-4)
+5. **Shopping Cart**
+   - Cart management with Context
+   - Local storage persistence
+   - Cart calculations
+
+6. **Checkout Process**
+   - Multi-step checkout form
+   - Order summary and confirmation
+   - Form validation
+
+### Phase 4: User Features (Week 4-5)
+7. **User Dashboard**
+   - Profile management
+   - Order history
+   - Wishlist functionality
+
+8. **Admin Interface**
+   - Dashboard layout
+   - Product management UI
+   - Order management interface
+
+### Phase 5: Polish & Optimization (Week 5-6)
+9. **Internationalization**
+   - Language toggle implementation
+   - Translation keys setup
+   - Swahili content integration
+
+10. **Final Polish**
+    - Performance optimization
+    - Accessibility testing
+    - Mobile responsiveness
+    - Code documentation
+
+---
+
+# QUALITY STANDARDS & DELIVERABLES
+
+## Code Quality Requirements
+- **Component Reusability**: Single responsibility, configurable props
+- **Performance**: Lazy loading, code splitting, optimized renders
+- **Accessibility**: Screen reader support, keyboard navigation
+- **Type Safety**: TypeScript interfaces for all data structures
+- **Documentation**: JSDoc comments for complex functions
+
+## Testing Strategy
+- **Unit Tests**: Critical utility functions
+- **Component Tests**: User interaction testing
+- **Integration Tests**: Page-level functionality
+- **Manual Testing**: Cross-browser, device compatibility
+
+## Final Deliverables
+1. **Complete Codebase**: Production-ready React application
+2. **Component Library**: Documented reusable components
+3. **Mock Data**: Realistic product, order, and user data
+4. **Deployment Guide**: Instructions for hosting setup
+5. **Feature Documentation**: User guide for admin features
+
+---
+
+# SUCCESS METRICS
+
+## Technical Metrics
+- **Performance**: Lighthouse score > 90
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Mobile Experience**: Fully responsive, touch-optimized
+- **Code Quality**: ESLint score with zero errors
+
+## User Experience Metrics
+- **Load Time**: < 3 seconds on 3G connection
+- **Conversion Flow**: Seamless cart to checkout experience
+- **Language Switch**: Instant, no page reload required
+- **Search Functionality**: Relevant results, fast response
+
+## Business Value
+- **Market Ready**: Professional pharmacy branding
+- **Scalable**: Architecture supports future feature additions
+- **Maintainable**: Clean code for easy updates
+- **Compliance Ready**: Structure supports regulatory requirements
+
+---
+
+*This specification ensures the development of a world-class pharmacy e-commerce platform that serves the unique needs of Gacinia Pharmacy while maintaining the highest standards of user experience, technical excellence, and business value.*
+
+
+
+# ROLE & EXPERTISE
+You are an expert **backend integration specialist** with deep knowledge in:
+- **API Design & Integration** (REST APIs, GraphQL, real-time connections)
+- **React Data Management** (React Query, SWR, Context API, Custom Hooks)
+- **Authentication & Authorization** (JWT, OAuth, Role-based access)
+- **E-commerce Backend Systems** (Payment processing, inventory management, order workflows)
+- **Healthcare/Pharmacy Systems** (HIPAA compliance, prescription validation, regulatory requirements)
+- **Database Integration** (Real-time sync, caching strategies, offline support)
+
+Your mission: **Integrate the Gacinia Pharmacy frontend with a comprehensive backend system** that handles authentication, product management, order processing, inventory tracking, and regulatory compliance.
+
+---
+
+
+
+
+# BACKEND ARCHITECTURE OVERVIEW
+
+## API Specification
+- **Base URL**: `https://api.gacinia-pharmacy.co.tz/v1`
+- **Authentication**: JWT Bearer tokens with refresh token rotation
+- **API Style**: RESTful with some GraphQL endpoints for complex queries
+- **Data Format**: JSON with standardized response structure
+- **Rate Limiting**: 1000 requests/hour per user, 10,000/hour for admin
+- **Real-time**: WebSocket connections for order updates, inventory changes
+
+## Database Schema (Reference)
+```sql
+-- Core entities the frontend will interact with
+Users (id, email, phone, role, profile_data, created_at)
+Products (id, name, description, category_id, price, wholesale_price, stock, requires_prescription)
+Categories (id, name, parent_id, image_url)
+Orders (id, user_id, total, status, delivery_address, created_at)
+Order_Items (order_id, product_id, quantity, unit_price)
+Prescriptions (id, user_id, image_url, status, verified_at)
+Cart_Items (user_id, product_id, quantity, added_at)
+Suppliers (id, name, contact_info, products)
+```
+
+---
+
+# API ENDPOINTS & INTEGRATION REQUIREMENTS
+
+## 1. Authentication & User Management
+
+### Auth Endpoints
+```typescript
+// Login/Registration
+POST /auth/register
+POST /auth/login
+POST /auth/logout
+POST /auth/refresh-token
+POST /auth/forgot-password
+POST /auth/reset-password
+POST /auth/verify-phone (SMS OTP)
+
+// User Profile
+GET /users/profile
+PUT /users/profile
+GET /users/addresses
+POST /users/addresses
+PUT /users/addresses/:id
+DELETE /users/addresses/:id
+```
+
+### Frontend Integration Requirements
+- **Auth Context**: Global authentication state management
+- **Token Management**: Automatic token refresh, secure storage
+- **Route Protection**: Private routes with role-based access
+- **Session Persistence**: Remember login across browser sessions
+- **Multi-language**: Auth forms in English/Swahili
+
+### Implementation Example
+```typescript
+// Create auth context with token management
+const useAuth = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Auto-refresh tokens, handle auth state
+  // Redirect on auth failure, logout functionality
+};
+
+// Protected route wrapper
+const ProtectedRoute = ({ children, roles = [] }) => {
+  // Check authentication and authorization
+};
+```
+
+---
+
+## 2. Product Management & Catalog
+
+### Product Endpoints
+```typescript
+// Public Product APIs
+GET /products?page=1&limit=20&category=&search=&sort=price_asc
+GET /products/:id
+GET /products/:id/related
+GET /categories
+GET /categories/:id/products
+
+// Search & Filters
+GET /products/search?q=panadol&filters={"price_range":[10,100],"in_stock":true}
+GET /products/autocomplete?q=pan
+
+// Admin Product APIs (role-protected)
+POST /admin/products
+PUT /admin/products/:id
+DELETE /admin/products/:id
+POST /admin/products/:id/images
+GET /admin/products/low-stock
+```
+
+### Frontend Integration Requirements
+- **Product Catalog**: Infinite scroll or pagination with React Query
+- **Search System**: Debounced search with autocomplete suggestions
+- **Filter Management**: Complex filter state with URL synchronization
+- **Image Optimization**: Lazy loading, multiple sizes, fallback images
+- **Stock Tracking**: Real-time stock updates via WebSocket
+- **Admin Panel**: Full CRUD operations for product management
+
+### Implementation Example
+```typescript
+// Custom hook for products with caching
+const useProducts = (filters) => {
+  return useQuery({
+    queryKey: ['products', filters],
+    queryFn: () => fetchProducts(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+// Real-time stock updates
+const useStockUpdates = () => {
+  useEffect(() => {
+    const socket = io(`${API_BASE_URL}/stock`);
+    socket.on('stock_update', (data) => {
+      queryClient.setQueryData(['products'], (old) => {
+        // Update specific product stock
+      });
+    });
+  }, []);
+};
+```
+
+---
+
+## 3. Shopping Cart & Order Management
+
+### Cart & Order Endpoints
+```typescript
+// Cart Management (Authenticated)
+GET /cart
+POST /cart/items (body: {product_id, quantity})
+PUT /cart/items/:product_id (body: {quantity})
+DELETE /cart/items/:product_id
+DELETE /cart/clear
+
+// Order Processing
+POST /orders/calculate-total (body: {items[], delivery_address, promo_code?})
+POST /orders (body: {items[], delivery_info, payment_method})
+GET /orders
+GET /orders/:id
+PUT /orders/:id/cancel
+GET /orders/:id/track
+
+// Payment Integration
+POST /payments/initialize (body: {order_id, method: 'mpesa'|'tigopesa'|'airtel'})
+GET /payments/:transaction_id/status
+POST /payments/:transaction_id/verify
+```
+
+### Frontend Integration Requirements
+- **Persistent Cart**: Sync cart between devices, guest cart handling
+- **Real-time Calculations**: Tax, delivery fees, discounts
+- **Order Tracking**: Live status updates, delivery notifications
+- **Payment Integration**: Mobile money APIs (M-Pesa, Tigo Pesa)
+- **Offline Support**: Queue orders when offline, sync when online
+
+### Implementation Example
+```typescript
+// Cart context with backend sync
+const useCart = () => {
+  const [cartItems, setCartItems] = useState([]);
+  
+  const addToCart = useMutation({
+    mutationFn: (item) => api.post('/cart/items', item),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['cart']);
+    },
+  });
+  
+  // Sync cart on login, merge guest cart
+};
+
+// Order tracking with WebSocket
+const useOrderTracking = (orderId) => {
+  const [orderStatus, setOrderStatus] = useState('pending');
+  
+  useEffect(() => {
+    const socket = io(`${API_BASE_URL}/orders`);
+    socket.emit('track_order', orderId);
+    socket.on('order_update', setOrderStatus);
+  }, [orderId]);
+};
+```
+
+---
+
+## 4. Prescription & Regulatory Compliance
+
+### Prescription Endpoints
+```typescript
+// Prescription Management
+POST /prescriptions/upload (multipart/form-data)
+GET /prescriptions
+GET /prescriptions/:id
+PUT /prescriptions/:id/status (admin only)
+
+// Regulated Products
+GET /products/:id/prescription-required
+POST /orders/validate-prescription (body: {prescription_id, product_ids[]})
+```
+
+### Frontend Integration Requirements
+- **File Upload**: Image/PDF prescription upload with progress
+- **Prescription Validation**: Check before adding regulated products to cart
+- **Status Tracking**: Prescription approval workflow
+- **Compliance UI**: Clear indicators for prescription-required products
+
+### Implementation Example
+```typescript
+// Prescription upload hook
+const usePrescriptionUpload = () => {
+  return useMutation({
+    mutationFn: (file) => {
+      const formData = new FormData();
+      formData.append('prescription', file);
+      return api.post('/prescriptions/upload', formData);
+    },
+    onSuccess: (data) => {
+      // Update prescription list
+      queryClient.invalidateQueries(['prescriptions']);
+    },
+  });
+};
+```
+
+---
+
+## 5. Admin Dashboard Integration
+
+### Admin Endpoints
+```typescript
+// Dashboard Analytics
+GET /admin/dashboard/stats
+GET /admin/dashboard/sales?period=7d
+GET /admin/dashboard/top-products?limit=10
+
+// Order Management
+GET /admin/orders?status=pending&page=1
+PUT /admin/orders/:id/status (body: {status, notes})
+GET /admin/orders/:id/details
+
+// Inventory Management  
+GET /admin/inventory/low-stock?threshold=10
+PUT /admin/inventory/:product_id (body: {stock_quantity, reorder_level})
+GET /admin/suppliers
+POST /admin/purchase-orders
+
+// Customer Management
+GET /admin/customers?search=&page=1
+GET /admin/customers/:id/orders
+PUT /admin/customers/:id/status
+```
+
+### Frontend Integration Requirements
+- **Real-time Dashboard**: Live stats, order notifications, stock alerts
+- **Bulk Operations**: Mass product updates, bulk order processing
+- **Export Features**: Sales reports, customer data, inventory reports
+- **Role-based Access**: Different admin levels with permission checks
+- **Audit Logging**: Track all admin actions with timestamps
+
+### Implementation Example
+```typescript
+// Admin dashboard with real-time updates
+const useAdminDashboard = () => {
+  const { data: stats } = useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: fetchDashboardStats,
+    refetchInterval: 30000, // Update every 30 seconds
+  });
+  
+  // WebSocket for real-time notifications
+  useEffect(() => {
+    const socket = io(`${API_BASE_URL}/admin`);
+    socket.on('new_order', showOrderNotification);
+    socket.on('low_stock_alert', showStockAlert);
+  }, []);
+};
+```
+
+---
+
+## 6. Real-time Features & WebSocket Integration
+
+### WebSocket Events
+```typescript
+// Client subscribes to:
+'stock_updates' // Product stock changes
+'order_status_updates' // Order status changes
+'new_messages' // Customer support chat
+'system_notifications' // Maintenance, promotions
+
+// Admin subscribes to:
+'new_orders' // Incoming orders
+'low_stock_alerts' // Inventory alerts
+'payment_confirmations' // Payment status updates
+```
+
+### Implementation Requirements
+- **Connection Management**: Auto-reconnect, connection status indicator
+- **Event Handling**: Type-safe event listeners with React hooks
+- **Fallback Strategy**: Polling when WebSocket unavailable
+- **Performance**: Connection pooling, selective subscriptions
+
+---
+
+# DATA MANAGEMENT STRATEGY
+
+## React Query Configuration
+```typescript
+// Query client setup with optimal caching
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      retry: 3,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      onError: (error) => {
+        // Global error handling
+        showErrorToast(error.message);
+      },
+    },
+  },
+});
+```
+
+## Custom Hooks Strategy
+- **Data Fetching**: `useProducts()`, `useOrders()`, `useProfile()`
+- **Mutations**: `useAddToCart()`, `useCreateOrder()`, `useUpdateProfile()`
+- **Real-time**: `useStockUpdates()`, `useOrderTracking()`
+- **Admin**: `useAdminStats()`, `useOrderManagement()`
+
+## Error Handling & Loading States
+```typescript
+// Standardized API response format
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// Global error handling
+const useApiError = () => {
+  return {
+    handleError: (error: ApiError) => {
+      if (error.status === 401) {
+        // Redirect to login
+        logout();
+      } else if (error.status === 403) {
+        // Show permission error
+      }
+      // Log error, show user-friendly message
+    },
+  };
+};
+```
+
+---
+
+# INTEGRATION IMPLEMENTATION PHASES
+
+## Phase 1: Core Authentication (Week 1)
+- Set up API client with interceptors
+- Implement auth context and token management
+- Create login/register forms with validation
+- Set up protected routes
+
+## Phase 2: Product Catalog Integration (Week 1-2)
+- Integrate product listing with pagination
+- Implement search and filtering
+- Add product detail page with real data
+- Set up image handling and optimization
+
+## Phase 3: Cart & Order System (Week 2-3)
+- Integrate cart management with backend
+- Implement order creation and tracking
+- Add payment method integration
+- Set up order status notifications
+
+## Phase 4: User Features (Week 3-4)
+- Integrate user dashboard with real data
+- Implement prescription upload and validation
+- Add order history and tracking
+- Set up profile management
+
+## Phase 5: Admin Integration (Week 4-5)
+- Integrate admin dashboard with real-time data
+- Implement product management CRUD
+- Add order processing workflows
+- Set up inventory management
+
+## Phase 6: Advanced Features (Week 5-6)
+- Implement WebSocket real-time updates
+- Add offline support and sync
+- Set up push notifications
+- Performance optimization and caching
+
+---
+
+# TESTING & QUALITY ASSURANCE
+
+## API Integration Testing
+- **Mock API**: Set up MSW for development and testing
+- **Error Scenarios**: Network failures, timeouts, invalid responses
+- **Loading States**: Skeleton screens, progress indicators
+- **Edge Cases**: Empty states, pagination limits, concurrent updates
+
+## Performance Requirements
+- **API Response Time**: < 500ms for product queries
+- **Image Loading**: Progressive loading, WebP support
+- **Cache Hit Rate**: > 80% for frequently accessed data
+- **Bundle Size**: Lazy load admin features, code splitting
+
+## Security Considerations
+- **Token Storage**: Secure HTTP-only cookies or encrypted localStorage
+- **API Security**: Request/response validation, XSS prevention
+- **File Uploads**: Image validation, size limits, virus scanning
+- **Admin Access**: Multi-factor authentication, session timeouts
+
+---
+
+# DEPLOYMENT & MONITORING
+
+## Environment Configuration
+```typescript
+// Environment variables
+REACT_APP_API_BASE_URL=https://api.gacinia-pharmacy.co.tz/v1
+REACT_APP_WS_URL=wss://api.gacinia-pharmacy.co.tz/ws
+REACT_APP_MPESA_SHORTCODE=174379
+REACT_APP_SENTRY_DSN=https://...
+REACT_APP_GA_TRACKING_ID=GA-...
+```
+
+## Monitoring & Analytics
+- **Error Tracking**: Sentry integration for API errors
+- **Performance Monitoring**: Core Web Vitals, API response times
+- **User Analytics**: Google Analytics, conversion tracking
+- **Health Checks**: API connectivity, WebSocket status
+
+---
+
+# SUCCESS METRICS
+
+## Technical Performance
+- **API Integration**: 99.9% uptime, < 500ms response time
+- **Real-time Features**: < 100ms WebSocket message delivery
+- **Error Rate**: < 1% failed API requests
+- **Cache Efficiency**: > 80% cache hit rate
+
+## User Experience
+- **Cart Abandonment**: < 30% abandonment rate
+- **Order Success**: > 95% successful order completion
+- **Search Relevance**: > 90% user satisfaction with search results
+- **Mobile Performance**: < 3s load time on 3G
+
+## Business Impact
+- **Order Processing**: Automated workflow reducing manual work by 80%
+- **Inventory Accuracy**: Real-time stock levels with 99% accuracy
+- **Customer Satisfaction**: Integrated support system, order tracking
+- **Regulatory Compliance**: 100% prescription validation coverage
+
+---
+
+*This comprehensive backend integration specification ensures seamless connectivity between your React frontend and the Gacinia Pharmacy backend systems, delivering a robust, scalable, and compliant e-commerce platform.*
