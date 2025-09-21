@@ -37,16 +37,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
         </div>
 
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground flex-1 leading-tight">
             {product.name}
           </h1>
           <ShareProduct 
             product={product}
             variant="outline"
-            size="default"
-            showText={true}
-            className="flex-shrink-0"
+            size="sm"
+            showText={false}
+            className="flex-shrink-0 sm:showText-true"
           />
         </div>
 
@@ -74,19 +74,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
         {/* Price */}
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-primary">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <span className="text-2xl sm:text-3xl font-bold text-primary">
               TZS {product.price.toLocaleString()}
             </span>
             {product.original_price && (
-              <>
-                <span className="text-lg text-muted-foreground line-through">
+              <div className="flex items-center gap-2">
+                <span className="text-base sm:text-lg text-muted-foreground line-through">
                   TZS {product.original_price.toLocaleString()}
                 </span>
-                <Badge className="bg-error text-error-foreground">
+                <Badge className="bg-error text-error-foreground text-xs">
                   -{discountPercentage}% OFF
                 </Badge>
-              </>
+              </div>
             )}
           </div>
           
@@ -120,11 +120,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Product Details Tabs */}
       <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="specifications">Specs</TabsTrigger>
-          <TabsTrigger value="usage">Usage</TabsTrigger>
-          <TabsTrigger value="safety">Safety</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+          <TabsTrigger value="description" className="text-xs sm:text-sm">Description</TabsTrigger>
+          <TabsTrigger value="specifications" className="text-xs sm:text-sm">Specs</TabsTrigger>
+          <TabsTrigger value="usage" className="text-xs sm:text-sm">Usage</TabsTrigger>
+          <TabsTrigger value="safety" className="text-xs sm:text-sm">Safety</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="space-y-4">
