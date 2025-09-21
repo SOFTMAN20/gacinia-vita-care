@@ -119,22 +119,22 @@ export function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Product Details Tabs */}
-      <Tabs defaultValue="description" className="w-full max-w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto">
-          <TabsTrigger value="description" className="text-xs sm:text-sm px-1 sm:px-3">Description</TabsTrigger>
-          <TabsTrigger value="specifications" className="text-xs sm:text-sm px-1 sm:px-3">Specs</TabsTrigger>
-          <TabsTrigger value="usage" className="text-xs sm:text-sm px-1 sm:px-3">Usage</TabsTrigger>
-          <TabsTrigger value="safety" className="text-xs sm:text-sm px-1 sm:px-3">Safety</TabsTrigger>
+      <Tabs defaultValue="description" className="w-full max-w-full overflow-hidden">
+        <TabsList className="grid w-full grid-cols-4 h-auto overflow-hidden">
+          <TabsTrigger value="description" className="text-xs sm:text-sm px-1 sm:px-3 truncate">Description</TabsTrigger>
+          <TabsTrigger value="specifications" className="text-xs sm:text-sm px-1 sm:px-3 truncate">Specs</TabsTrigger>
+          <TabsTrigger value="usage" className="text-xs sm:text-sm px-1 sm:px-3 truncate">Usage</TabsTrigger>
+          <TabsTrigger value="safety" className="text-xs sm:text-sm px-1 sm:px-3 truncate">Safety</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="description" className="space-y-4">
+        <TabsContent value="description" className="space-y-4 w-full max-w-full overflow-hidden">
           {product.description && (
-            <Card>
+            <Card className="w-full max-w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg">Product Description</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+              <CardContent className="w-full max-w-full overflow-hidden">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere hyphens-auto w-full">
                   {product.description}
                 </p>
               </CardContent>
@@ -142,16 +142,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
 
           {product.key_features && product.key_features.length > 0 && (
-            <Card>
+            <Card className="w-full max-w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg">Key Features</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
+              <CardContent className="w-full max-w-full overflow-hidden">
+                <ul className="space-y-2 w-full">
                   {product.key_features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
+                    <li key={index} className="flex items-start gap-2 w-full">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">{feature}</span>
+                      <span className="text-muted-foreground break-words overflow-wrap-anywhere hyphens-auto flex-1">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -160,7 +160,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
         </TabsContent>
 
-        <TabsContent value="specifications" className="space-y-4">
+        <TabsContent value="specifications" className="space-y-4 w-full max-w-full overflow-hidden">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Technical Specifications</CardTitle>
@@ -196,17 +196,17 @@ export function ProductInfo({ product }: ProductInfoProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="usage" className="space-y-4">
+        <TabsContent value="usage" className="space-y-4 w-full max-w-full overflow-hidden">
           {product.usage_instructions && (
-            <Card>
+            <Card className="w-full max-w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Package size={20} />
                   Usage Instructions
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+              <CardContent className="w-full max-w-full overflow-hidden">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere hyphens-auto w-full">
                   {product.usage_instructions}
                 </p>
               </CardContent>
@@ -214,15 +214,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
 
           {product.dosage && (
-            <Card>
+            <Card className="w-full max-w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Clock size={20} />
                   Dosage Information
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+              <CardContent className="w-full max-w-full overflow-hidden">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere hyphens-auto w-full">
                   {product.dosage}
                 </p>
               </CardContent>
@@ -230,12 +230,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
 
           {product.ingredients && (
-            <Card>
+            <Card className="w-full max-w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg">Active Ingredients</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+              <CardContent className="w-full max-w-full overflow-hidden">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere hyphens-auto w-full">
                   {product.ingredients}
                 </p>
               </CardContent>
@@ -243,44 +243,44 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
         </TabsContent>
 
-        <TabsContent value="safety" className="space-y-4">
+        <TabsContent value="safety" className="space-y-4 w-full max-w-full overflow-hidden">
           {product.storage_requirements && (
-            <Card>
+            <Card className="w-full max-w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Shield size={20} />
                   Storage Requirements
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+              <CardContent className="w-full max-w-full overflow-hidden">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere hyphens-auto w-full">
                   {product.storage_requirements}
                 </p>
               </CardContent>
             </Card>
           )}
 
-          <Card>
+          <Card className="w-full max-w-full overflow-hidden">
             <CardHeader>
               <CardTitle className="text-lg">Product Information</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 w-full max-w-full overflow-hidden">
               {product.manufacturer && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Manufacturer</span>
-                  <span className="text-muted-foreground">{product.manufacturer}</span>
+                <div className="flex justify-between py-2 border-b items-start gap-2">
+                  <span className="font-medium flex-shrink-0">Manufacturer</span>
+                  <span className="text-muted-foreground text-right break-words overflow-wrap-anywhere hyphens-auto">{product.manufacturer}</span>
                 </div>
               )}
               {product.batch_number && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Batch Number</span>
-                  <span className="text-muted-foreground">{product.batch_number}</span>
+                <div className="flex justify-between py-2 border-b items-start gap-2">
+                  <span className="font-medium flex-shrink-0">Batch Number</span>
+                  <span className="text-muted-foreground text-right break-words overflow-wrap-anywhere hyphens-auto">{product.batch_number}</span>
                 </div>
               )}
               {product.expiry_date && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Expiry Date</span>
-                  <span className="text-muted-foreground">{product.expiry_date}</span>
+                <div className="flex justify-between py-2 border-b items-start gap-2">
+                  <span className="font-medium flex-shrink-0">Expiry Date</span>
+                  <span className="text-muted-foreground text-right break-words overflow-wrap-anywhere hyphens-auto">{product.expiry_date}</span>
                 </div>
               )}
             </CardContent>

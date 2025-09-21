@@ -227,34 +227,34 @@ export function PurchaseOptions({ product }: PurchaseOptionsProps) {
       {/* Delivery Information */}
       <Card>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
                 <Truck className="h-5 w-5 text-green-600" />
               </div>
-              <div>
-                <p className="text-sm font-medium">Free Delivery</p>
-                <p className="text-xs text-muted-foreground">Within Mbeya</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">Free Delivery</p>
+                <p className="text-xs text-muted-foreground truncate">Within Mbeya</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
                 <Shield className="h-5 w-5 text-blue-600" />
               </div>
-              <div>
-                <p className="text-sm font-medium">Secure Payment</p>
-                <p className="text-xs text-muted-foreground">100% Safe</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">Secure Payment</p>
+                <p className="text-xs text-muted-foreground truncate">100% Safe</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0">
                 <CreditCard className="h-5 w-5 text-purple-600" />
               </div>
-              <div>
-                <p className="text-sm font-medium">Multiple Payments</p>
-                <p className="text-xs text-muted-foreground">M-Pesa, Cash</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">Multiple Payments</p>
+                <p className="text-xs text-muted-foreground truncate">M-Pesa, Cash</p>
               </div>
             </div>
           </div>
