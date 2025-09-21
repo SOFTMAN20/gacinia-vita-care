@@ -37,16 +37,21 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
         </div>
 
+<<<<<<< HEAD
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground flex-1 break-words">
+=======
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground flex-1 leading-tight">
+>>>>>>> 114cac4481ce6feffb9430874d609ba3f649093e
             {product.name}
           </h1>
           <ShareProduct 
             product={product}
             variant="outline"
-            size="default"
-            showText={true}
-            className="flex-shrink-0"
+            size="sm"
+            showText={false}
+            className="flex-shrink-0 sm:showText-true"
           />
         </div>
 
@@ -74,19 +79,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
         {/* Price */}
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-primary">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <span className="text-2xl sm:text-3xl font-bold text-primary">
               TZS {product.price.toLocaleString()}
             </span>
             {product.original_price && (
-              <>
-                <span className="text-lg text-muted-foreground line-through">
+              <div className="flex items-center gap-2">
+                <span className="text-base sm:text-lg text-muted-foreground line-through">
                   TZS {product.original_price.toLocaleString()}
                 </span>
-                <Badge className="bg-error text-error-foreground">
+                <Badge className="bg-error text-error-foreground text-xs">
                   -{discountPercentage}% OFF
                 </Badge>
-              </>
+              </div>
             )}
           </div>
           
@@ -120,11 +125,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Product Details Tabs */}
       <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="specifications">Specs</TabsTrigger>
-          <TabsTrigger value="usage">Usage</TabsTrigger>
-          <TabsTrigger value="safety">Safety</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+          <TabsTrigger value="description" className="text-xs sm:text-sm">Description</TabsTrigger>
+          <TabsTrigger value="specifications" className="text-xs sm:text-sm">Specs</TabsTrigger>
+          <TabsTrigger value="usage" className="text-xs sm:text-sm">Usage</TabsTrigger>
+          <TabsTrigger value="safety" className="text-xs sm:text-sm">Safety</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="space-y-4">
@@ -133,8 +138,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
               <CardHeader className="px-3 sm:px-6">
                 <CardTitle className="text-base sm:text-lg">Product Description</CardTitle>
               </CardHeader>
+<<<<<<< HEAD
               <CardContent className="overflow-hidden px-3 sm:px-6">
                 <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap text-sm sm:text-base max-w-full">
+=======
+              <CardContent>
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
+>>>>>>> 114cac4481ce6feffb9430874d609ba3f649093e
                   {product.description}
                 </p>
               </CardContent>
@@ -151,7 +161,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                   {product.key_features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">{feature}</span>
+                      <span className="text-muted-foreground break-words">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -206,7 +216,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.usage_instructions}
                 </p>
               </CardContent>
@@ -222,7 +232,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.dosage}
                 </p>
               </CardContent>
@@ -235,7 +245,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <CardTitle className="text-lg">Active Ingredients</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.ingredients}
                 </p>
               </CardContent>
@@ -253,7 +263,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.storage_requirements}
                 </p>
               </CardContent>
