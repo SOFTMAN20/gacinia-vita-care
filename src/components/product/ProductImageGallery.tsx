@@ -26,11 +26,11 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
+      <div className="relative aspect-square bg-muted rounded-lg overflow-hidden max-h-[70vh] sm:max-h-none">
         <img
           src={currentImage}
           alt={`${productName} - View ${currentImageIndex + 1}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain sm:object-cover"
         />
         
         {/* Navigation Arrows */}
