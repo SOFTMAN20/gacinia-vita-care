@@ -1,4 +1,4 @@
-import { Minus, Plus, Heart, Trash2, ShoppingBag, Gift } from 'lucide-react';
+import { Minus, Plus, Heart, Trash2, ShoppingBag } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 const Cart = () => {
-  const { state, removeItem, updateQuantity, clearCart, applyDiscount } = useCart();
-  const [promoCode, setPromoCode] = useState('');
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const { state, removeItem, updateQuantity, clearCart } = useCart();
   const { toast } = useToast();
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
@@ -24,36 +22,6 @@ const Cart = () => {
     }
   };
 
-  const handleApplyPromoCode = async () => {
-    if (!promoCode.trim()) return;
-    
-    setIsApplyingPromo(true);
-    
-    // Simulate API call for promo code validation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock promo codes
-    const validPromoCodes = {
-      'SAVE10': 10000, // TZS 10,000 off
-      'WELCOME': 5000,  // TZS 5,000 off
-      'HEALTH20': state.subtotal * 0.2 // 20% off
-    };
-
-    const discount = validPromoCodes[promoCode.toUpperCase() as keyof typeof validPromoCodes];
-    
-    if (discount) {
-      applyDiscount(discount);
-      setPromoCode('');
-    } else {
-      toast({
-        title: "Invalid Promo Code",
-        description: "The promo code you entered is not valid.",
-        variant: "destructive",
-      });
-    }
-    
-    setIsApplyingPromo(false);
-  };
 
   const handleMoveToWishlist = (productId: string) => {
     // In a real app, this would move the item to wishlist
@@ -235,34 +203,6 @@ const Cart = () => {
 
             {/* Order Summary */}
             <div className="space-y-6">
-              {/* Promo Code */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Gift size={20} />
-                    Promo Code
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter promo code"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                    />
-                    <Button
-                      onClick={handleApplyPromoCode}
-                      disabled={!promoCode.trim() || isApplyingPromo}
-                    >
-                      {isApplyingPromo ? 'Applying...' : 'Apply'}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Try: SAVE10, WELCOME, or HEALTH20
-                  </p>
-                </CardContent>
-              </Card>
-
               {/* Order Summary */}
               <Card>
                 <CardHeader>
