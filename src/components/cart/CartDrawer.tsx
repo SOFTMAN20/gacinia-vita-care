@@ -122,6 +122,10 @@ export function CartDrawer() {
                     <span>TZS {state.subtotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
+                    <span>Tax (18%):</span>
+                    <span>TZS {state.tax.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span>Delivery:</span>
                     <span>TZS {state.deliveryFee.toLocaleString()}</span>
                   </div>

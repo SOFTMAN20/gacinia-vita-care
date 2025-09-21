@@ -225,6 +225,10 @@ const Checkout = () => {
                   <span>TZS {state.subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span>Tax (18%):</span>
+                  <span>TZS {state.tax.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
                   <span>Delivery:</span>
                   <span>TZS {state.deliveryFee.toLocaleString()}</span>
                 </div>
