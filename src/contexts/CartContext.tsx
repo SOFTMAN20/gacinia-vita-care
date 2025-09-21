@@ -33,8 +33,8 @@ type CartAction =
   | { type: 'APPLY_DISCOUNT'; payload: number }
   | { type: 'LOAD_CART'; payload: CartItem[] };
 
-const TAX_RATE = 0.18; // 18% VAT in Tanzania
-const DELIVERY_FEE = 5000; // TZS 5,000 delivery fee
+const TAX_RATE = 0; // 0% tax for now
+const DELIVERY_FEE = 0; // Free delivery for now
 
 const calculateCartTotals = (items: CartItem[], discount: number = 0) => {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
