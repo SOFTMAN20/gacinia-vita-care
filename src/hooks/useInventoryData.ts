@@ -119,37 +119,11 @@ export function useInventoryData() {
     fetchInventoryData();
   }, []);
 
-  const updateProductStock = async (productId: string, newStockCount: number) => {
-    try {
-      const { error } = await supabase
-        .from('products')
-        .update({ 
-          stock_count: newStockCount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', productId);
-
-      if (error) throw error;
-
-      // Refresh data after update
-      await fetchInventoryData();
-      
-      return { success: true };
-    } catch (err) {
-      console.error('Error updating stock:', err);
-      return { 
-        success: false, 
-        error: err instanceof Error ? err.message : 'Failed to update stock' 
-      };
-    }
-  };
-
   return {
     stats,
     inventoryItems,
     loading,
     error,
-    refetch: fetchInventoryData,
-    updateProductStock
+    refetch: fetchInventoryData
   };
 }

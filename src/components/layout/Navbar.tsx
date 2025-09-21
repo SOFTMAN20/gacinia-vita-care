@@ -39,7 +39,6 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const realtimeStatus = useRealtimeProducts();
 
   const menuItems = [
-    { name: t('nav.allProducts', 'All Products'), href: '/products' },
     { name: t('nav.medicines'), href: '/products?category=prescription-medicines,over-the-counter' },
     { name: t('nav.cosmetics'), href: '/products?category=cosmetics-personal-care' },
     { name: t('nav.equipment'), href: '/products?category=medical-equipment,first-aid-wellness' },

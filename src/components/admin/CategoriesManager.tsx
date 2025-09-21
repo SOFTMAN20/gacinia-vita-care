@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
   Edit3, 
@@ -70,9 +70,9 @@ export default function CategoriesManager() {
     isActive: true
   });
 
-  const handleInputChange = useCallback((field: keyof CategoryFormData, value: string | boolean) => {
+  const handleInputChange = (field: keyof CategoryFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
+  };
 
   const generateSlug = (name: string) => {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -88,7 +88,7 @@ export default function CategoriesManager() {
     });
   };
 
-  const handleSave = useCallback(async () => {
+  const handleSave = async () => {
     try {
       if (editingCategory) {
         // Update existing category
@@ -115,7 +115,7 @@ export default function CategoriesManager() {
     } catch (error) {
       // Error is handled in the hook
     }
-  }, [editingCategory, formData, updateCategory, createCategory, resetForm]);
+  };
 
   const handleEdit = (category: any) => {
     setEditingCategory(category);
@@ -136,11 +136,11 @@ export default function CategoriesManager() {
     }
   };
 
-  const handleImagesChange = useCallback((images: string[]) => {
+  const handleImagesChange = (images: string[]) => {
     handleInputChange('image', images[0] || '');
-  }, [handleInputChange]);
+  };
 
-  const CategoryForm = useMemo(() => (
+  const CategoryForm = () => (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -150,7 +150,6 @@ export default function CategoriesManager() {
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             placeholder="Enter category name"
-            autoComplete="off"
           />
         </div>
         <div>
@@ -160,7 +159,6 @@ export default function CategoriesManager() {
             value={formData.nameSwahili}
             onChange={(e) => handleInputChange('nameSwahili', e.target.value)}
             placeholder="Jina la jamii kwa Kiswahili"
-            autoComplete="off"
           />
         </div>
       </div>
@@ -173,7 +171,6 @@ export default function CategoriesManager() {
           onChange={(e) => handleInputChange('description', e.target.value)}
           placeholder="Category description"
           rows={3}
-          autoComplete="off"
         />
       </div>
 
@@ -220,7 +217,7 @@ export default function CategoriesManager() {
         </Button>
       </div>
     </div>
-  ), [formData, editingCategory, handleInputChange, handleImagesChange, handleSave, resetForm]);
+  );
 
   if (loading) {
     return (
@@ -266,7 +263,7 @@ export default function CategoriesManager() {
                 Create a new product category for your store
               </DialogDescription>
             </DialogHeader>
-{CategoryForm}
+            <CategoryForm />
           </DialogContent>
         </Dialog>
       </div>
@@ -402,7 +399,7 @@ export default function CategoriesManager() {
                 Update category information
               </DialogDescription>
             </DialogHeader>
-{CategoryForm}
+            <CategoryForm />
           </DialogContent>
         </Dialog>
       )}

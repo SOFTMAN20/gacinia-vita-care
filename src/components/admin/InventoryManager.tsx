@@ -152,7 +152,7 @@ const mockStockMovements: StockMovement[] = [
 ];
 
 export default function InventoryManager() {
-  const { stats: realStats, inventoryItems: realInventoryItems, loading, error, updateProductStock } = useInventoryData();
+  const { stats: realStats, inventoryItems: realInventoryItems, loading, error } = useInventoryData();
   const [stockMovements, setStockMovements] = useState<StockMovement[]>(mockStockMovements);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isAdjustmentDialogOpen, setIsAdjustmentDialogOpen] = useState(false);
@@ -206,57 +206,30 @@ export default function InventoryManager() {
     return matchesSearch && matchesFilter;
   });
 
-  const handleStockAdjustment = async () => {
+  const handleStockAdjustment = () => {
     if (!selectedItem || adjustmentData.quantity === 0) return;
 
-    try {
-      // Calculate new stock count based on adjustment type
-      let newStockCount = selectedItem.currentStock;
-      
-      if (adjustmentData.type === 'in') {
-        newStockCount += Math.abs(adjustmentData.quantity);
-      } else if (adjustmentData.type === 'out') {
-        newStockCount -= Math.abs(adjustmentData.quantity);
-      } else if (adjustmentData.type === 'adjustment') {
-        // For adjustment, the quantity is the new absolute value
-        newStockCount = Math.abs(adjustmentData.quantity);
-      }
+    const newMovement: StockMovement = {
+      id: Date.now().toString(),
+      productId: selectedItem.id,
+      productName: selectedItem.name,
+      type: adjustmentData.type,
+      quantity: adjustmentData.type === 'out' ? -Math.abs(adjustmentData.quantity) : Math.abs(adjustmentData.quantity),
+      reason: adjustmentData.reason,
+      date: new Date().toISOString().split('T')[0],
+      user: 'Current User',
+      reference: adjustmentData.reference
+    };
 
-      // Ensure stock doesn't go below 0
-      newStockCount = Math.max(0, newStockCount);
+    setStockMovements(prev => [newMovement, ...prev]);
 
-      // Update the database
-      const result = await updateProductStock(selectedItem.id, newStockCount);
-      
-      if (result.success) {
-        // Create stock movement record
-        const newMovement: StockMovement = {
-          id: Date.now().toString(),
-          productId: selectedItem.id,
-          productName: selectedItem.name,
-          type: adjustmentData.type,
-          quantity: adjustmentData.type === 'out' ? -Math.abs(adjustmentData.quantity) : Math.abs(adjustmentData.quantity),
-          reason: adjustmentData.reason,
-          date: new Date().toISOString().split('T')[0],
-          user: 'Current User',
-          reference: adjustmentData.reference
-        };
+    // Note: In a real app, you would update the database here
+    // For now, we just update the stock movements list
+    console.log('Stock adjustment:', newMovement);
 
-        setStockMovements(prev => [newMovement, ...prev]);
-
-        // Reset form and close dialog
-        setAdjustmentData({ type: 'in', quantity: 0, reason: '', reference: '' });
-        setIsAdjustmentDialogOpen(false);
-        setSelectedItem(null);
-        
-        console.log('Stock updated successfully:', newMovement);
-      } else {
-        console.error('Failed to update stock:', result.error);
-        // You could show a toast notification here
-      }
-    } catch (error) {
-      console.error('Error during stock adjustment:', error);
-    }
+    setIsAdjustmentDialogOpen(false);
+    setSelectedItem(null);
+    setAdjustmentData({ type: 'in', quantity: 0, reason: '', reference: '' });
   };
 
   // Export functionality

@@ -63,9 +63,9 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       <Navbar cartItemCount={state.totalItems} />
       
-      <main className="container mx-auto px-4 py-4 md:py-6">
+      <main className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 mb-4 md:mb-6">
+        <div className="flex items-center gap-2 mb-6">
           <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
             <ArrowLeft size={16} className="mr-2" />
             Back to Products
@@ -73,7 +73,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Product Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="grid lg:grid-cols-12 gap-8">
           {/* Product Images */}
           <div className="lg:col-span-5">
             <ProductImageGallery
@@ -82,14 +82,14 @@ const ProductDetail = () => {
             />
           </div>
 
-          {/* Product Information - Mobile: Full width, Desktop: 4 columns */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* Product Information */}
+          <div className="lg:col-span-4">
             <ProductInfo product={product} />
           </div>
 
-          {/* Purchase Options - Mobile: Full width, Desktop: 3 columns */}
+          {/* Purchase Options */}
           <div className="lg:col-span-3">
-            <div className="lg:sticky lg:top-6">
+            <div className="sticky top-6">
               <PurchaseOptions product={product} />
             </div>
           </div>
@@ -108,7 +108,7 @@ const ProductDetail = () => {
         <div className="mt-16">
           <RelatedProducts
             currentProductId={product.id}
-            category={product.category?.slug || ''}
+            category={product.category_id}
           />
         </div>
       </main>

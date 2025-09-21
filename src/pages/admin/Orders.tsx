@@ -42,7 +42,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAdminOrders, type AdminOrder } from '@/hooks/useAdminOrders';
-import OrderDetail from '@/components/admin/OrderDetail';
 
 
 const statusConfig = {
@@ -58,8 +57,7 @@ const paymentStatusConfig = {
   pending: { label: 'Pending', variant: 'secondary' as const },
   paid: { label: 'Paid', variant: 'default' as const },
   failed: { label: 'Failed', variant: 'destructive' as const },
-  refunded: { label: 'Refunded', variant: 'outline' as const },
-  cash_on_delivery: { label: 'Cash on Delivery', variant: 'outline' as const }
+  refunded: { label: 'Refunded', variant: 'outline' as const }
 };
 
 export default function OrdersPage() {
@@ -67,8 +65,6 @@ export default function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [showOrderDetail, setShowOrderDetail] = useState(false);
 
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
@@ -87,66 +83,6 @@ export default function OrdersPage() {
 
   const handleStatusUpdate = (orderId: string, newStatus: AdminOrder['status']) => {
     updateOrderStatus(orderId, newStatus);
-  };
-
-  const handleViewDetails = (orderId: string) => {
-    setSelectedOrderId(orderId);
-    setShowOrderDetail(true);
-  };
-
-  const handleBackToOrders = () => {
-    setSelectedOrderId(null);
-    setShowOrderDetail(false);
-  };
-
-  const handleExport = () => {
-    const csvHeaders = [
-      'Order #',
-      'Customer',
-      'Items',
-      'Status',
-      'Payment Status',
-      'Total (TSh)',
-      'Date',
-      'Customer Phone',
-      'Delivery Address'
-    ];
-
-    const csvData = filteredOrders.map(order => {
-      const deliveryAddress = typeof order.delivery_address === 'object' ? order.delivery_address : null;
-      const customerName = deliveryAddress?.fullName || 
-                         order.profiles?.full_name || 
-                         `User ID: ${order.user_id}`;
-      const customerPhone = deliveryAddress?.phone || order.profiles?.phone || '';
-      const fullAddress = deliveryAddress ? 
-        `${deliveryAddress.address || ''}, ${deliveryAddress.city || ''}` : '';
-      
-      return [
-        order.order_number || `ORD-${order.id.slice(-8)}`,
-        customerName,
-        order.order_items?.length || 0,
-        order.status,
-        order.payment_status,
-        order.total_amount,
-        new Date(order.created_at).toLocaleDateString(),
-        customerPhone,
-        fullAddress
-      ];
-    });
-
-    const csvContent = [csvHeaders, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `gacinia-orders-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const totalRevenue = orders.reduce((sum, order) => sum + order.total_amount, 0);
@@ -198,7 +134,7 @@ export default function OrdersPage() {
                 <SelectItem value="refunded">Refunded</SelectItem>
               </SelectContent>
                 </Select>
-                <Button variant="outline" className="touch-target" onClick={handleExport}>
+                <Button variant="outline" className="touch-target">
                   <Download className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Export</span>
                 </Button>
@@ -241,15 +177,8 @@ export default function OrdersPage() {
                 ) : (
                   filteredOrders.map((order) => {
                     const StatusIcon = statusConfig[order.status].icon;
-                    
-                    // Get customer name from delivery address (checkout form) first, then fallback to profile
-                    const deliveryAddress = typeof order.delivery_address === 'object' ? order.delivery_address : null;
-                    const customerName = deliveryAddress?.fullName || 
-                                       order.profiles?.full_name || 
-                                       `User ID: ${order.user_id}`;
-                    const customerPhone = deliveryAddress?.phone || 
-                                        order.profiles?.phone || '';
-                    const customerEmail = deliveryAddress?.email || '';
+                    const customerName = order.profiles?.full_name || 'Unknown Customer';
+                    const customerPhone = order.profiles?.phone || '';
                     const itemsCount = order.order_items?.length || 0;
                     
                     return (
@@ -260,9 +189,6 @@ export default function OrdersPage() {
                             <div className="font-medium">{customerName}</div>
                             {customerPhone && (
                               <div className="text-sm text-muted-foreground">{customerPhone}</div>
-                            )}
-                            {customerEmail && (
-                              <div className="text-sm text-muted-foreground">{customerEmail}</div>
                             )}
                           </div>
                         </TableCell>
@@ -296,7 +222,7 @@ export default function OrdersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleViewDetails(order.id)}>
+                              <DropdownMenuItem>
                                 <Eye className="w-4 h-4 mr-2" />
                                 View Details
                               </DropdownMenuItem>
@@ -442,11 +368,6 @@ export default function OrdersPage() {
       </Card>
     </div>
   );
-
-  // Show order detail view if an order is selected
-  if (showOrderDetail && selectedOrderId) {
-    return <OrderDetail orderId={selectedOrderId} onBack={handleBackToOrders} />;
-  }
 
   return (
     <div className="space-y-6">

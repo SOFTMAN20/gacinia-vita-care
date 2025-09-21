@@ -80,13 +80,13 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
       {/* Thumbnail Gallery */}
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex gap-2 overflow-x-auto pb-2">
           {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
               className={cn(
-                "flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 transition-colors",
+                "flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors",
                 index === currentImageIndex 
                   ? "border-primary" 
                   : "border-border hover:border-primary/50"
