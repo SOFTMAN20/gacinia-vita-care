@@ -275,10 +275,6 @@ const Cart = () => {
                       <span>TZS {state.subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Tax (18% VAT):</span>
-                      <span>TZS {state.tax.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
                       <span>Delivery Fee:</span>
                       <span>TZS {state.deliveryFee.toLocaleString()}</span>
                     </div>
