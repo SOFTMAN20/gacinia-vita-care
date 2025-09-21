@@ -78,15 +78,25 @@ export default function AdminProducts() {
     return matchesSearch && matchesCategory;
   });
 
+  const generateUniqueSKU = (baseName: string): string => {
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const namePrefix = baseName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase();
+    return `${namePrefix}-${timestamp}-${randomSuffix}`;
+  };
+
   const handleProductSubmit = async (data: any) => {
     try {
+      // Generate unique SKU if not provided or if it's empty
+      const finalSKU = data.sku && data.sku.trim() ? data.sku.trim() : generateUniqueSKU(data.name);
+      
       const productData: CreateProductData = {
         name: data.name,
         description: data.description,
         short_description: data.shortDescription,
         category_id: data.category,
         brand: data.brand,
-        sku: data.sku || `SKU-${Date.now()}`, // Generate SKU if not provided
+        sku: finalSKU,
         price: Number(data.retailPrice),
         original_price: data.originalPrice ? Number(data.originalPrice) : null,
         wholesale_price: Number(data.wholesalePrice),
@@ -115,6 +125,11 @@ export default function AdminProducts() {
       setEditingProduct(null);
     } catch (error) {
       console.error('Product submission error:', error);
+      if (error?.message?.includes('duplicate key value violates unique constraint "products_sku_key"')) {
+        toast.error('This SKU already exists. Please use a different SKU.');
+      } else {
+        toast.error('Failed to save product. Please try again.');
+      }
     }
   };
 
