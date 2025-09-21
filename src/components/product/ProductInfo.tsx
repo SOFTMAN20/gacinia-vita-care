@@ -15,10 +15,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex flex-wrap gap-2 max-w-full">
           {product.brand && (
             <Badge variant="outline" className="text-muted-foreground">
               {product.brand}
@@ -37,16 +37,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
           )}
         </div>
 
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground break-words">
             {product.name}
           </h1>
           <ShareProduct 
             product={product}
             variant="outline"
             size="default"
-            showText={true}
-            className="flex-shrink-0"
+            showText={false}
+            className="flex-shrink-0 self-start"
           />
         </div>
 
@@ -74,16 +74,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
         {/* Price */}
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-primary">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span className="text-2xl sm:text-3xl font-bold text-primary break-all">
               TZS {product.price.toLocaleString()}
             </span>
             {product.original_price && (
               <>
-                <span className="text-lg text-muted-foreground line-through">
+                <span className="text-base sm:text-lg text-muted-foreground line-through break-all">
                   TZS {product.original_price.toLocaleString()}
                 </span>
-                <Badge className="bg-error text-error-foreground">
+                <Badge className="bg-error text-error-foreground text-xs">
                   -{discountPercentage}% OFF
                 </Badge>
               </>
@@ -119,12 +119,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Product Details Tabs */}
-      <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="specifications">Specs</TabsTrigger>
-          <TabsTrigger value="usage">Usage</TabsTrigger>
-          <TabsTrigger value="safety">Safety</TabsTrigger>
+      <Tabs defaultValue="description" className="w-full max-w-full">
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger value="description" className="text-xs sm:text-sm px-1 sm:px-3">Description</TabsTrigger>
+          <TabsTrigger value="specifications" className="text-xs sm:text-sm px-1 sm:px-3">Specs</TabsTrigger>
+          <TabsTrigger value="usage" className="text-xs sm:text-sm px-1 sm:px-3">Usage</TabsTrigger>
+          <TabsTrigger value="safety" className="text-xs sm:text-sm px-1 sm:px-3">Safety</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="space-y-4">

@@ -24,13 +24,13 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   const currentImage = images[currentImageIndex] || images[0];
 
   return (
-    <div className="space-y-2 sm:space-y-4">
+    <div className="space-y-2 sm:space-y-4 w-full max-w-full">
       {/* Main Image */}
       <div className="relative aspect-square bg-muted rounded-lg overflow-hidden w-full max-w-full">
         <img
           src={currentImage}
           alt={`${productName} - View ${currentImageIndex + 1}`}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain max-w-full"
         />
         
         {/* Navigation Arrows */}
@@ -80,7 +80,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
       {/* Thumbnail Gallery */}
       {images.length > 1 && (
-        <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide max-w-full">
           {images.map((image, index) => (
             <button
               key={index}
@@ -95,7 +95,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
               <img
                 src={image}
                 alt={`${productName} - Thumbnail ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover max-w-full"
               />
             </button>
           ))}

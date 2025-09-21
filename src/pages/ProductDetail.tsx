@@ -63,9 +63,9 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       <Navbar cartItemCount={state.totalItems} />
       
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-full overflow-hidden">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-4 sm:mb-6">
           <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
             <ArrowLeft size={16} className="mr-2" />
             Back to Products
@@ -73,9 +73,9 @@ const ProductDetail = () => {
         </div>
 
         {/* Product Details */}
-        <div className="grid lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           {/* Product Images */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5 w-full min-w-0">
             <ProductImageGallery
               images={productImages}
               productName={product.name}
@@ -83,13 +83,13 @@ const ProductDetail = () => {
           </div>
 
           {/* Product Information */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 w-full min-w-0">
             <ProductInfo product={product} />
           </div>
 
           {/* Purchase Options */}
-          <div className="lg:col-span-3">
-            <div className="sticky top-6">
+          <div className="lg:col-span-3 w-full min-w-0">
+            <div className="lg:sticky lg:top-6">
               <PurchaseOptions product={product} />
             </div>
           </div>
