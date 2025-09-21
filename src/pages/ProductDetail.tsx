@@ -108,7 +108,7 @@ const ProductDetail = () => {
         <div className="mt-16">
           <RelatedProducts
             currentProductId={product.id}
-            category={product.category_id}
+            category={product.category?.slug || ''}
           />
         </div>
       </main>

@@ -38,7 +38,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </div>
 
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground flex-1">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground flex-1 break-words">
             {product.name}
           </h1>
           <ShareProduct 
@@ -129,12 +129,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
         <TabsContent value="description" className="space-y-4">
           {product.description && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Product Description</CardTitle>
+            <Card className="overflow-hidden w-full">
+              <CardHeader className="px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">Product Description</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+              <CardContent className="overflow-hidden px-3 sm:px-6">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap text-sm sm:text-base max-w-full">
                   {product.description}
                 </p>
               </CardContent>

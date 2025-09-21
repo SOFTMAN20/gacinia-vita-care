@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCategories } from '@/hooks/useCategories';
-import { Pill, Sparkles, Stethoscope, Building2, ArrowRight } from 'lucide-react';
+import { Pill, Sparkles, Stethoscope, Building2, ArrowRight, LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import categoryEquipment from '@/assets/category-equipment.jpg';
@@ -9,7 +9,8 @@ import categoryCosmetics from '@/assets/category-cosmetics.jpg';
 import categoryMedicines from '@/assets/category-medicines.jpg';
 import categoryWholesale from '@/assets/category-wholesale.jpg';
 
-const categoryImages: Record<string, string> = {
+// Fallback images for categories without database images
+const fallbackImages: Record<string, string> = {
   'prescription-medicines': categoryMedicines,
   'over-the-counter': categoryMedicines,
   'cosmetics-personal-care': categoryCosmetics,
@@ -17,7 +18,8 @@ const categoryImages: Record<string, string> = {
   'medical-equipment': categoryEquipment,
 };
 
-const categoryIcons: Record<string, any> = {
+// Fallback icons for categories without database icons
+const fallbackIcons: Record<string, LucideIcon> = {
   'prescription-medicines': Pill,
   'over-the-counter': Pill,
   'cosmetics-personal-care': Sparkles,
@@ -55,6 +57,18 @@ export function CategoryGrid() {
     );
   }
 
+  if (categories.length === 0) {
+    return (
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No categories available at the moment.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -69,9 +83,13 @@ export function CategoryGrid() {
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {categories.map((category) => {
-            const Icon = categoryIcons[category.slug] || Pill;
+            // Use database image if available, otherwise fallback
+            const categoryImage = category.image_url || fallbackImages[category.slug] || categoryMedicines;
+            // Use database icon if available, otherwise fallback
+            const Icon = fallbackIcons[category.slug] || Pill;
+            
             return (
               <Card 
                 key={category.id}
@@ -80,7 +98,7 @@ export function CategoryGrid() {
               >
                 <div className="aspect-square relative">
                   <img 
-                    src={categoryImages[category.slug] || categoryMedicines} 
+                    src={categoryImage} 
                     alt={category.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
