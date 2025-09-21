@@ -134,7 +134,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <CardTitle className="text-lg">Product Description</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.description}
                 </p>
               </CardContent>
@@ -151,7 +151,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                   {product.key_features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">{feature}</span>
+                      <span className="text-muted-foreground break-words">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -206,7 +206,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.usage_instructions}
                 </p>
               </CardContent>
@@ -222,7 +222,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.dosage}
                 </p>
               </CardContent>
@@ -235,7 +235,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <CardTitle className="text-lg">Active Ingredients</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.ingredients}
                 </p>
               </CardContent>
@@ -253,7 +253,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                   {product.storage_requirements}
                 </p>
               </CardContent>
