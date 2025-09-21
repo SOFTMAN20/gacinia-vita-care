@@ -15,38 +15,38 @@ export function ProductInfo({ product }: ProductInfoProps) {
     : 0;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="space-y-3 sm:space-y-4">
+      <div className="space-y-4">
         <div className="flex flex-wrap gap-2">
           {product.brand && (
-            <Badge variant="outline" className="text-muted-foreground text-xs">
+            <Badge variant="outline" className="text-muted-foreground">
               {product.brand}
             </Badge>
           )}
           {product.requires_prescription && (
-            <Badge className="bg-warning/10 text-warning border-warning/20 text-xs">
-              <AlertTriangle size={10} className="mr-1" />
+            <Badge className="bg-warning/10 text-warning border-warning/20">
+              <AlertTriangle size={12} className="mr-1" />
               Prescription Required
             </Badge>
           )}
           {product.wholesale_available && (
-            <Badge className="bg-accent/10 text-accent border-accent/20 text-xs">
+            <Badge className="bg-accent/10 text-accent border-accent/20">
               Wholesale Available
             </Badge>
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words overflow-wrap-anywhere flex-1">
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground flex-1">
             {product.name}
           </h1>
           <ShareProduct 
             product={product}
             variant="outline"
-            size="sm"
-            showText={false}
-            className="flex-shrink-0 self-start"
+            size="default"
+            showText={true}
+            className="flex-shrink-0"
           />
         </div>
 
@@ -74,24 +74,24 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
         {/* Price */}
         <div className="space-y-2">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-            <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary break-words">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-primary">
               TZS {product.price.toLocaleString()}
             </span>
             {product.original_price && (
-              <div className="flex items-center gap-2">
-                <span className="text-base sm:text-lg text-muted-foreground line-through">
+              <>
+                <span className="text-lg text-muted-foreground line-through">
                   TZS {product.original_price.toLocaleString()}
                 </span>
-                <Badge className="bg-error text-error-foreground text-xs">
+                <Badge className="bg-error text-error-foreground">
                   -{discountPercentage}% OFF
                 </Badge>
-              </div>
+              </>
             )}
           </div>
           
           {product.wholesale_price && (
-            <p className="text-xs sm:text-sm text-muted-foreground break-words">
+            <p className="text-sm text-muted-foreground">
               Wholesale price: TZS {product.wholesale_price.toLocaleString()} (bulk orders)
             </p>
           )}
@@ -120,21 +120,21 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Product Details Tabs */}
       <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="description" className="text-xs sm:text-sm px-2 py-2">Description</TabsTrigger>
-          <TabsTrigger value="specifications" className="text-xs sm:text-sm px-2 py-2">Specs</TabsTrigger>
-          <TabsTrigger value="usage" className="text-xs sm:text-sm px-2 py-2">Usage</TabsTrigger>
-          <TabsTrigger value="safety" className="text-xs sm:text-sm px-2 py-2">Safety</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="description">Description</TabsTrigger>
+          <TabsTrigger value="specifications">Specs</TabsTrigger>
+          <TabsTrigger value="usage">Usage</TabsTrigger>
+          <TabsTrigger value="safety">Safety</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="description" className="space-y-3 sm:space-y-4">
+        <TabsContent value="description" className="space-y-4">
           {product.description && (
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base sm:text-lg">Product Description</CardTitle>
+              <CardHeader>
+                <CardTitle className="text-lg">Product Description</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base break-words overflow-wrap-anywhere">
+              <CardContent>
+                <p className="text-muted-foreground leading-relaxed">
                   {product.description}
                 </p>
               </CardContent>
@@ -143,15 +143,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
           {product.key_features && product.key_features.length > 0 && (
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base sm:text-lg">Key Features</CardTitle>
+              <CardHeader>
+                <CardTitle className="text-lg">Key Features</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent>
                 <ul className="space-y-2">
                   {product.key_features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground text-sm sm:text-base break-words overflow-wrap-anywhere">{feature}</span>
+                      <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>

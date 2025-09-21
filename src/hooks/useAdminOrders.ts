@@ -50,7 +50,7 @@ export const useAdminOrders = () => {
         .from('orders')
         .select(`
           *,
-          profiles:user_id (
+          profiles!orders_user_id_fkey (
             full_name,
             phone
           ),
@@ -120,6 +120,55 @@ export const useAdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
+
+    // Set up real-time subscription for orders table
+    const channel = supabase
+      .channel('admin-orders')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          console.log('Real-time orders update received:', payload);
+          
+          if (payload.eventType === 'UPDATE') {
+            // Update specific order in the list
+            setOrders(prev => prev.map(order => {
+              if (order.id === payload.new.id) {
+                // Check if payment status changed
+                const oldPaymentStatus = order.payment_status;
+                const newPaymentStatus = payload.new.payment_status;
+                
+                if (oldPaymentStatus !== newPaymentStatus) {
+                  toast({
+                    title: "Order Updated",
+                    description: `Order ${payload.new.order_number || payload.new.id.slice(-8)} payment status changed to "${newPaymentStatus}"`,
+                    duration: 3000,
+                  });
+                }
+                
+                return { ...order, ...payload.new };
+              }
+              return order;
+            }));
+          } else if (payload.eventType === 'INSERT') {
+            // Add new order to the list
+            fetchOrders(); // Refetch to get full order data with relations
+          } else if (payload.eventType === 'DELETE') {
+            // Remove deleted order from the list
+            setOrders(prev => prev.filter(order => order.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return {

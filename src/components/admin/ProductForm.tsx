@@ -40,6 +40,7 @@ const productSchema = z.object({
   brand: z.string().optional(),
   sku: z.string().min(1, 'SKU is required'),
   retailPrice: z.number().min(0, 'Price must be positive'),
+  originalPrice: z.number().optional(),
   wholesalePrice: z.number().min(0, 'Wholesale price must be positive'),
   stock: z.number().min(0, 'Stock must be positive'),
   minStock: z.number().min(0, 'Minimum stock must be positive'),
@@ -91,6 +92,7 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       brand: product?.brand || '',
       sku: product?.sku || '',
       retailPrice: product?.retailPrice || 0,
+      originalPrice: product?.originalPrice || 0,
       wholesalePrice: product?.wholesalePrice || 0,
       stock: product?.stock || 0,
       minStock: product?.minStock || 5,
@@ -496,6 +498,28 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                             placeholder="0"
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="originalPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Original Price (TSh)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            {...field} 
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Original price before discount (for sale calculations)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
