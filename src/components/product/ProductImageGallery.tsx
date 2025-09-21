@@ -24,13 +24,13 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   const currentImage = images[currentImageIndex] || images[0];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 sm:space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square bg-muted rounded-lg overflow-hidden max-h-[70vh] sm:max-h-none">
+      <div className="relative aspect-square bg-muted rounded-lg overflow-hidden w-full max-w-full">
         <img
           src={currentImage}
           alt={`${productName} - View ${currentImageIndex + 1}`}
-          className="w-full h-full object-contain sm:object-cover"
+          className="w-full h-full object-contain"
         />
         
         {/* Navigation Arrows */}
@@ -80,13 +80,13 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
       {/* Thumbnail Gallery */}
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
               className={cn(
-                "flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors",
+                "flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-md sm:rounded-lg overflow-hidden border-2 transition-colors",
                 index === currentImageIndex 
                   ? "border-primary" 
                   : "border-border hover:border-primary/50"
