@@ -31,7 +31,6 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster richColors position="top-right" />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
