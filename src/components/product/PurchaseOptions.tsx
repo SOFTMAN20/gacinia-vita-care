@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 interface PurchaseOptionsProps {
   product: Product;
@@ -17,8 +18,10 @@ interface PurchaseOptionsProps {
 export function PurchaseOptions({ product }: PurchaseOptionsProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
   const { toast } = useToast();
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const maxQuantity = product.stock_count || 99;
   const totalPrice = product.price * quantity;
@@ -58,6 +61,35 @@ export function PurchaseOptions({ product }: PurchaseOptionsProps) {
       });
     } finally {
       setIsAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (product.requires_prescription) {
+      toast({
+        title: "Prescription Required",
+        description: "Please upload a valid prescription for this product.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsBuyingNow(true);
+    
+    try {
+      // Add to cart first
+      addItem(product, quantity);
+      
+      // Navigate to checkout immediately
+      navigate('/checkout');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to proceed to checkout. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBuyingNow(false);
     }
   };
 
@@ -189,10 +221,11 @@ export function PurchaseOptions({ product }: PurchaseOptionsProps) {
           variant="outline" 
           className="w-full" 
           size="lg"
-          disabled={!product.in_stock}
+          onClick={handleBuyNow}
+          disabled={!product.in_stock || isBuyingNow}
         >
           <Zap size={20} className="mr-2" />
-          Buy Now
+          {isBuyingNow ? 'Processing...' : 'Buy Now'}
         </Button>
       </div>
 
