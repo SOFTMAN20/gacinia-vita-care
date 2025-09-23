@@ -19,9 +19,11 @@ import { CartIcon } from '@/components/cart/CartIcon';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { LanguageToggle } from '@/components/ui/language-toggle';
 import { ConnectionStatus } from '@/components/ui/connection-status';
+import { NotificationCenter } from '@/components/ui/notification-center';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeProducts } from '@/hooks/useRealtimeProducts';
+import { useRealtimeStock } from '@/hooks/useRealtimeStock';
 
 interface NavbarProps {
   cartItemCount?: number;
@@ -35,8 +37,9 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  // Real-time connection status
+  // Real-time connection status and stock updates
   const realtimeStatus = useRealtimeProducts();
+  useRealtimeStock(); // Initialize real-time stock monitoring
 
   const menuItems = [
     { name: t('nav.allProducts', 'All Products'), href: '/products' },
@@ -169,6 +172,9 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
                   </Link>
                 </Button>
               )}
+
+              {/* Notifications (only for authenticated users) */}
+              {user && <NotificationCenter />}
 
               {/* Cart */}
               <CartIcon />

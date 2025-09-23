@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useOrders } from '@/hooks/useOrders';
+import { useProcessOrder } from '@/hooks/useProcessOrder';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   CheckCircle, 
@@ -52,7 +52,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { createOrder, loading: orderLoading } = useOrders();
+  const { processOrder, loading: orderLoading } = useProcessOrder();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('review');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
@@ -118,42 +118,32 @@ const Checkout = () => {
     setIsProcessing(true);
     
     try {
-      // Prepare order data
+      // Prepare order data for the new edge function
       const orderData = {
+        delivery_address: {
+          fullName: deliveryInfo.fullName,
+          phone: deliveryInfo.phone,
+          email: deliveryInfo.email,
+          address: deliveryInfo.address,
+          city: deliveryInfo.city,
+          region: deliveryInfo.region,
+          postalCode: deliveryInfo.postalCode,
+          deliveryType: deliveryInfo.deliveryType,
+          timeSlot: deliveryInfo.timeSlot,
+          instructions: deliveryInfo.instructions
+        },
         payment_method: paymentInfo.method,
-        subtotal: state.subtotal,
-        tax_amount: state.tax,
-        delivery_fee: state.deliveryFee,
-        discount_amount: state.discount,
-        total_amount: state.total + (paymentInfo.method === 'cod' ? 2000 : 0),
-        delivery_address: deliveryInfo,
-        notes: deliveryInfo.instructions,
-        items: state.items.map(item => ({
-          product_id: item.product.id,
-          quantity: item.quantity,
-          unit_price: item.product.price,
-          total_price: item.product.price * item.quantity
-        }))
+        notes: deliveryInfo.instructions
       };
 
-      const order = await createOrder(orderData);
+      // Use the new processOrder function which calls our edge function
+      const order = await processOrder(orderData);
       setOrderNumber(order.order_number || `GCN${Date.now().toString().slice(-6)}`);
       setCurrentStep('confirmation');
-      
-      // Clear cart after successful order
-      await clearCart();
 
-      toast({
-        title: "Order Placed Successfully!",
-        description: `Your order #${order.order_number} has been confirmed.`,
-      });
     } catch (error) {
       console.error('Error placing order:', error);
-      toast({
-        title: "Order Failed",
-        description: "There was an error placing your order. Please try again.",
-        variant: "destructive",
-      });
+      // Error handling is already done in useProcessOrder hook
     } finally {
       setIsProcessing(false);
     }

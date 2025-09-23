@@ -7,7 +7,7 @@ export interface AdminOrder {
   order_number: string;
   user_id: string;
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded' | 'cash_on_delivery';
   payment_method: string | null;
   subtotal: number;
   tax_amount: number;
