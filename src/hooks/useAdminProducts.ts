@@ -89,6 +89,8 @@ export function useAdminProducts() {
         featured: Boolean(productData.featured),
       };
       
+      console.log('Creating product with data:', finalProductData);
+      
       const { data, error } = await supabase
         .from('products')
         .insert([finalProductData])
@@ -98,7 +100,12 @@ export function useAdminProducts() {
         `)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error creating product:', error);
+        throw error;
+      }
+      
+      console.log('Product created successfully:', data);
       
       // Update local state
       setProducts(prev => [data, ...prev]);
