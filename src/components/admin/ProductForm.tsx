@@ -73,7 +73,9 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   const [currentTag, setCurrentTag] = useState('');
   const [showAddBrandDialog, setShowAddBrandDialog] = useState(false);
   const { categories } = useCategories();
-  const { brands } = useBrands();
+  const { brands, loading: brandsLoading } = useBrands();
+  
+  console.log('Brands loaded:', brands);
 
   const handleBrandAdded = (brandName: string) => {
     form.setValue('brand', brandName);
@@ -446,11 +448,17 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {brands.map((brand) => (
-                                <SelectItem key={brand.id} value={brand.name}>
-                                  {brand.name}
-                                </SelectItem>
-                              ))}
+                              {brandsLoading ? (
+                                <SelectItem value="" disabled>Loading brands...</SelectItem>
+                              ) : brands.length > 0 ? (
+                                brands.map((brand) => (
+                                  <SelectItem key={brand.id} value={brand.name}>
+                                    {brand.name}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="" disabled>No brands found - click + to add one</SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                           <Button
