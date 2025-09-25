@@ -13,6 +13,7 @@ import {
   Filter
 } from 'lucide-react';
 import { useInventoryData } from '@/hooks/useInventoryData';
+import { useStockMovements } from '@/hooks/useStockMovements';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -153,6 +154,7 @@ const mockStockMovements: StockMovement[] = [
 
 export default function InventoryManager() {
   const { stats: realStats, inventoryItems: realInventoryItems, loading, error, updateProductStock } = useInventoryData();
+  const { movements, loading: movementsLoading } = useStockMovements();
   const [stockMovements, setStockMovements] = useState<StockMovement[]>(mockStockMovements);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isAdjustmentDialogOpen, setIsAdjustmentDialogOpen] = useState(false);
@@ -378,7 +380,7 @@ export default function InventoryManager() {
 
   const stats = realStats;
 
-  if (loading) {
+  if (loading || movementsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -587,7 +589,7 @@ export default function InventoryManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {stockMovements.slice(0, 10).map((movement) => (
+              {(movements.length ? movements : stockMovements).slice(0, 10).map((movement) => (
                 <TableRow key={movement.id}>
                   <TableCell>{movement.date}</TableCell>
                   <TableCell>{movement.productName}</TableCell>
