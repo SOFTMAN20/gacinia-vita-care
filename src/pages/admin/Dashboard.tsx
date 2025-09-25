@@ -19,7 +19,8 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import ProductForm from '@/components/admin/ProductForm';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
-import { useLowStockAlerts } from '@/hooks/useLowStockAlerts';
+import { useLowStockAlerts, type LowStockProduct } from '@/hooks/useLowStockAlerts';
+import { RestockDialog } from '@/components/admin/RestockDialog';
 
 // Mock data for admin dashboard
 const dashboardData = {
@@ -126,6 +127,18 @@ const getStatusBadge = (status: string) => {
 // Low Stock Alerts Component
 const LowStockAlertsSection = () => {
   const { lowStockProducts, loading, error, refetch } = useLowStockAlerts();
+  const [selectedProduct, setSelectedProduct] = useState<LowStockProduct | null>(null);
+  const [restockDialogOpen, setRestockDialogOpen] = useState(false);
+
+  const handleRestockClick = (product: LowStockProduct) => {
+    setSelectedProduct(product);
+    setRestockDialogOpen(true);
+  };
+
+  const handleRestockSuccess = () => {
+    refetch();
+    setSelectedProduct(null);
+  };
 
   if (loading) {
     return (
@@ -258,7 +271,12 @@ const LowStockAlertsSection = () => {
                       Min: {product.min_stock_level}
                     </p>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleRestockClick(product)}
+                    className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                  >
                     Restock
                   </Button>
                 </div>
@@ -276,6 +294,13 @@ const LowStockAlertsSection = () => {
           </div>
         )}
       </CardContent>
+      
+      <RestockDialog
+        product={selectedProduct}
+        open={restockDialogOpen}
+        onOpenChange={setRestockDialogOpen}
+        onSuccess={handleRestockSuccess}
+      />
     </Card>
   );
 };
