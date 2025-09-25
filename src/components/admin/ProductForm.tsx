@@ -447,11 +447,11 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                             </FormControl>
                             <SelectContent>
                               {brandsLoading ? (
-                                <SelectItem value="" disabled>
+                                <SelectItem value="loading" disabled>
                                   Loading brands...
                                 </SelectItem>
                               ) : brands.length === 0 ? (
-                                <SelectItem value="" disabled>
+                                <SelectItem value="no-brands" disabled>
                                   No brands available
                                 </SelectItem>
                               ) : (
