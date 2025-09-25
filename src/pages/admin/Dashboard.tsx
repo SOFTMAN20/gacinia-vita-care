@@ -9,7 +9,9 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Plus
+  Plus,
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import ProductForm from '@/components/admin/ProductForm';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
+import { useLowStockAlerts } from '@/hooks/useLowStockAlerts';
 
 // Mock data for admin dashboard
 const dashboardData = {
@@ -117,6 +120,163 @@ const getStatusBadge = (status: string) => {
       <Icon size={12} />
       {config.label}
     </Badge>
+  );
+};
+
+// Low Stock Alerts Component
+const LowStockAlertsSection = () => {
+  const { lowStockProducts, loading, error, refetch } = useLowStockAlerts();
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-warning">
+            <AlertTriangle size={20} />
+            Low Stock Alerts
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-4">
+            <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+            Loading alerts...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle size={20} />
+              Low Stock Alerts
+            </div>
+            <Button variant="outline" size="sm" onClick={refetch}>
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Retry
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-destructive text-center py-4">
+            Failed to load low stock alerts. Please try again.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-warning">
+            <AlertTriangle size={20} />
+            Low Stock Alerts
+            {lowStockProducts.length > 0 && (
+              <Badge variant="destructive" className="ml-2">
+                {lowStockProducts.length}
+              </Badge>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={refetch}>
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm">
+              <ExternalLink className="h-4 w-4 mr-1" />
+              View All
+            </Button>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {lowStockProducts.length === 0 ? (
+          <div className="text-center py-8">
+            <CheckCircle className="h-12 w-12 text-success mx-auto mb-2" />
+            <p className="text-lg font-medium text-success">All products are well stocked!</p>
+            <p className="text-muted-foreground">No low stock alerts at this time.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {lowStockProducts.slice(0, 5).map((product) => (
+              <div 
+                key={product.id}
+                className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    {product.image_url ? (
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        className="h-12 w-12 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                        <Package className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    {product.stock_count === 0 && (
+                      <div className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full flex items-center justify-center">
+                        <span className="text-[10px] text-destructive-foreground font-bold">!</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium">{product.name}</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {product.sku && <span>SKU: {product.sku}</span>}
+                      {product.category_name && (
+                        <>
+                          <span>•</span>
+                          <span>{product.category_name}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">
+                        Stock: {product.stock_count}
+                      </span>
+                      <Badge 
+                        variant={product.stock_count === 0 ? "destructive" : "secondary"}
+                        className="text-xs"
+                      >
+                        {product.stock_count === 0 ? "OUT OF STOCK" : "LOW STOCK"}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Min: {product.min_stock_level}
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Restock
+                  </Button>
+                </div>
+              </div>
+            ))}
+            
+            {lowStockProducts.length > 5 && (
+              <div className="text-center pt-2">
+                <Button variant="ghost" size="sm">
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View {lowStockProducts.length - 5} more alerts
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
@@ -318,19 +478,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Low Stock Alerts */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-warning">
-              <AlertTriangle size={20} />
-              Low Stock Alerts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center text-muted-foreground p-4">
-              Low stock alerts feature coming soon
-            </div>
-          </CardContent>
-        </Card>
+        <LowStockAlertsSection />
       </div>
 
       {/* Pending Prescriptions */}
