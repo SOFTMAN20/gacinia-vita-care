@@ -98,7 +98,7 @@ export default function AdminProducts() {
         brand: data.brand,
         sku: finalSKU,
         price: Number(data.retailPrice),
-        original_price: data.originalPrice ? Number(data.originalPrice) : null,
+        original_price: data.originalPrice ? Number(data.originalPrice) : undefined,
         wholesale_price: Number(data.wholesalePrice),
         image_url: data.images?.[0],
         images: data.images || [],
