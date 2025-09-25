@@ -9,12 +9,12 @@ import {
   Search, 
   User, 
   Menu, 
-  Cross, 
   Phone, 
   MapPin,
   Settings,
   LogOut
 } from 'lucide-react';
+import gaciniaLogo from '@/assets/gacinia-logo.png';
 import { CartIcon } from '@/components/cart/CartIcon';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { LanguageToggle } from '@/components/ui/language-toggle';
@@ -89,9 +89,11 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
             {/* Logo */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-                  <Cross className="text-white w-6 h-6" />
-                </div>
+                <img 
+                  src={gaciniaLogo} 
+                  alt="Gacinia Pharmacy & Medical Supplies" 
+                  className="w-10 h-10 object-contain"
+                />
                 <div>
                   <h1 className="font-heading text-xl font-bold text-primary">
                     {t('header.company')}
