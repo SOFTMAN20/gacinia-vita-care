@@ -65,21 +65,19 @@ interface ProductFormProps {
 }
 
 import { useCategories } from '@/hooks/useCategories';
-
-const brands = [
-  'Panadol',
-  'GSK',
-  'Pfizer',
-  'Johnson & Johnson',
-  'Bayer',
-  'Novartis',
-  'Local Brand'
-];
+import { useBrands } from '@/hooks/useBrands';
+import AddBrandDialog from './AddBrandDialog';
 
 export default function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductFormProps) {
   const [images, setImages] = useState<string[]>(product?.images || []);
   const [currentTag, setCurrentTag] = useState('');
+  const [showAddBrandDialog, setShowAddBrandDialog] = useState(false);
   const { categories } = useCategories();
+  const { brands } = useBrands();
+
+  const handleBrandAdded = (brandName: string) => {
+    form.setValue('brand', brandName);
+  };
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -440,20 +438,31 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Brand</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select brand" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {brands.map((brand) => (
-                              <SelectItem key={brand} value={brand}>
-                                {brand}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex gap-2">
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Select brand" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {brands.map((brand) => (
+                                <SelectItem key={brand.id} value={brand.name}>
+                                  {brand.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setShowAddBrandDialog(true)}
+                            title="Add new brand"
+                          >
+                            +
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -666,6 +675,11 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
           </div>
         </form>
       </Form>
+      <AddBrandDialog
+        open={showAddBrandDialog}
+        onOpenChange={setShowAddBrandDialog}
+        onBrandAdded={handleBrandAdded}
+      />
     </div>
   );
 }
