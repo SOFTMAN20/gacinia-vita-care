@@ -73,10 +73,11 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   const [currentTag, setCurrentTag] = useState('');
   const [showAddBrandDialog, setShowAddBrandDialog] = useState(false);
   const { categories } = useCategories();
-  const { brands, loading: brandsLoading } = useBrands();
+  const { brands, loading: brandsLoading, refetch: refetchBrands } = useBrands();
 
   const handleBrandAdded = (brandName: string) => {
     form.setValue('brand', brandName);
+    refetchBrands(); // Ensure the brands list is updated
   };
 
   const form = useForm<ProductFormData>({
