@@ -24,6 +24,7 @@ export const useLowStockAlerts = () => {
       setLoading(true);
       setError(null);
 
+      // First, get all active products
       const { data, error: fetchError } = await supabase
         .from('products')
         .select(`
@@ -39,12 +40,18 @@ export const useLowStockAlerts = () => {
           )
         `)
         .eq('is_active', true)
-        .or('stock_count.lte.min_stock_level,stock_count.eq.0')
         .order('stock_count', { ascending: true });
 
       if (fetchError) throw fetchError;
 
-      const formattedData: LowStockProduct[] = (data || []).map(product => ({
+      // Filter products with low stock or out of stock on the client side
+      const lowStockData = (data || []).filter(product => {
+        const stockCount = product.stock_count || 0;
+        const minStockLevel = product.min_stock_level || 5;
+        return stockCount <= minStockLevel || stockCount === 0;
+      });
+
+      const formattedData: LowStockProduct[] = lowStockData.map(product => ({
         id: product.id,
         name: product.name,
         sku: product.sku || '',
