@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ShoppingBag, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '@/assets/hero-pharmacy.jpg';
+import heroPharmacyMain from '@/assets/hero-pharmacy-main.jpg';
+import heroMedicalSupplies from '@/assets/hero-medical-supplies.jpg';
+import heroDelivery from '@/assets/hero-delivery.jpg';
 
 export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -18,6 +20,8 @@ export function HeroSection() {
       cta1Sw: "Nunua Sasa",
       cta2: "Wholesale Portal",
       cta2Sw: "Jumla",
+      image: heroPharmacyMain,
+      alt: "Modern pharmacy interior with medicines"
     },
     {
       title: "Professional Medical Supplies",
@@ -28,6 +32,8 @@ export function HeroSection() {
       cta1Sw: "Tazama Katalogi",
       cta2: "Contact Us",
       cta2Sw: "Wasiliana Nasi",
+      image: heroMedicalSupplies,
+      alt: "Professional medical equipment and supplies"
     },
     {
       title: "Fast & Reliable Delivery",
@@ -38,6 +44,8 @@ export function HeroSection() {
       cta1Sw: "Agiza Sasa",
       cta2: "Learn More",
       cta2Sw: "Jua Zaidi",
+      image: heroDelivery,
+      alt: "Fast medical delivery service"
     },
   ];
 
@@ -107,8 +115,8 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
-          src={heroImage}
-          alt="Gacinia Pharmacy Interior"
+          src={currentSlideData.image}
+          alt={currentSlideData.alt}
           className="w-full h-full object-cover opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary/40 to-secondary/60" />
