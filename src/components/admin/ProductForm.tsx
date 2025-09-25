@@ -73,7 +73,7 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   const [currentTag, setCurrentTag] = useState('');
   const [showAddBrandDialog, setShowAddBrandDialog] = useState(false);
   const { categories } = useCategories();
-  const { brands } = useBrands();
+  const { brands, loading: brandsLoading } = useBrands();
 
   const handleBrandAdded = (brandName: string) => {
     form.setValue('brand', brandName);
@@ -439,18 +439,28 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                       <FormItem>
                         <FormLabel>Brand</FormLabel>
                         <div className="flex gap-2">
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger className="flex-1">
                                 <SelectValue placeholder="Select brand" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {brands.map((brand) => (
-                                <SelectItem key={brand.id} value={brand.name}>
-                                  {brand.name}
+                              {brandsLoading ? (
+                                <SelectItem value="" disabled>
+                                  Loading brands...
                                 </SelectItem>
-                              ))}
+                              ) : brands.length === 0 ? (
+                                <SelectItem value="" disabled>
+                                  No brands available
+                                </SelectItem>
+                              ) : (
+                                brands.map((brand) => (
+                                  <SelectItem key={brand.id} value={brand.name}>
+                                    {brand.name}
+                                  </SelectItem>
+                                ))
+                              )}
                             </SelectContent>
                           </Select>
                           <Button
@@ -459,8 +469,9 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                             size="icon"
                             onClick={() => setShowAddBrandDialog(true)}
                             title="Add new brand"
+                            disabled={brandsLoading}
                           >
-                            +
+                            <Plus className="h-4 w-4" />
                           </Button>
                         </div>
                         <FormMessage />
