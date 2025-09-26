@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { 
   Search, 
-  Filter, 
   Download, 
   Eye, 
   Mail, 
   Phone,
   MapPin,
-  Calendar,
   ShoppingBag,
   TrendingUp,
   Users,

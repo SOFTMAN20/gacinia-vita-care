@@ -1,7 +1,7 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { useUser } from '@/contexts/UserContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,14 +19,31 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { 
+  useAddresses, 
+  useUserOrders, 
+  usePrescriptions, 
+  useWishlist 
+} from '@/hooks/useUserDashboard';
+import { ProfileTab } from '@/components/dashboard/ProfileTab';
+import { OrdersTab } from '@/components/dashboard/OrdersTab';
+import { AddressesTab } from '@/components/dashboard/AddressesTab';
+import { PrescriptionsTab } from '@/components/dashboard/PrescriptionsTab';
+import { WishlistTab } from '@/components/dashboard/WishlistTab';
 
 export default function Dashboard() {
-  const { state } = useUser();
-  const { user, orders, prescriptions, wishlist } = state;
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
+  const { state: cartState } = useCart();
   const navigate = useNavigate();
+
+  // Fetch real data from Supabase
+  const { data: addresses = [], isLoading: addressesLoading } = useAddresses();
+  const { data: orders = [], isLoading: ordersLoading } = useUserOrders();
+  const { data: prescriptions = [], isLoading: prescriptionsLoading } = usePrescriptions();
+  const { data: wishlist = [], isLoading: wishlistLoading } = useWishlist();
 
   // Redirect admin users to admin dashboard
   useEffect(() => {
@@ -34,6 +51,11 @@ export default function Dashboard() {
       navigate('/admin');
     }
   }, [profile, navigate]);
+
+  const isLoading = addressesLoading || ordersLoading || prescriptionsLoading || wishlistLoading;
+
+  // Don't show loading for individual sections, just for initial load
+  const isInitialLoading = addressesLoading && ordersLoading && prescriptionsLoading && wishlistLoading;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -66,16 +88,34 @@ export default function Dashboard() {
   };
 
   const recentOrders = orders.slice(0, 3);
+  const approvedPrescriptions = prescriptions.filter(p => p.status === 'approved');
+
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar cartItemCount={cartState.totalItems} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading your dashboard...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <Navbar cartItemCount={cartState.totalItems} />
       
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {user?.name}!
+            Welcome back, {profile?.full_name || user?.email}!
           </h1>
           <p className="text-muted-foreground">
             Manage your account, orders, and health information
@@ -126,7 +166,7 @@ export default function Dashboard() {
                 <CheckCircle className="w-8 h-8 text-green-500" />
                 <div>
                   <p className="text-2xl font-bold">
-                    {prescriptions.filter((p) => p.status === 'approved').length}
+                    {approvedPrescriptions.length}
                   </p>
                   <p className="text-sm text-muted-foreground">Approved Prescriptions</p>
                 </div>
@@ -161,14 +201,16 @@ export default function Dashboard() {
                     {recentOrders.map((order) => (
                       <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div>
-                          <p className="font-medium">{order.orderNumber}</p>
-                          <p className="text-sm text-muted-foreground">{order.date}</p>
+                          <p className="font-medium">{order.order_number || `Order #${order.id.slice(0, 8)}`}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(order.created_at).toLocaleDateString()}
+                          </p>
                         </div>
                         <div className="text-right">
                           <Badge className={`${getStatusColor(order.status)} text-white`}>
                             {order.status}
                           </Badge>
-                          <p className="text-sm mt-1">TZS {order.total.toLocaleString()}</p>
+                          <p className="text-sm mt-1">TZS {order.total_amount.toLocaleString()}</p>
                         </div>
                       </div>
                     ))}
@@ -194,7 +236,10 @@ export default function Dashboard() {
                         <div>
                           <p className="font-medium">{prescription.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            Expires: {prescription.expiryDate}
+                            {prescription.expiry_date 
+                              ? `Expires: ${new Date(prescription.expiry_date).toLocaleDateString()}`
+                              : `Uploaded: ${new Date(prescription.upload_date).toLocaleDateString()}`
+                            }
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -242,58 +287,23 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Profile management coming soon...</p>
-              </CardContent>
-            </Card>
+            <ProfileTab />
           </TabsContent>
 
           <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Order history coming soon...</p>
-              </CardContent>
-            </Card>
+            <OrdersTab />
           </TabsContent>
 
           <TabsContent value="addresses">
-            <Card>
-              <CardHeader>
-                <CardTitle>Address Book</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Address management coming soon...</p>
-              </CardContent>
-            </Card>
+            <AddressesTab />
           </TabsContent>
 
           <TabsContent value="prescriptions">
-            <Card>
-              <CardHeader>
-                <CardTitle>Prescription Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Prescription management coming soon...</p>
-              </CardContent>
-            </Card>
+            <PrescriptionsTab />
           </TabsContent>
 
           <TabsContent value="wishlist">
-            <Card>
-              <CardHeader>
-                <CardTitle>My Wishlist</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Wishlist management coming soon...</p>
-              </CardContent>
-            </Card>
+            <WishlistTab />
           </TabsContent>
         </Tabs>
       </div>
