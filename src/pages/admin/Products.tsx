@@ -39,6 +39,7 @@ import CategoriesManager from '@/components/admin/CategoriesManager';
 import InventoryManager from '@/components/admin/InventoryManager';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const getStatusBadge = (product: any) => {
   if (!product.in_stock || product.stock_count === 0) {
@@ -87,49 +88,87 @@ export default function AdminProducts() {
   };
 
   const handleProductSubmit = async (data: any) => {
+    console.log('🚀 handleProductSubmit called with data:', data);
+    
+    // Check authentication status
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('🔐 Current user:', user);
+    
+    if (!user) {
+      toast.error('You must be logged in to add products');
+      return;
+    }
+    
     try {
+      // Validate required fields
+      if (!data.name || !data.category || !data.retailPrice) {
+        console.error('❌ Missing required fields:', { name: data.name, category: data.category, retailPrice: data.retailPrice });
+        toast.error('Please fill in all required fields (Name, Category, Price)');
+        return;
+      }
+      
       // Generate unique SKU if not provided or if it's empty
       const finalSKU = data.sku && data.sku.trim() ? data.sku.trim() : generateUniqueSKU(data.name);
+      console.log('🔧 Generated SKU:', finalSKU);
       
       const productData: CreateProductData = {
         name: data.name,
-        description: data.description,
-        short_description: data.shortDescription,
+        description: data.description || '',
+        short_description: data.shortDescription || '',
         category_id: data.category,
-        brand: data.brand,
+        brand: data.brand || null,
         sku: finalSKU,
-        price: Number(data.retailPrice),
-        original_price: data.originalPrice ? Number(data.originalPrice) : undefined,
-        wholesale_price: data.wholesalePrice ? Number(data.wholesalePrice) : undefined,
-        image_url: data.images?.[0],
+        price: Number(data.retailPrice) || 0,
+        original_price: data.originalPrice && Number(data.originalPrice) > 0 ? Number(data.originalPrice) : null,
+        wholesale_price: data.wholesalePrice && Number(data.wholesalePrice) > 0 ? Number(data.wholesalePrice) : null,
+        image_url: data.images?.[0] || null,
         images: data.images || [],
-        stock_count: Number(data.stock),
+        stock_count: Number(data.stock) || 0,
         min_stock_level: Number(data.minStock) || 5,
         requires_prescription: Boolean(data.requiresPrescription),
         wholesale_available: Boolean(data.wholesaleAvailable),
         key_features: data.tags || [],
-        weight: data.weight ? data.weight.toString() : null,
+        weight: data.weight && Number(data.weight) > 0 ? data.weight.toString() : null,
         is_active: data.status === 'active',
         featured: Boolean(data.featured),
-        in_stock: Number(data.stock) > 0, // Set in_stock based on stock count
+        in_stock: Number(data.stock) > 0,
       };
 
+      console.log('📦 Final product data to be sent:', productData);
+
       if (editingProduct) {
+        console.log('✏️ Updating existing product...');
         await updateProduct(editingProduct.id, productData);
         toast.success('Product updated and customers can now see the changes!');
       } else {
-        await createProduct(productData);
+        console.log('➕ Creating new product...');
+        const result = await createProduct(productData);
+        console.log('✅ Product creation result:', result);
         toast.success('Product created and is now available for customers!');
       }
       
       setShowProductForm(false);
       setEditingProduct(null);
     } catch (error) {
-      console.error('Product submission error:', error);
+      console.error('❌ Product submission error:', error);
+      console.error('❌ Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint
+      });
+      
+      // More specific error handling
       if (error?.message?.includes('duplicate key value violates unique constraint "products_sku_key"')) {
         toast.error('This SKU already exists. Please use a different SKU.');
+      } else if (error?.message?.includes('violates foreign key constraint')) {
+        toast.error('Invalid category selected. Please choose a valid category.');
+      } else if (error?.message?.includes('violates not-null constraint')) {
+        toast.error('Missing required field. Please check all required fields are filled.');
+      } else if (error?.message?.includes('permission denied')) {
+        toast.error('Permission denied. Please check if you are logged in as admin.');
       } else {
-        toast.error('Failed to save product. Please try again.');
+        toast.error(`Failed to save product: ${error?.message || 'Unknown error'}`);
       }
     }
   };

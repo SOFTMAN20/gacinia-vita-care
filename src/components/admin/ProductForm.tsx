@@ -34,24 +34,24 @@ import { ImageUploader } from '@/components/ui/image-uploader';
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   nameSwahili: z.string().optional(),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  shortDescription: z.string().max(500, 'Short description must be under 500 characters'),
+  description: z.string().min(1, 'Description is required'),
+  shortDescription: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
   brand: z.string().optional(),
-  sku: z.string().min(1, 'SKU is required'),
-  retailPrice: z.number().min(0, 'Price must be positive'),
-  originalPrice: z.number().optional(),
-  wholesalePrice: z.number().min(0, 'Wholesale price must be positive'),
-  stock: z.number().min(0, 'Stock must be positive'),
-  minStock: z.number().min(0, 'Minimum stock must be positive'),
-  weight: z.number().optional(),
-  requiresPrescription: z.boolean(),
-  wholesaleAvailable: z.boolean(),
-  featured: z.boolean(),
-  status: z.enum(['active', 'inactive', 'draft']),
+  sku: z.string().optional(),
+  retailPrice: z.coerce.number().min(0.01, 'Price must be greater than 0'),
+  originalPrice: z.coerce.number().optional(),
+  wholesalePrice: z.coerce.number().optional(),
+  stock: z.coerce.number().min(0, 'Stock must be positive'),
+  minStock: z.coerce.number().min(0, 'Minimum stock must be positive'),
+  weight: z.coerce.number().optional(),
+  requiresPrescription: z.boolean().default(false),
+  wholesaleAvailable: z.boolean().default(false),
+  featured: z.boolean().default(false),
+  status: z.enum(['active', 'inactive', 'draft']).default('active'),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).default([]),
   images: z.array(z.string()).optional(),
 });
 
@@ -128,6 +128,9 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   };
 
   const onFormSubmit = (data: ProductFormData) => {
+    console.log('🔥 ProductForm onFormSubmit called with:', data);
+    console.log('🔥 Images:', images);
+    console.log('✅ Form validation passed, submitting...');
     onSubmit({ ...data, images });
   };
 
@@ -153,7 +156,17 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
           <Button variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={form.handleSubmit(onFormSubmit)} disabled={isLoading}>
+          <Button 
+            onClick={(e) => {
+              console.log('🔥 Save button clicked!');
+              console.log('🔥 Form values:', form.getValues());
+              console.log('🔥 Form errors:', form.formState.errors);
+              
+              // Manually trigger form submission
+              form.handleSubmit(onFormSubmit)();
+            }}
+            disabled={isLoading}
+          >
             <Save className="w-4 h-4 mr-2" />
             {isLoading ? 'Saving...' : 'Save Product'}
           </Button>
@@ -161,7 +174,11 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-6">
+        <form 
+          id="product-form"
+          onSubmit={form.handleSubmit(onFormSubmit)} 
+          className="space-y-6"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Information */}
             <div className="lg:col-span-2 space-y-6">

@@ -21,6 +21,8 @@ import ProductForm from '@/components/admin/ProductForm';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { useLowStockAlerts, type LowStockProduct } from '@/hooks/useLowStockAlerts';
 import { RestockDialog } from '@/components/admin/RestockDialog';
+import { useAdminProducts } from '@/hooks/useAdminProducts';
+import { toast } from 'sonner';
 
 // Mock data for admin dashboard
 const dashboardData = {
@@ -308,11 +310,61 @@ const LowStockAlertsSection = () => {
 export default function AdminDashboard() {
   const [showProductForm, setShowProductForm] = useState(false);
   const { data: dashboardData, loading, error } = useAdminDashboard();
+  const { createProduct } = useAdminProducts();
 
-  const handleProductSubmit = (data: Record<string, unknown> & { images: string[] }) => {
-    console.log('Product submitted:', data);
-    setShowProductForm(false);
-    // Here you would typically make an API call to save the product
+  const handleProductSubmit = async (data: Record<string, unknown> & { images: string[] }) => {
+    console.log('🚀 Dashboard handleProductSubmit called with:', data);
+    
+    try {
+      
+      // Validate required fields
+      if (!data.name || !data.category || !data.retailPrice) {
+        toast.error('Please fill in all required fields (Name, Category, Price)');
+        return;
+      }
+      
+      // Generate unique SKU if not provided
+      const generateUniqueSKU = (baseName: string): string => {
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const namePrefix = baseName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase();
+        return `${namePrefix}-${timestamp}-${randomSuffix}`;
+      };
+      
+      const finalSKU = data.sku && data.sku.toString().trim() ? data.sku.toString().trim() : generateUniqueSKU(data.name.toString());
+      
+      const productData = {
+        name: data.name.toString(),
+        description: data.description?.toString() || '',
+        short_description: data.shortDescription?.toString() || '',
+        category_id: data.category.toString(),
+        brand: data.brand?.toString() || null,
+        sku: finalSKU,
+        price: Number(data.retailPrice) || 0,
+        original_price: data.originalPrice && Number(data.originalPrice) > 0 ? Number(data.originalPrice) : null,
+        wholesale_price: data.wholesalePrice && Number(data.wholesalePrice) > 0 ? Number(data.wholesalePrice) : null,
+        image_url: data.images?.[0] || null,
+        images: data.images || [],
+        stock_count: Number(data.stock) || 0,
+        min_stock_level: Number(data.minStock) || 5,
+        requires_prescription: Boolean(data.requiresPrescription),
+        wholesale_available: Boolean(data.wholesaleAvailable),
+        key_features: data.tags || [],
+        weight: data.weight && Number(data.weight) > 0 ? data.weight.toString() : null,
+        is_active: data.status === 'active',
+        featured: Boolean(data.featured),
+        in_stock: Number(data.stock) > 0,
+      };
+
+      console.log('📦 Creating product from dashboard:', productData);
+      await createProduct(productData);
+      
+      toast.success('Product created successfully!');
+      setShowProductForm(false);
+    } catch (error) {
+      console.error('❌ Error creating product from dashboard:', error);
+      toast.error(`Failed to create product: ${error?.message || 'Unknown error'}`);
+    }
   };
 
   const handleProductCancel = () => {

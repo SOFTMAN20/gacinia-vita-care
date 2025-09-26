@@ -81,7 +81,10 @@ export function useAdminProducts() {
   };
 
   const createProduct = async (productData: CreateProductData) => {
-    return optimistic.addProductOptimistic(productData, async () => {
+    console.log('🔥 useAdminProducts createProduct called with:', productData);
+    
+    // Bypass optimistic updates for now to debug
+    try {
       const finalProductData = {
         ...productData,
         is_active: productData.is_active !== false,
@@ -89,7 +92,7 @@ export function useAdminProducts() {
         featured: Boolean(productData.featured),
       };
       
-      console.log('Creating product with data:', finalProductData);
+      console.log('🔥 Final product data for Supabase:', finalProductData);
       
       const { data, error } = await supabase
         .from('products')
@@ -101,16 +104,19 @@ export function useAdminProducts() {
         .single();
 
       if (error) {
-        console.error('Supabase error creating product:', error);
+        console.error('🔥 Supabase error creating product:', error);
         throw error;
       }
       
-      console.log('Product created successfully:', data);
+      console.log('🔥 Product created successfully:', data);
       
       // Update local state
       setProducts(prev => [data, ...prev]);
       return data;
-    });
+    } catch (error) {
+      console.error('🔥 Error in createProduct:', error);
+      throw error;
+    }
   };
 
   const updateProduct = async (id: string, productData: Partial<CreateProductData>) => {
