@@ -216,14 +216,14 @@ const LowStockAlertsSection = () => {
             <p className="text-muted-foreground">No low stock alerts at this time.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-hidden">
             {lowStockProducts.slice(0, 5).map((product) => (
               <div 
                 key={product.id}
-                className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors min-w-0"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <div className="relative flex-shrink-0">
                     {product.image_url ? (
                       <img 
                         src={product.image_url} 
@@ -241,28 +241,28 @@ const LowStockAlertsSection = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium">{product.name}</h4>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {product.sku && <span>SKU: {product.sku}</span>}
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-medium truncate">{product.name}</h4>
+                    <div className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
+                      {product.sku && <span className="truncate">SKU: {product.sku}</span>}
                       {product.category_name && (
                         <>
-                          <span>•</span>
-                          <span>{product.category_name}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="truncate">{product.category_name}</span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                  <div className="text-left sm:text-right flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium whitespace-nowrap">
                         Stock: {product.stock_count}
                       </span>
                       <Badge 
                         variant={product.stock_count === 0 ? "destructive" : "secondary"}
-                        className="text-xs"
+                        className="text-xs whitespace-nowrap"
                       >
                         {product.stock_count === 0 ? "OUT OF STOCK" : "LOW STOCK"}
                       </Badge>
@@ -275,7 +275,7 @@ const LowStockAlertsSection = () => {
                     variant="outline" 
                     size="sm" 
                     onClick={() => handleRestockClick(product)}
-                    className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                    className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 w-full sm:w-auto flex-shrink-0"
                   >
                     Restock
                   </Button>
