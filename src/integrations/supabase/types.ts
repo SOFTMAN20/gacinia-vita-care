@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          city: string
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          label: string
+          postal_code: string | null
+          region: string
+          street: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          city: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          label: string
+          postal_code?: string | null
+          region: string
+          street: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          city?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          label?: string
+          postal_code?: string | null
+          region?: string
+          street?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "addresses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           country_of_origin: string | null
@@ -271,6 +318,59 @@ export type Database = {
           },
         ]
       }
+      prescriptions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          doctor_name: string | null
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          name: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+          upload_date: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          doctor_name?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          upload_date?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          doctor_name?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          upload_date?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           batch_number: string | null
@@ -455,6 +555,42 @@ export type Database = {
           tax_id?: string | null
         }
         Relationships: []
+      }
+      wishlist: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wishlist_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
