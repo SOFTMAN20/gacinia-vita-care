@@ -10,7 +10,8 @@ import {
   AlertTriangle,
   Settings,
   Archive,
-  FolderTree
+  FolderTree,
+  MoreHorizontal
 } from 'lucide-react';
 import { useAdminProducts, CreateProductData } from '@/hooks/useAdminProducts';
 import { useCategories } from '@/hooks/useCategories';
@@ -190,23 +191,25 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Products Management</h1>
-          <p className="text-muted-foreground">
+      <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Products Management</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your pharmacy inventory and product catalog
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowProductForm(true)}>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
+          <Button variant="outline" onClick={() => setShowProductForm(true)} className="w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
-            Add Product
+            <span className="sm:hidden">Add Product</span>
+            <span className="hidden sm:inline">Add Product</span>
           </Button>
           {selectedProducts.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Bulk Actions ({selectedProducts.length})
+                <Button variant="outline" className="w-full sm:w-auto">
+                  <span className="sm:hidden">Actions ({selectedProducts.length})</span>
+                  <span className="hidden sm:inline">Bulk Actions ({selectedProducts.length})</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -233,10 +236,19 @@ export default function AdminProducts() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="products" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="products" className="text-xs sm:text-sm py-2">
+            <span className="sm:hidden">Products</span>
+            <span className="hidden sm:inline">Products</span>
+          </TabsTrigger>
+          <TabsTrigger value="categories" className="text-xs sm:text-sm py-2">
+            <span className="sm:hidden">Categories</span>
+            <span className="hidden sm:inline">Categories</span>
+          </TabsTrigger>
+          <TabsTrigger value="inventory" className="text-xs sm:text-sm py-2">
+            <span className="sm:hidden">Inventory</span>
+            <span className="hidden sm:inline">Inventory</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-6">
@@ -290,22 +302,27 @@ export default function AdminProducts() {
       {/* Filters and Search */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex flex-1 gap-4">
-              <div className="relative flex-1 max-w-md">
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search products, SKU..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 w-full"
                 />
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-full sm:w-auto justify-start">
                     <Filter className="w-4 h-4 mr-2" />
-                    {selectedCategory === 'all' ? 'All Categories' : selectedCategory}
+                    <span className="sm:hidden">
+                      {selectedCategory === 'all' ? 'All' : selectedCategory}
+                    </span>
+                    <span className="hidden sm:inline">
+                      {selectedCategory === 'all' ? 'All Categories' : selectedCategory}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -322,115 +339,118 @@ export default function AdminProducts() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
-                  <input
-                    type="checkbox"
-                    checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
-                    onChange={selectAllProducts}
-                    className="rounded border-gray-300"
-                  />
-                </TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>SKU</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12 px-2 sm:px-4">
                     <input
                       type="checkbox"
-                      checked={selectedProducts.includes(product.id)}
-                      onChange={() => toggleProductSelection(product.id)}
+                      checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                      onChange={selectAllProducts}
                       className="rounded border-gray-300"
                     />
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{product.name}</div>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{product.sku || '-'}</TableCell>
-                  <TableCell>{product.category?.name || '-'}</TableCell>
-                  <TableCell>TSh {product.price.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStockIndicator(product.stock_count, product.min_stock_level)}
-                      <span>{product.stock_count}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(product)}
-                  </TableCell>
-                  <TableCell>{new Date(product.updated_at).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          Actions
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => {
-                          const formData = {
-                            name: product.name,
-                            nameSwahili: '',
-                            description: product.description || '',
-                            shortDescription: product.short_description || '',
-                            category: product.category_id,
-                            brand: product.brand || '',
-                            sku: product.sku || '',
-                            retailPrice: product.price,
-                            originalPrice: product.original_price || 0,
-                            wholesalePrice: product.wholesale_price || 0,
-                            stock: product.stock_count,
-                            minStock: product.min_stock_level,
-                            weight: product.weight ? parseFloat(product.weight) : 0,
-                            requiresPrescription: product.requires_prescription,
-                            wholesaleAvailable: product.wholesale_available,
-                            featured: product.featured,
-                            status: product.is_active ? 'active' : 'inactive',
-                            seoTitle: '',
-                            seoDescription: '',
-                            tags: product.key_features || [],
-                            images: product.images || []
-                          };
-                          setEditingProduct({ ...product, ...formData });
-                          setShowProductForm(true);
-                        }}>
-                          <Edit3 className="w-4 h-4 mr-2" />
-                          Edit Product
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          className="text-destructive"
-                          onClick={() => {
-                            if (confirm('Are you sure you want to delete this product?')) {
-                              deleteProduct(product.id);
-                            }
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Product
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead className="px-2 sm:px-4">Product</TableHead>
+                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">SKU</TableHead>
+                  <TableHead className="hidden md:table-cell px-2 sm:px-4">Category</TableHead>
+                  <TableHead className="px-2 sm:px-4">Price</TableHead>
+                  <TableHead className="px-2 sm:px-4">Stock</TableHead>
+                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell px-2 sm:px-4">Last Updated</TableHead>
+                  <TableHead className="text-right px-2 sm:px-4 w-20">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="px-2 sm:px-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedProducts.includes(product.id)}
+                        onChange={() => toggleProductSelection(product.id)}
+                        className="rounded border-gray-300"
+                      />
+                    </TableCell>
+                    <TableCell className="px-2 sm:px-4">
+                      <div className="font-medium text-sm sm:text-base truncate max-w-32 sm:max-w-none">{product.name}</div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell px-2 sm:px-4 font-mono text-sm">{product.sku || '-'}</TableCell>
+                    <TableCell className="hidden md:table-cell px-2 sm:px-4 text-sm">{product.category?.name || '-'}</TableCell>
+                    <TableCell className="px-2 sm:px-4 text-sm sm:text-base">TSh {product.price.toLocaleString()}</TableCell>
+                    <TableCell className="px-2 sm:px-4">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        {getStockIndicator(product.stock_count, product.min_stock_level)}
+                        <span className="text-sm">{product.stock_count}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell px-2 sm:px-4">
+                      {getStatusBadge(product)}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell px-2 sm:px-4 text-sm">{new Date(product.updated_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right px-2 sm:px-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            const formData = {
+                              name: product.name,
+                              nameSwahili: '',
+                              description: product.description || '',
+                              shortDescription: product.short_description || '',
+                              category: product.category_id,
+                              brand: product.brand || '',
+                              sku: product.sku || '',
+                              retailPrice: product.price,
+                              originalPrice: product.original_price || 0,
+                              wholesalePrice: product.wholesale_price || 0,
+                              stock: product.stock_count,
+                              minStock: product.min_stock_level,
+                              weight: product.weight ? parseFloat(product.weight) : 0,
+                              requiresPrescription: product.requires_prescription,
+                              wholesaleAvailable: product.wholesale_available,
+                              featured: product.featured,
+                              status: product.is_active ? 'active' : 'inactive',
+                              seoTitle: '',
+                              seoDescription: '',
+                              tags: product.key_features || [],
+                              images: product.images || []
+                            };
+                            setEditingProduct({ ...product, ...formData });
+                            setShowProductForm(true);
+                          }}>
+                            <Edit3 className="w-4 h-4 mr-2" />
+                            Edit Product
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => {
+                              if (confirm('Are you sure you want to delete this product?')) {
+                                deleteProduct(product.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Product
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       </TabsContent>

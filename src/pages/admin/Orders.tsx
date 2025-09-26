@@ -159,50 +159,51 @@ export default function OrdersPage() {
   const OrdersTable = () => (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Orders Management</CardTitle>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search orders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-full sm:w-64"
-                />
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={paymentFilter} onValueChange={setPaymentFilter}>
-                  <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue placeholder="Payment" />
-                  </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Payments</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="refunded">Refunded</SelectItem>
-              </SelectContent>
-                </Select>
-                <Button variant="outline" className="touch-target" onClick={handleExport}>
-                  <Download className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Export</span>
-                </Button>
-              </div>
+        <div className="space-y-4">
+          <CardTitle className="text-lg sm:text-xl">Orders Management</CardTitle>
+          <div className="flex flex-col space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search orders..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full"
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="shipped">Shipped</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Payment" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Payments</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="refunded">Refunded</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" className="w-full sm:w-auto" onClick={handleExport}>
+                <Download className="w-4 h-4 mr-2" />
+                <span className="sm:hidden">Export</span>
+                <span className="hidden sm:inline">Export</span>
+              </Button>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -221,14 +222,14 @@ export default function OrdersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="px-2 sm:px-4">Order #</TableHead>
+                  <TableHead className="px-2 sm:px-4">Customer</TableHead>
+                  <TableHead className="hidden sm:table-cell px-2 sm:px-4">Items</TableHead>
+                  <TableHead className="px-2 sm:px-4">Status</TableHead>
+                  <TableHead className="hidden md:table-cell px-2 sm:px-4">Payment</TableHead>
+                  <TableHead className="px-2 sm:px-4">Total</TableHead>
+                  <TableHead className="hidden lg:table-cell px-2 sm:px-4">Date</TableHead>
+                  <TableHead className="px-2 sm:px-4 w-16">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -254,44 +255,45 @@ export default function OrdersPage() {
                     
                     return (
                       <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.order_number}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium px-2 sm:px-4 text-sm">{order.order_number}</TableCell>
+                        <TableCell className="px-2 sm:px-4">
                           <div>
-                            <div className="font-medium">{customerName}</div>
+                            <div className="font-medium text-sm truncate max-w-24 sm:max-w-none">{customerName}</div>
                             {customerPhone && (
-                              <div className="text-sm text-muted-foreground">{customerPhone}</div>
+                              <div className="text-xs text-muted-foreground hidden sm:block">{customerPhone}</div>
                             )}
                             {customerEmail && (
-                              <div className="text-sm text-muted-foreground">{customerEmail}</div>
+                              <div className="text-xs text-muted-foreground hidden sm:block">{customerEmail}</div>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell px-2 sm:px-4">
                           <div className="text-sm">
                             {itemsCount} item{itemsCount !== 1 ? 's' : ''}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant={statusConfig[order.status].variant} className="flex items-center gap-1 w-fit">
+                        <TableCell className="px-2 sm:px-4">
+                          <Badge variant={statusConfig[order.status].variant} className="flex items-center gap-1 w-fit text-xs">
                             <StatusIcon className="w-3 h-3" />
-                            {statusConfig[order.status].label}
+                            <span className="hidden sm:inline">{statusConfig[order.status].label}</span>
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant={paymentStatusConfig[order.payment_status].variant}>
+                        <TableCell className="hidden md:table-cell px-2 sm:px-4">
+                          <Badge variant={paymentStatusConfig[order.payment_status].variant} className="text-xs">
                             {paymentStatusConfig[order.payment_status].label}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium px-2 sm:px-4 text-sm">
                           TSh {order.total_amount.toLocaleString()}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden lg:table-cell px-2 sm:px-4 text-sm">
                           {new Date(order.created_at).toLocaleDateString()}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="px-2 sm:px-4">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -450,17 +452,19 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Orders Management</h2>
-        <p className="text-muted-foreground">
-          Process and track customer orders
-        </p>
+      <div className="flex flex-col space-y-2 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+        <div className="space-y-1">
+          <h2 className="text-2xl sm:text-3xl font-bold">Orders Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Process and track customer orders
+          </p>
+        </div>
       </div>
 
       <Tabs defaultValue="orders" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 h-auto">
+          <TabsTrigger value="orders" className="text-sm py-2">Orders</TabsTrigger>
+          <TabsTrigger value="analytics" className="text-sm py-2">Analytics</TabsTrigger>
         </TabsList>
         
         <TabsContent value="orders">

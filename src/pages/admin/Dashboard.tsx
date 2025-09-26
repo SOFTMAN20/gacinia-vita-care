@@ -333,19 +333,23 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard Overview</h1>
-          <p className="text-muted-foreground">
+      <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Overview</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Welcome back, Admin. Here's what's happening with your pharmacy today.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setShowProductForm(true)}>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
+          <Button onClick={() => setShowProductForm(true)} className="w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
-            Add Product
+            <span className="sm:hidden">Add Product</span>
+            <span className="hidden sm:inline">Add Product</span>
           </Button>
-          <Button variant="outline">View Reports</Button>
+          <Button variant="outline" className="w-full sm:w-auto">
+            <span className="sm:hidden">Reports</span>
+            <span className="hidden sm:inline">View Reports</span>
+          </Button>
         </div>
       </div>
 
