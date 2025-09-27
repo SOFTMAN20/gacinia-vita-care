@@ -181,7 +181,7 @@ const Products = () => {
       <Navbar cartItemCount={state.totalItems} />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header - Always show */}
         <div className="mb-8">
           <h1 className="font-heading text-3xl font-bold text-foreground mb-4">
             {getPageTitle()}
@@ -230,30 +230,29 @@ const Products = () => {
             </div>
           )}
 
-          {/* Results */}
-          {!loading && !error && (
-            <>
-              {/* Toolbar */}
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-sm text-muted-foreground">
-                  {filteredAndSortedProducts.length} products found
-                </p>
-                <ProductSort
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                />
-              </div>
-
-              {/* Products Grid */}
-              <ProductGrid
-                products={filteredAndSortedProducts}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-                onAddToCart={handleAddToCart}
-                onQuickView={handleQuickView}
-                onToggleWishlist={handleToggleWishlist}
+          {/* Toolbar - Always show unless error */}
+          {!error && (
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-sm text-muted-foreground">
+                {loading ? 'Loading products...' : `${filteredAndSortedProducts.length} products found`}
+              </p>
+              <ProductSort
+                sortBy={sortBy}
+                onSortChange={setSortBy}
               />
-            </>
+            </div>
+          )}
+
+          {/* Products Grid */}
+          {!loading && !error && (
+            <ProductGrid
+              products={filteredAndSortedProducts}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onAddToCart={handleAddToCart}
+              onQuickView={handleQuickView}
+              onToggleWishlist={handleToggleWishlist}
+            />
           )}
         </div>
       </main>
