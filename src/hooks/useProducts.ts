@@ -164,7 +164,7 @@ export function useFeaturedProducts() {
         .eq('is_active', true)
         .eq('featured', true)
         .order('created_at', { ascending: false })
-        .limit(8);
+        .limit(12);
 
       if (error) {
         throw error;

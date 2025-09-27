@@ -1,4 +1,5 @@
-import { Cross, Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter } from 'lucide-react';
+import gaciniaLogo from '@/assets/gacinia-logo.png';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,9 +11,11 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-surface rounded-lg flex items-center justify-center">
-                <Cross className="text-primary w-5 h-5" />
-              </div>
+              <img 
+                src={gaciniaLogo} 
+                alt="Gacinia Pharmacy & Medical Supplies" 
+                className="w-8 h-8 object-contain"
+              />
               <div>
                 <h3 className="font-heading text-lg font-bold">Gacinia</h3>
                 <p className="text-xs opacity-90">Pharmacy & Medical</p>

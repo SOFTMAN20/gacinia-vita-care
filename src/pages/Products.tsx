@@ -20,7 +20,7 @@ const Products = () => {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const { addItem, state } = useCart();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -49,7 +49,7 @@ const Products = () => {
     const categoryParam = searchParams.get('category');
     const wholesaleParam = searchParams.get('wholesale');
     const searchParam = searchParams.get('search');
-    
+
     const newFilters: FilterState = {
       categories: [],
       brands: [],
@@ -57,7 +57,7 @@ const Products = () => {
       availability: [],
       special: []
     };
-    
+
     // Handle category filtering
     if (categoryParam) {
       const categories = categoryParam.split(',');
@@ -65,19 +65,19 @@ const Products = () => {
     } else if (category) {
       newFilters.categories = [category];
     }
-    
+
     // Handle wholesale filtering
     if (wholesaleParam === 'true') {
       newFilters.special = ['wholesale'];
     }
-    
+
     // Handle search query
     if (searchParam) {
       setSearchQuery(searchParam);
     } else {
       setSearchQuery('');
     }
-    
+
     setFilters(newFilters);
   }, [searchParams, category]);
 
@@ -86,7 +86,7 @@ const Products = () => {
     const categoryParam = searchParams.get('category');
     const wholesaleParam = searchParams.get('wholesale');
     const searchParam = searchParams.get('search');
-    
+
     if (searchParam) {
       return `Search Results for "${searchParam}"`;
     } else if (wholesaleParam === 'true') {
@@ -95,7 +95,7 @@ const Products = () => {
       const category = categories.find(cat => cat.slug === categoryParam);
       return category ? category.name : 'Products';
     }
-    
+
     return 'Products Catalog';
   };
 
@@ -179,7 +179,7 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar cartItemCount={state.totalItems} />
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Search Section */}
         <div className="mb-8">
@@ -188,26 +188,6 @@ const Products = () => {
             onSearchChange={setSearchQuery}
             suggestions={['Panadol Extra', 'Blood pressure monitor', 'Vitamin C tablets']}
           />
-        </div>
-
-        {/* Filters Sheet */}
-        <div className="mb-6">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline">
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80">
-              <ProductFilters
-                filters={filters}
-                onFiltersChange={setFilters}
-                onClearFilters={clearFilters}
-                isMobile
-              />
-            </SheetContent>
-          </Sheet>
         </div>
 
         {/* Products Content */}
@@ -227,13 +207,32 @@ const Products = () => {
             </div>
           )}
 
-          {/* Toolbar - Sort only */}
+          {/* Toolbar - Filters and Sort in one line */}
           {!error && (
-            <div className="flex justify-end items-center mb-6">
-              <ProductSort
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-              />
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-6">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filters
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-80">
+                  <ProductFilters
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    onClearFilters={clearFilters}
+                    isMobile
+                  />
+                </SheetContent>
+              </Sheet>
+
+              <div className="w-full sm:w-auto">
+                <ProductSort
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                />
+              </div>
             </div>
           )}
 
@@ -250,7 +249,7 @@ const Products = () => {
           )}
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

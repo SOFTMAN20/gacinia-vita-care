@@ -9,11 +9,11 @@ import {
   BarChart3, 
   Settings,
   ChevronLeft,
-  ChevronRight,
-  Cross
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import gaciniaLogo from '@/assets/gacinia-logo.png';
 
 interface AdminSidebarProps {
   className?: string;
@@ -80,9 +80,11 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Cross className="text-white w-5 h-5" />
-              </div>
+              <img 
+                src={gaciniaLogo} 
+                alt="Gacinia Pharmacy & Medical Supplies" 
+                className="w-8 h-8 object-contain"
+              />
               <div>
                 <h2 className="font-heading text-lg font-bold text-primary">
                   Gacinia Admin
