@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { 
-  Search, 
-  User, 
-  Menu, 
-  Phone, 
+import {
+  Search,
+  User,
+  Menu,
+  Phone,
   MapPin,
   Settings,
-  LogOut
+  LogOut,
+  ChevronDown
 } from 'lucide-react';
 import gaciniaLogo from '@/assets/gacinia-logo.png';
 import { CartIcon } from '@/components/cart/CartIcon';
@@ -32,18 +33,26 @@ interface NavbarProps {
 export function Navbar({ cartItemCount = 0 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
   const { user, profile, hasRole, signOut } = useAuth();
   const { language } = useLanguage();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
+
   // Real-time connection status and stock updates
   const realtimeStatus = useRealtimeProducts();
   useRealtimeStock(); // Initialize real-time stock monitoring
 
   const menuItems = [
     { name: t('nav.allProducts', 'All Products'), href: '/products' },
-    { name: t('nav.medicines'), href: '/products?category=prescription-medicines,over-the-counter' },
+    {
+      name: t('nav.medicines'),
+      href: '/products?category=prescription-medicines,over-the-counter',
+      dropdown: [
+        { name: 'Over-the-Counter', href: '/products?category=over-the-counter' },
+        { name: 'Prescription Medicines', href: '/products?category=prescription-medicines' }
+      ]
+    },
     { name: t('nav.cosmetics'), href: '/products?category=cosmetics-personal-care' },
     { name: t('nav.equipment'), href: '/products?category=medical-equipment,first-aid-wellness' },
     { name: t('nav.wholesale'), href: '/products?wholesale=true' },
@@ -89,9 +98,9 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
             {/* Logo */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <img 
-                  src={gaciniaLogo} 
-                  alt="Gacinia Pharmacy & Medical Supplies" 
+                <img
+                  src={gaciniaLogo}
+                  alt="Gacinia Pharmacy & Medical Supplies"
                   className="w-10 h-10 object-contain"
                 />
                 <div>
@@ -200,14 +209,50 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 py-3 border-t" role="menubar">
             {menuItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm px-2 py-1"
-                role="menuitem"
-              >
-                {item.name}
-              </Link>
+              item.dropdown ? (
+                <div
+                  key={item.name}
+                  className="relative"
+                  onMouseEnter={() => setHoveredDropdown(item.name)}
+                  onMouseLeave={() => setHoveredDropdown(null)}
+                >
+                  <DropdownMenu open={hoveredDropdown === item.name}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm px-2 py-1 h-auto"
+                        role="menuitem"
+                      >
+                        {item.name}
+                        <ChevronDown className="ml-1 h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="bg-surface border border-border"
+                      onMouseEnter={() => setHoveredDropdown(item.name)}
+                      onMouseLeave={() => setHoveredDropdown(null)}
+                    >
+                      {item.dropdown.map((subItem) => (
+                        <DropdownMenuItem key={subItem.name} asChild>
+                          <Link to={subItem.href} className="flex items-center w-full">
+                            {subItem.name}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm px-2 py-1"
+                  role="menuitem"
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </div>
         </div>
@@ -229,14 +274,41 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
               {/* Mobile Navigation Links */}
               <div className="space-y-2">
                 {menuItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="block py-3 px-2 text-foreground hover:text-primary transition-colors touch-target rounded-lg hover:bg-muted"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
+                  item.dropdown ? (
+                    <DropdownMenu key={item.name}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between py-3 px-2 text-foreground hover:text-primary transition-colors touch-target rounded-lg hover:bg-muted h-auto"
+                        >
+                          {item.name}
+                          <ChevronDown className="ml-1 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="bg-surface border border-border w-56">
+                        {item.dropdown.map((subItem) => (
+                          <DropdownMenuItem key={subItem.name} asChild>
+                            <Link
+                              to={subItem.href}
+                              className="flex items-center w-full"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {subItem.name}
+                            </Link>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className="block py-3 px-2 text-foreground hover:text-primary transition-colors touch-target rounded-lg hover:bg-muted"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  )
                 ))}
               </div>
 
@@ -278,7 +350,7 @@ export function Navbar({ cartItemCount = 0 }: NavbarProps) {
           </div>
         )}
       </nav>
-      
+
       {/* Cart Drawer */}
       <CartDrawer />
     </>

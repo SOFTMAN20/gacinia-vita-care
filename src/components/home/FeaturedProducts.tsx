@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { ProductCard } from '@/components/ui/product-card';
+import { ProductQuickView } from '@/components/product/ProductQuickView';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useFeaturedProducts } from '@/hooks/useProducts';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Product } from '@/hooks/useProducts';
 import productsShowcase from '@/assets/products-showcase.jpg';
 
 export function FeaturedProducts() {
@@ -12,14 +15,22 @@ export function FeaturedProducts() {
   const { addItem } = useCart();
   const navigate = useNavigate();
   const { products: featuredProducts, loading, error } = useFeaturedProducts();
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   const handleAddToCart = (product: any) => {
     addItem(product, 1);
     toast.success(`${product.name} added to cart`);
   };
 
-  const handleQuickView = (product: any) => {
-    navigate(`/products/${product.id}`);
+  const handleQuickView = (product: Product) => {
+    setQuickViewProduct(product);
+    setIsQuickViewOpen(true);
+  };
+
+  const handleCloseQuickView = () => {
+    setIsQuickViewOpen(false);
+    setQuickViewProduct(null);
   };
 
   if (loading) {
@@ -83,6 +94,13 @@ export function FeaturedProducts() {
           </Button>
         </div>
       </div>
+
+      {/* Product Quick View Modal */}
+      <ProductQuickView
+        product={quickViewProduct}
+        isOpen={isQuickViewOpen}
+        onClose={handleCloseQuickView}
+      />
     </section>
   );
 }

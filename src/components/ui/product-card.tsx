@@ -17,8 +17,8 @@ interface ProductCardProps {
   isWishlisted?: boolean;
 }
 
-export function ProductCard({ 
-  product, 
+export function ProductCard({
+  product,
   className,
   onAddToCart,
   onQuickView,
@@ -27,7 +27,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const { addItem } = useCart();
   const navigate = useNavigate();
-  const discountPercentage = product.original_price 
+  const discountPercentage = product.original_price
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0;
 
@@ -35,6 +35,18 @@ export function ProductCard({
 
   const handleImageClick = () => {
     navigate(`/products/${product.id}`);
+  };
+
+  const handleQuickViewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onQuickView) {
+      onQuickView(product);
+    }
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleWishlist?.(product);
   };
 
   return (
@@ -50,7 +62,7 @@ export function ProductCard({
           className="object-contain w-full h-full transition-transform duration-300 hover:scale-105"
           loading="lazy"
         />
-        
+
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {discountPercentage > 0 && (
@@ -71,33 +83,35 @@ export function ProductCard({
             size="sm"
             variant="outline"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full"
-            onClick={() => onToggleWishlist?.(product)}
+            onClick={handleWishlistClick}
           >
-            <Heart 
-              size={14} 
+            <Heart
+              size={14}
               className={cn(
                 "transition-colors",
                 isWishlisted ? "fill-red-500 text-red-500" : "text-gray-400"
-              )} 
+              )}
             />
           </Button>
-          
-          <ShareProduct 
-            product={product}
-            variant="outline"
-            size="icon"
-            className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full [&>svg]:text-green-600 [&>svg]:hover:text-green-700"
-          />
-          
+
+          <div onClick={(e) => e.stopPropagation()}>
+            <ShareProduct
+              product={product}
+              variant="outline"
+              size="icon"
+              className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full [&>svg]:text-green-600 [&>svg]:hover:text-green-700"
+            />
+          </div>
+
           <Button
             size="sm"
             variant="outline"
             className="w-8 h-8 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full"
-            onClick={() => onQuickView?.(product)}
+            onClick={handleQuickViewClick}
           >
-            <Eye 
-              size={14} 
-              className="text-blue-600 hover:text-blue-700 transition-colors" 
+            <Eye
+              size={14}
+              className="text-blue-600 hover:text-blue-700 transition-colors"
             />
           </Button>
         </div>

@@ -8,6 +8,7 @@ import { ProductReviews } from '@/components/product/ProductReviews';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useMetaTags } from '@/hooks/useMetaTags';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,6 +20,15 @@ const ProductDetail = () => {
   
   // Find the product by ID
   const product = products?.find(p => p.id === id);
+
+  // Set up Open Graph meta tags for social sharing
+  useMetaTags({
+    title: product?.name,
+    description: product?.description || product?.short_description || `${product?.name} - Quality healthcare product available at Gacinia Pharmacy & Medical Supplies in Mbeya, Tanzania. Price: TZS ${product?.price.toLocaleString()}`,
+    image: product?.image_url,
+    url: `${window.location.origin}/products/${product?.id}`,
+    type: 'product'
+  });
   
   if (loading) {
     return (

@@ -8,6 +8,7 @@ import { ProductFilters, FilterState } from '@/components/catalog/ProductFilters
 import { ProductSort, SortOption } from '@/components/catalog/ProductSort';
 import { ProductGrid, ViewMode } from '@/components/catalog/ProductGrid';
 import { ProductSearch } from '@/components/catalog/ProductSearch';
+import { ProductQuickView } from '@/components/product/ProductQuickView';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useProducts } from '@/hooks/useProducts';
@@ -24,6 +25,8 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     brands: [],
@@ -156,8 +159,13 @@ const Products = () => {
   };
 
   const handleQuickView = (product: Product) => {
-    console.log('Quick view:', product);
-    // TODO: Implement quick view modal
+    setQuickViewProduct(product);
+    setIsQuickViewOpen(true);
+  };
+
+  const handleCloseQuickView = () => {
+    setIsQuickViewOpen(false);
+    setQuickViewProduct(null);
   };
 
   const handleToggleWishlist = (product: Product) => {
@@ -251,6 +259,13 @@ const Products = () => {
       </main>
 
       <Footer />
+
+      {/* Product Quick View Modal */}
+      <ProductQuickView
+        product={quickViewProduct}
+        isOpen={isQuickViewOpen}
+        onClose={handleCloseQuickView}
+      />
     </div>
   );
 };

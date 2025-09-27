@@ -44,7 +44,10 @@ export function ShareProduct({
   // Create share content
   const shareTitle = `Check out ${product.name} at Gacinia Pharmacy`;
   const shareDescription = `${product.name} - TZS ${product.price.toLocaleString()} | Quality medicines and healthcare products in Mbeya, Tanzania`;
-  const shareImage = product.image_url;
+  const shareImage = product.image_url || `${window.location.origin}/og-image.jpg`;
+  
+  // Enhanced WhatsApp message with better formatting
+  const whatsappMessage = `🏥 *${product.name}*\n\n💰 Price: *TZS ${product.price.toLocaleString()}*\n\n📍 Available at Gacinia Pharmacy & Medical Supplies, Mbeya\n\n${product.description ? `📋 ${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}\n\n` : ''}🔗 View details: ${productUrl}\n\n#GaciniaPharmacy #Mbeya #Healthcare`;
 
   // Social media sharing URLs
   const shareUrls = {
@@ -52,7 +55,7 @@ export function ShareProduct({
     
     twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(shareTitle)}&hashtags=GaciniaPharmacy,Mbeya,Healthcare`,
     
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareTitle}\n\n${shareDescription}\n\n${productUrl}`)}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`,
     
     instagram: productUrl, // Instagram doesn't support direct sharing, so we'll copy the link
     
