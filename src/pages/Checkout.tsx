@@ -532,7 +532,38 @@ const Checkout = () => {
         <div className="max-w-4xl mx-auto">
           {/* Progress Steps */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
+            {/* Mobile view - show only current step */}
+            <div className="md:hidden">
+              <div className="flex items-center justify-center">
+                {(() => {
+                  const currentStepData = steps.find(s => s.id === currentStep);
+                  if (!currentStepData) return null;
+                  const Icon = currentStepData.icon;
+                  const stepOrder: CheckoutStep[] = ['review', 'delivery', 'payment', 'confirmation'];
+                  const currentIndex = stepOrder.indexOf(currentStep);
+                  const totalSteps = stepOrder.length;
+                  
+                  return (
+                    <div className="flex flex-col items-center text-center">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary border-primary text-primary-foreground mb-2">
+                        <Icon size={24} />
+                      </div>
+                      <div>
+                        <p className="text-base font-medium text-primary">
+                          {currentStepData.title}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Step {currentIndex + 1} of {totalSteps}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Desktop view - show all steps */}
+            <div className="hidden md:flex items-center justify-between">
               {steps.map((step, index) => {
                 const isActive = step.id === currentStep;
                 const isCompleted = steps.findIndex(s => s.id === currentStep) > index;
