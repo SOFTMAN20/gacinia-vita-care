@@ -349,7 +349,7 @@ export default function AdminDashboard() {
         min_stock_level: Number(data.minStock) || 5,
         requires_prescription: Boolean(data.requiresPrescription),
         wholesale_available: Boolean(data.wholesaleAvailable),
-        key_features: data.tags || [],
+        key_features: Array.isArray(data.tags) ? data.tags : [],
         weight: data.weight && Number(data.weight) > 0 ? data.weight.toString() : null,
         is_active: data.status === 'active',
         featured: Boolean(data.featured),

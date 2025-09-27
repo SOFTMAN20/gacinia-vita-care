@@ -23,6 +23,11 @@ export function ImageUploader({
   className = ''
 }: ImageUploaderProps) {
   const [images, setImages] = useState<string[]>(currentImages);
+
+  // Update local state when currentImages prop changes
+  React.useEffect(() => {
+    setImages(currentImages);
+  }, [currentImages]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { uploadImages, deleteImage, isUploading, uploadProgress } = useImageUpload({
