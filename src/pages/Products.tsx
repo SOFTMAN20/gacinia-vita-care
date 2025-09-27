@@ -181,11 +181,8 @@ const Products = () => {
       <Navbar cartItemCount={state.totalItems} />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Header - Always show */}
+        {/* Search Section */}
         <div className="mb-8">
-          <h1 className="font-heading text-3xl font-bold text-foreground mb-4">
-            {getPageTitle()}
-          </h1>
           <ProductSearch
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -230,12 +227,9 @@ const Products = () => {
             </div>
           )}
 
-          {/* Toolbar - Always show unless error */}
+          {/* Toolbar - Sort only */}
           {!error && (
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-muted-foreground">
-                {loading ? 'Loading products...' : `${filteredAndSortedProducts.length} products found`}
-              </p>
+            <div className="flex justify-end items-center mb-6">
               <ProductSort
                 sortBy={sortBy}
                 onSortChange={setSortBy}
