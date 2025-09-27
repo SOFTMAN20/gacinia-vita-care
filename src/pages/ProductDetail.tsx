@@ -21,11 +21,29 @@ const ProductDetail = () => {
   // Find the product by ID
   const product = products?.find(p => p.id === id);
 
+  // Prepare image URL for social sharing - ensure it's accessible
+  const getShareableImageUrl = (imageUrl?: string) => {
+    if (!imageUrl) return undefined;
+    
+    // If it's already an absolute URL, use it
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // If it's a relative URL starting with /, make it absolute
+    if (imageUrl.startsWith('/')) {
+      return `${window.location.origin}${imageUrl}`;
+    }
+    
+    // If it's a relative URL without /, add the origin and /
+    return `${window.location.origin}/${imageUrl}`;
+  };
+
   // Set up Open Graph meta tags for social sharing
   useMetaTags({
     title: product?.name,
     description: product?.description || product?.short_description || `${product?.name} - Quality healthcare product available at Gacinia Pharmacy & Medical Supplies in Mbeya, Tanzania. Price: TZS ${product?.price.toLocaleString()}`,
-    image: product?.image_url,
+    image: getShareableImageUrl(product?.image_url),
     url: `${window.location.origin}/products/${product?.id}`,
     type: 'product'
   });

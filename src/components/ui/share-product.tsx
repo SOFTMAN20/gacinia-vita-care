@@ -41,10 +41,19 @@ export function ShareProduct({
   // Generate product URL (in production, this would be the actual product page URL)
   const productUrl = `${window.location.origin}/products/${product.id}`;
   
+  // Prepare shareable image URL
+  const getShareableImageUrl = (imageUrl?: string) => {
+    if (!imageUrl) return `${window.location.origin}/og-image.jpg`;
+    
+    if (imageUrl.startsWith('http')) return imageUrl;
+    if (imageUrl.startsWith('/')) return `${window.location.origin}${imageUrl}`;
+    return `${window.location.origin}/${imageUrl}`;
+  };
+
   // Create share content
   const shareTitle = `Check out ${product.name} at Gacinia Pharmacy`;
   const shareDescription = `${product.name} - TZS ${product.price.toLocaleString()} | Quality medicines and healthcare products in Mbeya, Tanzania`;
-  const shareImage = product.image_url || `${window.location.origin}/og-image.jpg`;
+  const shareImage = getShareableImageUrl(product.image_url);
   
   // Enhanced WhatsApp message with better formatting
   const whatsappMessage = `🏥 *${product.name}*\n\n💰 Price: *TZS ${product.price.toLocaleString()}*\n\n📍 Available at Gacinia Pharmacy & Medical Supplies, Mbeya\n\n${product.description ? `📋 ${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}\n\n` : ''}🔗 View details: ${productUrl}\n\n#GaciniaPharmacy #Mbeya #Healthcare`;

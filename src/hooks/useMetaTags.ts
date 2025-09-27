@@ -21,13 +21,32 @@ export function useMetaTags({
     // Store original meta tags to restore later
     const originalTags: { [key: string]: string } = {};
     
-    // Ensure image URL is absolute
-    const absoluteImageUrl = image ? (
-      image.startsWith('http') ? image : `${window.location.origin}${image}`
-    ) : `${window.location.origin}/og-image.jpg`;
+    // Ensure image URL is absolute and valid
+    const getAbsoluteImageUrl = (imageUrl?: string) => {
+      // If no image provided, use default
+      if (!imageUrl) {
+        return `${window.location.origin}/og-image.jpg`;
+      }
+      
+      // If already absolute, use as is
+      if (imageUrl.startsWith('http')) {
+        return imageUrl;
+      }
+      
+      // Make relative URLs absolute
+      const baseUrl = window.location.origin;
+      if (imageUrl.startsWith('/')) {
+        return `${baseUrl}${imageUrl}`;
+      }
+      
+      return `${baseUrl}/${imageUrl}`;
+    };
+    
+    const absoluteImageUrl = getAbsoluteImageUrl(image);
     
     // Meta tags to update
     const metaTags = [
+      // Open Graph tags
       { property: 'og:title', content: title },
       { property: 'og:description', content: description },
       { property: 'og:image', content: absoluteImageUrl },
@@ -35,15 +54,26 @@ export function useMetaTags({
       { property: 'og:image:width', content: '1200' },
       { property: 'og:image:height', content: '630' },
       { property: 'og:image:type', content: 'image/jpeg' },
+      { property: 'og:image:alt', content: `${title} - ${siteName}` },
       { property: 'og:url', content: url },
       { property: 'og:type', content: type },
       { property: 'og:site_name', content: siteName },
+      
+      // Twitter Card tags
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: absoluteImageUrl },
       { name: 'twitter:image:alt', content: `${title} - ${siteName}` },
-      { name: 'description', content: description }
+      
+      // WhatsApp specific (uses Open Graph)
+      { property: 'og:image:url', content: absoluteImageUrl },
+      
+      // General meta tags
+      { name: 'description', content: description },
+      
+      // Additional image meta for better compatibility
+      { name: 'image', content: absoluteImageUrl }
     ];
 
     // Update document title
