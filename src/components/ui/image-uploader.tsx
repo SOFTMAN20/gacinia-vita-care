@@ -69,7 +69,12 @@ export function ImageUploader({
       if (imageUrl.includes('supabase')) {
         const pathParts = imageUrl.split('/');
         const fileName = pathParts[pathParts.length - 1];
-        await deleteImage(fileName);
+        try {
+          await deleteImage(fileName);
+        } catch (deleteError) {
+          console.warn('Failed to delete from storage:', deleteError);
+          // Continue with removal from UI even if storage deletion fails
+        }
       }
 
       const updatedImages = images.filter((_, i) => i !== index);
@@ -77,6 +82,7 @@ export function ImageUploader({
       onImagesChange(updatedImages);
       toast.success('Image removed successfully');
     } catch (error) {
+      console.error('Error removing image:', error);
       toast.error('Failed to remove image');
     }
   };
@@ -171,11 +177,16 @@ export function ImageUploader({
                 <Button
                   size="sm"
                   variant="destructive"
-                  className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRemoveImage(index);
+                  }}
                   disabled={isUploading}
+                  title="Remove image"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                 </Button>
                 
                 {index === 0 && maxFiles > 1 && (
