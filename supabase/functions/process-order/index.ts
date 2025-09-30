@@ -164,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Don't fail the order for this
     }
 
-    // 7. Send notification
+    // 7. Send notification to customer
     try {
       await supabaseClient.functions.invoke('send-notification', {
         body: {
@@ -180,7 +180,29 @@ const handler = async (req: Request): Promise<Response> => {
         }
       });
     } catch (notificationError) {
-      console.error('Failed to send notification:', notificationError);
+      console.error('Failed to send customer notification:', notificationError);
+      // Don't fail the order for notification issues
+    }
+
+    // 8. Send notification to admins about new order
+    try {
+      await supabaseClient.functions.invoke('send-notification', {
+        body: {
+          user_id: 'admin', // This will be handled by the admin notification logic
+          type: 'new_order_admin',
+          title: 'New Order Received',
+          message: `Order #${order.order_number} placed for TZS ${totalAmount.toLocaleString()}`,
+          data: {
+            order_id: order.id,
+            order_number: order.order_number,
+            total_amount: totalAmount,
+            user_id: orderData.user_id
+          }
+        }
+      });
+      console.log('Admin notification sent for new order');
+    } catch (notificationError) {
+      console.error('Failed to send admin notification:', notificationError);
       // Don't fail the order for notification issues
     }
 

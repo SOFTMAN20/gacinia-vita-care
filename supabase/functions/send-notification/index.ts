@@ -78,6 +78,8 @@ const handler = async (req: Request): Promise<Response> => {
       case 'stock_alert':
         console.log(`Stock alert sent to user ${notificationData.user_id}`);
         break;
+      case 'new_order_admin':
+      case 'order_status_admin':
       case 'low_stock_admin':
         // Send to all admin users
         const { data: adminUsers } = await supabaseClient
@@ -86,13 +88,14 @@ const handler = async (req: Request): Promise<Response> => {
           .eq('role', 'admin');
         
         if (adminUsers) {
+          console.log(`Sending notification to ${adminUsers.length} admin users`);
           for (const admin of adminUsers) {
             await supabaseClient
               .from('notifications')
               .insert({
                 user_id: admin.id,
-                type: 'low_stock_admin',
-                title: 'Low Stock Alert',
+                type: notificationData.type,
+                title: notificationData.title,
                 message: notificationData.message,
                 data: notificationData.data,
                 is_read: false
