@@ -24,6 +24,7 @@ interface RestockDialogProps {
 export const RestockDialog = ({ product, open, onOpenChange, onSuccess }: RestockDialogProps) => {
   const [newStock, setNewStock] = useState('');
   const [addAmount, setAddAmount] = useState('');
+  const [reference, setReference] = useState('');
   const { restockProduct, loading } = useRestockProduct();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,11 +38,17 @@ export const RestockDialog = ({ product, open, onOpenChange, onSuccess }: Restoc
     }
 
     try {
-      await restockProduct(product.id, stockValue);
+      await restockProduct(
+        product.id, 
+        stockValue,
+        reference || undefined,
+        'Stock replenishment'
+      );
       onSuccess();
       onOpenChange(false);
       setNewStock('');
       setAddAmount('');
+      setReference('');
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -58,6 +65,7 @@ export const RestockDialog = ({ product, open, onOpenChange, onSuccess }: Restoc
     onOpenChange(false);
     setNewStock('');
     setAddAmount('');
+    setReference('');
   };
 
   if (!product) return null;
@@ -136,6 +144,18 @@ export const RestockDialog = ({ product, open, onOpenChange, onSuccess }: Restoc
                 onChange={(e) => setNewStock(e.target.value)}
                 min="0"
                 required
+              />
+            </div>
+
+            {/* Reference Field */}
+            <div className="grid gap-2">
+              <Label htmlFor="reference">Reference Number (Optional)</Label>
+              <Input
+                id="reference"
+                type="text"
+                placeholder="e.g., PO-2025-001"
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
               />
             </div>
           </div>

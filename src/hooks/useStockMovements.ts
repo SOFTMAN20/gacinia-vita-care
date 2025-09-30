@@ -6,9 +6,9 @@ export type StockMovement = {
   productId: string;
   productName: string;
   type: 'in' | 'out' | 'adjustment';
-  quantity: number; // negative for out, positive for in
+  quantity: number;
   reason: string;
-  date: string; // YYYY-MM-DD
+  date: string;
   user: string;
   reference?: string;
 };
@@ -23,23 +23,26 @@ export function useStockMovements() {
       setLoading(true);
       setError(null);
 
-      // Pull recent order items as stock "out" movements
+      // Fetch from stock_movements table with product details
       const { data, error } = await supabase
-        .from('order_items')
+        .from('stock_movements')
         .select(`
           id,
           product_id,
+          type,
           quantity,
-          order:orders(
-            id,
-            created_at,
-            order_number
-          ),
+          reason,
+          reference,
+          created_at,
+          user_id,
           product:products(
             name
+          ),
+          profile:profiles(
+            full_name
           )
         `)
-        .order('created_at', { referencedTable: 'orders', ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
@@ -48,12 +51,12 @@ export function useStockMovements() {
         id: row.id,
         productId: row.product_id,
         productName: row.product?.name || 'Unknown Product',
-        type: 'out',
-        quantity: -Math.abs(row.quantity || 0),
-        reason: 'Sale to customer',
-        date: (row.order?.created_at || new Date().toISOString()).split('T')[0],
-        user: 'Sales',
-        reference: row.order?.order_number || undefined,
+        type: row.type,
+        quantity: row.quantity,
+        reason: row.reason,
+        date: row.created_at.split('T')[0],
+        user: row.profile?.full_name || 'System',
+        reference: row.reference || undefined,
       }));
 
       setMovements(mapped);
@@ -67,6 +70,27 @@ export function useStockMovements() {
 
   useEffect(() => {
     fetchMovements();
+
+    // Set up real-time subscription for stock movements
+    const channel = supabase
+      .channel('stock-movements-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'stock_movements'
+        },
+        () => {
+          console.log('Stock movement detected, refetching...');
+          fetchMovements();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return { movements, loading, error, refetch: fetchMovements };

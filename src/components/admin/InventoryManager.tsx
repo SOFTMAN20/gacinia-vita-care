@@ -56,18 +56,6 @@ interface InventoryItem {
   batchNumber?: string;
 }
 
-interface StockMovement {
-  id: string;
-  productId: string;
-  productName: string;
-  type: 'in' | 'out' | 'adjustment';
-  quantity: number;
-  reason: string;
-  date: string;
-  user: string;
-  reference?: string;
-}
-
 const mockInventoryItems: InventoryItem[] = [
   {
     id: '1',
@@ -117,45 +105,9 @@ const mockInventoryItems: InventoryItem[] = [
   }
 ];
 
-const mockStockMovements: StockMovement[] = [
-  {
-    id: '1',
-    productId: 'PRD-001',
-    productName: 'Panadol Extra',
-    type: 'in',
-    quantity: 100,
-    reason: 'New stock arrival',
-    date: '2024-01-10',
-    user: 'Admin User',
-    reference: 'PO-2024-001'
-  },
-  {
-    id: '2',
-    productId: 'PRD-001',
-    productName: 'Panadol Extra',
-    type: 'out',
-    quantity: 5,
-    reason: 'Sale to customer',
-    date: '2024-01-11',
-    user: 'Sales Staff',
-    reference: 'ORD-2024-015'
-  },
-  {
-    id: '3',
-    productId: 'PRD-002',
-    productName: 'Amoxicillin 500mg',
-    type: 'adjustment',
-    quantity: -2,
-    reason: 'Damaged items',
-    date: '2024-01-12',
-    user: 'Inventory Manager'
-  }
-];
-
 export default function InventoryManager() {
   const { stats: realStats, inventoryItems: realInventoryItems, loading, error, updateProductStock } = useInventoryData();
   const { movements, loading: movementsLoading } = useStockMovements();
-  const [stockMovements, setStockMovements] = useState<StockMovement[]>(mockStockMovements);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isAdjustmentDialogOpen, setIsAdjustmentDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -212,16 +164,22 @@ export default function InventoryManager() {
     if (!selectedItem || adjustmentData.quantity === 0) return;
 
     try {
+      const { data: { user } } = await (await import('@/integrations/supabase/client')).supabase.auth.getUser();
+      
       // Calculate new stock count based on adjustment type
       let newStockCount = selectedItem.currentStock;
+      let quantityForMovement = adjustmentData.quantity;
       
       if (adjustmentData.type === 'in') {
         newStockCount += Math.abs(adjustmentData.quantity);
+        quantityForMovement = Math.abs(adjustmentData.quantity);
       } else if (adjustmentData.type === 'out') {
         newStockCount -= Math.abs(adjustmentData.quantity);
+        quantityForMovement = -Math.abs(adjustmentData.quantity);
       } else if (adjustmentData.type === 'adjustment') {
         // For adjustment, the quantity is the new absolute value
         newStockCount = Math.abs(adjustmentData.quantity);
+        quantityForMovement = Math.abs(adjustmentData.quantity) - selectedItem.currentStock;
       }
 
       // Ensure stock doesn't go below 0
@@ -231,30 +189,31 @@ export default function InventoryManager() {
       const result = await updateProductStock(selectedItem.id, newStockCount);
       
       if (result.success) {
-        // Create stock movement record
-        const newMovement: StockMovement = {
-          id: Date.now().toString(),
-          productId: selectedItem.id,
-          productName: selectedItem.name,
-          type: adjustmentData.type,
-          quantity: adjustmentData.type === 'out' ? -Math.abs(adjustmentData.quantity) : Math.abs(adjustmentData.quantity),
-          reason: adjustmentData.reason,
-          date: new Date().toISOString().split('T')[0],
-          user: 'Current User',
-          reference: adjustmentData.reference
-        };
+        // Log stock movement in database
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { error: movementError } = await supabase
+          .from('stock_movements')
+          .insert({
+            product_id: selectedItem.id,
+            type: adjustmentData.type,
+            quantity: quantityForMovement,
+            reason: adjustmentData.reason || 'Manual stock adjustment',
+            reference: adjustmentData.reference || undefined,
+            user_id: user?.id,
+          });
 
-        setStockMovements(prev => [newMovement, ...prev]);
+        if (movementError) {
+          console.error('Failed to log stock movement:', movementError);
+        }
 
         // Reset form and close dialog
         setAdjustmentData({ type: 'in', quantity: 0, reason: '', reference: '' });
         setIsAdjustmentDialogOpen(false);
         setSelectedItem(null);
         
-        console.log('Stock updated successfully:', newMovement);
+        console.log('Stock updated successfully');
       } else {
         console.error('Failed to update stock:', result.error);
-        // You could show a toast notification here
       }
     } catch (error) {
       console.error('Error during stock adjustment:', error);
@@ -589,7 +548,7 @@ export default function InventoryManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(movements.length ? movements : stockMovements).slice(0, 10).map((movement) => (
+              {movements.slice(0, 10).map((movement) => (
                 <TableRow key={movement.id}>
                   <TableCell>{movement.date}</TableCell>
                   <TableCell>{movement.productName}</TableCell>
