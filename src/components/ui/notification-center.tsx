@@ -110,14 +110,14 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                 
                 {notification.data && (
                   <div className="w-full">
-                    {notification.type === 'order_created' && (
+                    {(notification.type === 'order_created' || notification.type === 'new_order_admin') && (
                       <div className="text-xs text-muted-foreground">
                         Order #{notification.data.order_number} • TZS {notification.data.total_amount?.toLocaleString()}
                       </div>
                     )}
-                    {notification.type === 'order_status_updated' && (
+                    {(notification.type === 'order_status_updated' || notification.type === 'order_status_admin') && (
                       <div className="text-xs text-muted-foreground">
-                        Status: {notification.data.new_status}
+                        Status: {notification.data.new_status?.replace(/_/g, ' ')}
                       </div>
                     )}
                     {notification.type === 'stock_alert' && (
