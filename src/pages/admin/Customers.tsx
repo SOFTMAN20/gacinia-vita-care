@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   Search, 
   Download, 
@@ -10,7 +10,8 @@ import {
   TrendingUp,
   Users,
   UserCheck,
-  MoreHorizontal
+  MoreHorizontal,
+  Loader2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -39,95 +40,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: {
-    street: string;
-    city: string;
-    region: string;
-  };
-  joinDate: string;
-  lastOrder: string;
-  totalOrders: number;
-  totalSpent: number;
-  status: 'active' | 'inactive' | 'blocked';
-  customerType: 'retail' | 'wholesale';
-}
-
-const mockCustomers: Customer[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    phone: '+255 123 456 789',
-    address: {
-      street: '123 Main Street',
-      city: 'Mwanza',
-      region: 'Mwanza'
-    },
-    joinDate: '2023-06-15',
-    lastOrder: '2024-01-15',
-    totalOrders: 12,
-    totalSpent: 450000,
-    status: 'active',
-    customerType: 'retail'
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    phone: '+255 987 654 321',
-    address: {
-      street: '456 Oak Avenue',
-      city: 'Dar es Salaam',
-      region: 'Dar es Salaam'
-    },
-    joinDate: '2023-08-20',
-    lastOrder: '2024-01-10',
-    totalOrders: 8,
-    totalSpent: 320000,
-    status: 'active',
-    customerType: 'retail'
-  },
-  {
-    id: '3',
-    name: 'Mbeya General Hospital',
-    email: 'procurement@mbeyahospital.go.tz',
-    phone: '+255 555 111 222',
-    address: {
-      street: 'Hospital Road',
-      city: 'Mbeya',
-      region: 'Mbeya'
-    },
-    joinDate: '2023-03-10',
-    lastOrder: '2024-01-12',
-    totalOrders: 45,
-    totalSpent: 12500000,
-    status: 'active',
-    customerType: 'wholesale'
-  },
-  {
-    id: '4',
-    name: 'Ahmed Hassan',
-    email: 'ahmed@example.com',
-    phone: '+255 777 888 999',
-    address: {
-      street: '789 Pine Street',
-      city: 'Arusha',
-      region: 'Arusha'
-    },
-    joinDate: '2023-11-05',
-    lastOrder: '2023-12-20',
-    totalOrders: 3,
-    totalSpent: 95000,
-    status: 'inactive',
-    customerType: 'retail'
-  }
-];
+import { useCustomers } from '@/hooks/useCustomers';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const statusConfig = {
   active: { label: 'Active', variant: 'default' as const },
@@ -141,26 +55,30 @@ const customerTypeConfig = {
 };
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+  const { data: customers = [], isLoading, error } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.phone.includes(searchTerm);
-    
-    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
-    const matchesType = typeFilter === 'all' || customer.customerType === typeFilter;
-    
-    return matchesSearch && matchesStatus && matchesType;
-  });
+  const filteredCustomers = useMemo(() => {
+    return customers.filter(customer => {
+      const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           customer.phone.includes(searchTerm);
+      
+      const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
+      const matchesType = typeFilter === 'all' || customer.customerType === typeFilter;
+      
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [customers, searchTerm, statusFilter, typeFilter]);
 
-  const totalCustomers = customers.length;
-  const activeCustomers = customers.filter(c => c.status === 'active').length;
-  const wholesaleCustomers = customers.filter(c => c.customerType === 'wholesale').length;
-  const totalRevenue = customers.reduce((sum, customer) => sum + customer.totalSpent, 0);
+  const stats = useMemo(() => ({
+    totalCustomers: customers.length,
+    activeCustomers: customers.filter(c => c.status === 'active').length,
+    wholesaleCustomers: customers.filter(c => c.customerType === 'wholesale').length,
+    totalRevenue: customers.reduce((sum, customer) => sum + customer.totalSpent, 0)
+  }), [customers]);
 
   const CustomersTable = () => (
     <Card>
@@ -206,30 +124,51 @@ export default function CustomersPage() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead>Total Spent</TableHead>
-                <TableHead>Last Order</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCustomers.map((customer) => (
+        {isLoading ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex gap-4">
+                <Skeleton className="h-16 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-destructive">
+            Error loading customers. Please try again.
+          </div>
+        ) : filteredCustomers.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No customers found matching your filters.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Orders</TableHead>
+                  <TableHead>Total Spent</TableHead>
+                  <TableHead>Last Order</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell>
                     <div>
                       <div className="font-medium">{customer.name}</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {customer.address.city}, {customer.address.region}
-                      </div>
+                      {customer.address ? (
+                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {customer.address.city}, {customer.address.region}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">No address</div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -261,7 +200,9 @@ export default function CustomersPage() {
                     TSh {customer.totalSpent.toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    {new Date(customer.lastOrder).toLocaleDateString()}
+                    {customer.lastOrder 
+                      ? new Date(customer.lastOrder).toLocaleDateString()
+                      : 'No orders'}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -291,6 +232,7 @@ export default function CustomersPage() {
             </TableBody>
           </Table>
         </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -304,9 +246,9 @@ export default function CustomersPage() {
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCustomers}</div>
+            <div className="text-2xl font-bold">{stats.totalCustomers}</div>
             <p className="text-xs text-muted-foreground">
-              +2 this month
+              Total registered customers
             </p>
           </CardContent>
         </Card>
@@ -316,9 +258,11 @@ export default function CustomersPage() {
             <UserCheck className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeCustomers}</div>
+            <div className="text-2xl font-bold">{stats.activeCustomers}</div>
             <p className="text-xs text-muted-foreground">
-              {Math.round((activeCustomers / totalCustomers) * 100)}% of total
+              {stats.totalCustomers > 0 
+                ? Math.round((stats.activeCustomers / stats.totalCustomers) * 100) 
+                : 0}% of total
             </p>
           </CardContent>
         </Card>
@@ -328,7 +272,7 @@ export default function CustomersPage() {
             <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{wholesaleCustomers}</div>
+            <div className="text-2xl font-bold">{stats.wholesaleCustomers}</div>
             <p className="text-xs text-muted-foreground">
               High value customers
             </p>
@@ -340,7 +284,7 @@ export default function CustomersPage() {
             <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">TSh {totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">TSh {stats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Lifetime customer value
             </p>
@@ -396,11 +340,13 @@ export default function CustomersPage() {
                 <div className="w-32 bg-muted rounded-full h-2">
                   <div 
                     className="bg-primary h-2 rounded-full" 
-                    style={{ width: `${((totalCustomers - wholesaleCustomers) / totalCustomers) * 100}%` }}
+                    style={{ width: `${stats.totalCustomers > 0 ? ((stats.totalCustomers - stats.wholesaleCustomers) / stats.totalCustomers) * 100 : 0}%` }}
                   />
                 </div>
                 <span className="text-sm text-muted-foreground w-16 text-right">
-                  {totalCustomers - wholesaleCustomers} ({Math.round(((totalCustomers - wholesaleCustomers) / totalCustomers) * 100)}%)
+                  {stats.totalCustomers - stats.wholesaleCustomers} ({stats.totalCustomers > 0 
+                    ? Math.round(((stats.totalCustomers - stats.wholesaleCustomers) / stats.totalCustomers) * 100) 
+                    : 0}%)
                 </span>
               </div>
             </div>
@@ -413,11 +359,13 @@ export default function CustomersPage() {
                 <div className="w-32 bg-muted rounded-full h-2">
                   <div 
                     className="bg-secondary h-2 rounded-full" 
-                    style={{ width: `${(wholesaleCustomers / totalCustomers) * 100}%` }}
+                    style={{ width: `${stats.totalCustomers > 0 ? (stats.wholesaleCustomers / stats.totalCustomers) * 100 : 0}%` }}
                   />
                 </div>
                 <span className="text-sm text-muted-foreground w-16 text-right">
-                  {wholesaleCustomers} ({Math.round((wholesaleCustomers / totalCustomers) * 100)}%)
+                  {stats.wholesaleCustomers} ({stats.totalCustomers > 0 
+                    ? Math.round((stats.wholesaleCustomers / stats.totalCustomers) * 100) 
+                    : 0}%)
                 </span>
               </div>
             </div>
