@@ -24,6 +24,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminOrders from "./pages/admin/Orders";
 import AdminCustomers from "./pages/admin/Customers";
+import AdminReports from "./pages/admin/Reports";
 import "./i18n";
 
 const App = () => (
@@ -71,7 +72,7 @@ const App = () => (
                       <Route path="orders" element={<AdminOrders />} />
                       <Route path="customers" element={<AdminCustomers />} />
                       <Route path="inventory" element={<div>Inventory Management (Coming Soon)</div>} />
-                      <Route path="reports" element={<div>Reports & Analytics (Coming Soon)</div>} />
+                      <Route path="reports" element={<AdminReports />} />
                       <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
                     </Route>
                     
