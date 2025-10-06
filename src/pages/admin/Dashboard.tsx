@@ -189,24 +189,24 @@ const LowStockAlertsSection = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-warning">
-            <AlertTriangle size={20} />
-            Low Stock Alerts
+        <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2 text-warning text-base sm:text-lg">
+            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span className="font-semibold">Low Stock Alerts</span>
             {lowStockProducts.length > 0 && (
-              <Badge variant="destructive" className="ml-2">
+              <Badge variant="destructive" className="text-xs">
                 {lowStockProducts.length}
               </Badge>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={refetch}>
-              <RefreshCw className="h-4 w-4 mr-1" />
-              Refresh
+            <Button variant="outline" size="sm" onClick={refetch} className="text-xs sm:text-sm">
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
-            <Button variant="outline" size="sm">
-              <ExternalLink className="h-4 w-4 mr-1" />
-              View All
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+              <span className="hidden sm:inline">View All</span>
             </Button>
           </div>
         </CardTitle>
@@ -214,19 +214,19 @@ const LowStockAlertsSection = () => {
       <CardContent>
         {lowStockProducts.length === 0 ? (
           <div className="text-center py-8">
-            <CheckCircle className="h-12 w-12 text-success mx-auto mb-2" />
-            <p className="text-lg font-medium text-success">All products are well stocked!</p>
-            <p className="text-muted-foreground">No low stock alerts at this time.</p>
+            <CheckCircle className="h-10 w-10 sm:h-12 sm:w-12 text-success mx-auto mb-2" />
+            <p className="text-base sm:text-lg font-medium text-success">All products are well stocked!</p>
+            <p className="text-sm text-muted-foreground">No low stock alerts at this time.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {lowStockProducts.slice(0, 5).map((product) => (
               <div 
                 key={product.id}
-                className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
+                className="flex items-center justify-between gap-3 p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="relative flex-shrink-0">
                     {product.image_url ? (
                       <img 
                         src={product.image_url} 
@@ -244,33 +244,33 @@ const LowStockAlertsSection = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium">{product.name}</h4>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {product.sku && <span>SKU: {product.sku}</span>}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm truncate">{product.name}</h4>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      {product.sku && <span className="truncate">SKU: {product.sku}</span>}
                       {product.category_name && (
                         <>
                           <span>•</span>
-                          <span>{product.category_name}</span>
+                          <span className="truncate">{product.category_name}</span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-shrink-0">
                   <div className="text-right">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
+                    <div className="flex items-center gap-2 justify-end">
+                      <span className="text-sm font-medium whitespace-nowrap">
                         Stock: {product.stock_count}
                       </span>
                       <Badge 
                         variant={product.stock_count === 0 ? "destructive" : "secondary"}
-                        className="text-xs"
+                        className="text-xs font-semibold px-3 py-1"
                       >
-                        {product.stock_count === 0 ? "OUT OF STOCK" : "LOW STOCK"}
+                        {product.stock_count === 0 ? "OUT" : "LOW"}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Min: {product.min_stock_level}
                     </p>
                   </div>

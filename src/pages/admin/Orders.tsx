@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -69,6 +69,20 @@ export default function OrdersPage() {
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [showOrderDetail, setShowOrderDetail] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcut: Ctrl/Cmd + K to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
@@ -165,10 +179,12 @@ export default function OrdersPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search orders..."
+                ref={searchInputRef}
+                placeholder="Search orders... (Ctrl+K)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 w-full"
+                autoFocus
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
