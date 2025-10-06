@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
@@ -9,7 +9,9 @@ import {
   BarChart3, 
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Store,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -22,6 +24,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ className }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     { 
@@ -111,8 +114,8 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
+      <nav className="flex-1 p-4 flex flex-col">
+        <ul className="space-y-2 flex-1">
           {menuItems.map((item) => (
             <li key={item.name}>
               <NavLink
@@ -132,6 +135,24 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
             </li>
           ))}
         </ul>
+
+        {/* Back to Store Button */}
+        <div className="mt-4 pt-4 border-t border-border">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/')}
+            className={cn(
+              "w-full flex items-center gap-2 text-sm",
+              collapsed && "justify-center px-2"
+            )}
+            title={collapsed ? "Back to Store" : undefined}
+          >
+            <Store size={16} className="flex-shrink-0" />
+            {!collapsed && <span>Back to Store</span>}
+            {!collapsed && <ExternalLink size={14} className="ml-auto" />}
+          </Button>
+        </div>
       </nav>
 
       {/* User Info */}

@@ -11,7 +11,10 @@ import {
   Users,
   UserCheck,
   MoreHorizontal,
-  Loader2
+  Loader2,
+  Calendar,
+  DollarSign,
+  X
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -39,9 +42,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { useCustomers } from '@/hooks/useCustomers';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import { CustomerEmailDialog } from '@/components/admin/CustomerEmailDialog';
+import { CustomerOrdersDialog } from '@/components/admin/CustomerOrdersDialog';
+import { CustomerDetailsDialog } from '@/components/admin/CustomerDetailsDialog';
 
 const statusConfig = {
   active: { label: 'Active', variant: 'default' as const },
@@ -59,6 +73,10 @@ export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [ordersDialogOpen, setOrdersDialogOpen] = useState(false);
 
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
@@ -79,6 +97,66 @@ export default function CustomersPage() {
     wholesaleCustomers: customers.filter(c => c.customerType === 'wholesale').length,
     totalRevenue: customers.reduce((sum, customer) => sum + customer.totalSpent, 0)
   }), [customers]);
+
+  const handleExport = () => {
+    const csvHeaders = [
+      'Name',
+      'Email',
+      'Phone',
+      'City',
+      'Region',
+      'Type',
+      'Status',
+      'Total Orders',
+      'Total Spent (TSh)',
+      'Join Date',
+      'Last Order'
+    ];
+
+    const csvData = filteredCustomers.map(customer => [
+      customer.name,
+      customer.email,
+      customer.phone,
+      customer.address?.city || '',
+      customer.address?.region || '',
+      customer.customerType,
+      customer.status,
+      customer.totalOrders,
+      customer.totalSpent,
+      new Date(customer.joinDate).toLocaleDateString(),
+      customer.lastOrder ? new Date(customer.lastOrder).toLocaleDateString() : 'No orders'
+    ]);
+
+    const csvContent = [csvHeaders, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `customers-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Customer data exported successfully');
+  };
+
+  const handleViewDetails = (customer: any) => {
+    setSelectedCustomer(customer);
+    setDetailsOpen(true);
+  };
+
+  const handleSendEmail = (customer: any) => {
+    setSelectedCustomer(customer);
+    setEmailDialogOpen(true);
+  };
+
+  const handleViewOrders = (customer: any) => {
+    setSelectedCustomer(customer);
+    setOrdersDialogOpen(true);
+  };
 
   const CustomersTable = () => (
     <Card>
@@ -116,7 +194,7 @@ export default function CustomersPage() {
                 <SelectItem value="wholesale">Wholesale</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleExport}>
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -212,15 +290,15 @@ export default function CustomersPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewDetails(customer)}>
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSendEmail(customer)}>
                           <Mail className="w-4 h-4 mr-2" />
                           Send Email
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewOrders(customer)}>
                           <ShoppingBag className="w-4 h-4 mr-2" />
                           View Orders
                         </DropdownMenuItem>
@@ -398,6 +476,25 @@ export default function CustomersPage() {
           <CustomerAnalytics />
         </TabsContent>
       </Tabs>
+
+      {/* Dialogs */}
+      <CustomerDetailsDialog
+        customer={selectedCustomer}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
+      
+      <CustomerEmailDialog
+        customer={selectedCustomer}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+      
+      <CustomerOrdersDialog
+        customer={selectedCustomer}
+        open={ordersDialogOpen}
+        onOpenChange={setOrdersDialogOpen}
+      />
     </div>
   );
 }

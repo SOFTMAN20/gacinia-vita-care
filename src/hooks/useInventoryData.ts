@@ -2,6 +2,33 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 
+export interface StockMetrics {
+  totalProducts: number;
+  totalValue: number;
+  inStock: number;
+  lowStock: number;
+  outOfStock: number;
+}
+
+export interface InventoryProduct extends Tables<'products'> {
+  category?: Tables<'categories'>;
+}
+
+export interface StockMovement {
+  id: string;
+  product_id: string;
+  type: string;
+  quantity: number;
+  reason: string;
+  reference: string | null;
+  user_id: string | null;
+  created_at: string;
+  product?: {
+    name: string;
+    sku: string | null;
+  };
+}
+
 export interface InventoryStats {
   totalItems: number;
   lowStock: number;
@@ -27,6 +54,22 @@ export interface InventoryItem {
 }
 
 export function useInventoryData() {
+  const [products, setProducts] = useState<InventoryProduct[]>([]);
+  const [categories, setCategories] = useState<Tables<'categories'>[]>([]);
+  const [stockMetrics, setStockMetrics] = useState<StockMetrics>({
+    totalProducts: 0,
+    totalValue: 0,
+    inStock: 0,
+    lowStock: 0,
+    outOfStock: 0,
+  });
+  const [lowStockProducts, setLowStockProducts] = useState<InventoryProduct[]>([]);
+  const [expiringProducts, setExpiringProducts] = useState<InventoryProduct[]>([]);
+  const [recentMovements, setRecentMovements] = useState<StockMovement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Legacy format for InventoryManager component
   const [stats, setStats] = useState<InventoryStats>({
     totalItems: 0,
     lowStock: 0,
@@ -35,8 +78,6 @@ export function useInventoryData() {
     totalValue: 0
   });
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchInventoryData = async () => {
     try {
@@ -44,33 +85,81 @@ export function useInventoryData() {
       setError(null);
 
       // Fetch products with categories
-      const { data: products, error: productsError } = await supabase
+      const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select(`
-          id,
-          name,
-          sku,
-          price,
-          stock_count,
-          min_stock_level,
-          batch_number,
-          updated_at,
-          category:categories(name)
+          *,
+          category:categories(*)
         `)
-        .eq('is_active', true)
-        .order('updated_at', { ascending: false });
+        .order('name', { ascending: true });
 
       if (productsError) throw productsError;
 
-      // Transform products to inventory items
-      const items: InventoryItem[] = (products || []).map(product => {
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+
+      if (categoriesError) throw categoriesError;
+
+      // Fetch recent stock movements
+      const { data: movementsData, error: movementsError } = await supabase
+        .from('stock_movements')
+        .select(`
+          *,
+          product:products(name, sku)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (movementsError) throw movementsError;
+
+      setProducts(productsData || []);
+      setCategories(categoriesData || []);
+      setRecentMovements(movementsData || []);
+
+      // Calculate metrics
+      const totalProducts = productsData?.length || 0;
+      const inStock = productsData?.filter(p => p.stock_count && p.stock_count > p.min_stock_level).length || 0;
+      const lowStock = productsData?.filter(p => 
+        p.stock_count && p.stock_count > 0 && p.stock_count <= p.min_stock_level
+      ).length || 0;
+      const outOfStock = productsData?.filter(p => !p.stock_count || p.stock_count === 0).length || 0;
+      const reorderLevel = productsData?.filter(p => 
+        p.stock_count && p.stock_count > 0 && p.stock_count <= p.min_stock_level * 1.5
+      ).length || 0;
+      const totalValue = productsData?.reduce((sum, p) => 
+        sum + (p.price * (p.stock_count || 0)), 0
+      ) || 0;
+
+      setStockMetrics({
+        totalProducts,
+        totalValue,
+        inStock,
+        lowStock,
+        outOfStock,
+      });
+
+      // Set legacy stats for InventoryManager
+      setStats({
+        totalItems: totalProducts,
+        lowStock,
+        outOfStock,
+        reorderLevel,
+        totalValue
+      });
+
+      // Transform products to legacy inventory items format
+      const items: InventoryItem[] = (productsData || []).map(product => {
         let status: InventoryItem['status'] = 'in_stock';
         
         if (product.stock_count === 0) {
           status = 'out_of_stock';
-        } else if (product.stock_count <= product.min_stock_level) {
+        } else if (product.stock_count && product.stock_count <= product.min_stock_level) {
           status = 'low_stock';
-        } else if (product.stock_count <= product.min_stock_level * 1.5) {
+        } else if (product.stock_count && product.stock_count <= product.min_stock_level * 1.5) {
           status = 'reorder';
         }
 
@@ -82,30 +171,33 @@ export function useInventoryData() {
           minStock: product.min_stock_level || 5,
           price: Number(product.price) || 0,
           category: product.category?.name || 'Uncategorized',
-          lastUpdated: product.updated_at,
+          lastUpdated: product.updated_at || new Date().toISOString(),
           status,
           batchNumber: product.batch_number || undefined,
-          location: 'Main Store', // Default location
-          supplier: 'Various' // Default supplier
+          expiryDate: product.expiry_date || undefined,
+          location: 'Main Store',
+          supplier: 'Various'
         };
       });
 
       setInventoryItems(items);
 
-      // Calculate stats
-      const totalItems = items.length;
-      const lowStock = items.filter(item => item.status === 'low_stock').length;
-      const outOfStock = items.filter(item => item.status === 'out_of_stock').length;
-      const reorderLevel = items.filter(item => item.status === 'reorder').length;
-      const totalValue = items.reduce((sum, item) => sum + (item.currentStock * item.price), 0);
+      // Set low stock products
+      const lowStockItems = productsData?.filter(p => 
+        p.stock_count && p.stock_count > 0 && p.stock_count <= p.min_stock_level
+      ) || [];
+      setLowStockProducts(lowStockItems);
 
-      setStats({
-        totalItems,
-        lowStock,
-        outOfStock,
-        reorderLevel,
-        totalValue
-      });
+      // Set expiring products (products with expiry date within 90 days)
+      const ninetyDaysFromNow = new Date();
+      ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+      
+      const expiringItems = productsData?.filter(p => {
+        if (!p.expiry_date) return false;
+        const expiryDate = new Date(p.expiry_date);
+        return expiryDate <= ninetyDaysFromNow && expiryDate > new Date();
+      }) || [];
+      setExpiringProducts(expiringItems);
 
     } catch (err) {
       console.error('Error fetching inventory data:', err);
@@ -114,10 +206,6 @@ export function useInventoryData() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchInventoryData();
-  }, []);
 
   const updateProductStock = async (productId: string, newStockCount: number) => {
     try {
@@ -144,9 +232,22 @@ export function useInventoryData() {
     }
   };
 
+  useEffect(() => {
+    fetchInventoryData();
+  }, []);
+
   return {
+    // New format for standalone Inventory page
+    products,
+    categories,
+    stockMetrics,
+    lowStockProducts,
+    expiringProducts,
+    recentMovements,
+    // Legacy format for InventoryManager component
     stats,
     inventoryItems,
+    // Common
     loading,
     error,
     refetch: fetchInventoryData,

@@ -24,6 +24,9 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminOrders from "./pages/admin/Orders";
 import AdminCustomers from "./pages/admin/Customers";
+import AdminReports from "./pages/admin/Reports";
+import AdminInventory from "./pages/admin/Inventory";
+import AdminSettings from "./pages/admin/Settings";
 import "./i18n";
 
 const App = () => (
@@ -70,9 +73,9 @@ const App = () => (
                       <Route path="products" element={<AdminProducts />} />
                       <Route path="orders" element={<AdminOrders />} />
                       <Route path="customers" element={<AdminCustomers />} />
-                      <Route path="inventory" element={<div>Inventory Management (Coming Soon)</div>} />
-                      <Route path="reports" element={<div>Reports & Analytics (Coming Soon)</div>} />
-                      <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
+                      <Route path="inventory" element={<AdminInventory />} />
+                      <Route path="reports" element={<AdminReports />} />
+                      <Route path="settings" element={<AdminSettings />} />
                     </Route>
                     
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
