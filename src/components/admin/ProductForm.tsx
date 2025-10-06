@@ -39,12 +39,12 @@ const productSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   brand: z.string().optional(),
   sku: z.string().optional(),
-  retailPrice: z.coerce.number().min(0.01, 'Price must be greater than 0'),
-  originalPrice: z.coerce.number().optional(),
-  wholesalePrice: z.coerce.number().optional(),
+  retailPrice: z.number().min(0.01, 'Price must be greater than 0').or(z.literal(undefined)),
+  originalPrice: z.number().positive().optional().or(z.literal(undefined)),
+  wholesalePrice: z.number().positive().optional().or(z.literal(undefined)),
   stock: z.coerce.number().min(0, 'Stock must be positive'),
   minStock: z.coerce.number().min(0, 'Minimum stock must be positive'),
-  weight: z.coerce.number().optional(),
+  weight: z.number().positive().optional().or(z.literal(undefined)),
   requiresPrescription: z.boolean().default(false),
   wholesaleAvailable: z.boolean().default(false),
   featured: z.boolean().default(false),
@@ -90,12 +90,12 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       category: product?.category || '',
       brand: product?.brand || '',
       sku: product?.sku || '',
-      retailPrice: product?.retailPrice || 0,
-      originalPrice: product?.originalPrice || 0,
-      wholesalePrice: product?.wholesalePrice || 0,
+      retailPrice: product?.retailPrice || undefined,
+      originalPrice: product?.originalPrice || undefined,
+      wholesalePrice: product?.wholesalePrice || undefined,
       stock: product?.stock || 0,
       minStock: product?.minStock || 5,
-      weight: product?.weight || 0,
+      weight: product?.weight || undefined,
       requiresPrescription: product?.requiresPrescription || false,
       wholesaleAvailable: product?.wholesaleAvailable || false,
       featured: product?.featured || false,
@@ -531,9 +531,26 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                         <FormControl>
                           <Input 
                             type="number" 
-                            {...field} 
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                            placeholder="0"
+                            min="0"
+                            step="0.01"
+                            value={field.value === 0 || field.value ? field.value : ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '') {
+                                field.onChange(undefined);
+                              } else {
+                                const numValue = parseFloat(value);
+                                field.onChange(isNaN(numValue) ? undefined : numValue);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              field.onBlur();
+                              // Set to 0 if empty on blur (required field)
+                              if (e.target.value === '') {
+                                field.onChange(0);
+                              }
+                            }}
+                            placeholder="Enter retail price"
                           />
                         </FormControl>
                         <FormMessage />
@@ -550,9 +567,15 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                         <FormControl>
                           <Input 
                             type="number" 
-                            {...field} 
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                            placeholder="0"
+                            min="0"
+                            step="0.01"
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === '' ? undefined : parseFloat(value) || undefined);
+                            }}
+                            onBlur={field.onBlur}
+                            placeholder="Enter original price (optional)"
                           />
                         </FormControl>
                         <FormDescription>
@@ -572,9 +595,15 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                         <FormControl>
                           <Input 
                             type="number" 
-                            {...field} 
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                            placeholder="0"
+                            min="0"
+                            step="0.01"
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === '' ? undefined : parseFloat(value) || undefined);
+                            }}
+                            onBlur={field.onBlur}
+                            placeholder="Enter wholesale price (optional)"
                           />
                         </FormControl>
                         <FormDescription>
@@ -594,10 +623,15 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                         <FormControl>
                           <Input 
                             type="number" 
+                            min="0"
                             step="0.01"
-                            {...field} 
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                            placeholder="0.00"
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === '' ? undefined : parseFloat(value) || undefined);
+                            }}
+                            onBlur={field.onBlur}
+                            placeholder="Enter weight in kg (optional)"
                           />
                         </FormControl>
                         <FormDescription>
