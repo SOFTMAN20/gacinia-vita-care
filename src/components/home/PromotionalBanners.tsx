@@ -2,8 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Percent, Truck, Clock, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function PromotionalBanners() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-12 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -23,7 +26,12 @@ export function PromotionalBanners() {
               <p className="text-sm opacity-90 mb-4">
                 Premium beauty products at unbeatable prices
               </p>
-              <Button variant="secondary" size="sm" className="text-primary">
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="text-primary hover:scale-105 transition-transform"
+                onClick={() => navigate('/products?category=cosmetics-personal-care')}
+              >
                 Shop Now
               </Button>
             </CardContent>
@@ -44,7 +52,12 @@ export function PromotionalBanners() {
               <p className="text-sm opacity-90 mb-4">
                 On orders above TZS 50,000 within Mbeya
               </p>
-              <Button variant="secondary" size="sm" className="text-secondary">
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="text-secondary hover:scale-105 transition-transform"
+                onClick={() => navigate('/products')}
+              >
                 Learn More
               </Button>
             </CardContent>
@@ -65,7 +78,12 @@ export function PromotionalBanners() {
               <p className="text-sm opacity-90 mb-4">
                 Emergency medicine delivery within 2 hours
               </p>
-              <Button variant="secondary" size="sm" className="text-accent-dark">
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="text-accent-dark hover:scale-105 transition-transform"
+                onClick={() => navigate('/products')}
+              >
                 Order Now
               </Button>
             </CardContent>
@@ -86,7 +104,12 @@ export function PromotionalBanners() {
               <p className="text-sm opacity-90 mb-4">
                 Special pricing for hospitals and clinics
               </p>
-              <Button variant="secondary" size="sm" className="text-primary">
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="text-primary hover:scale-105 transition-transform"
+                onClick={() => navigate('/products?wholesale=true')}
+              >
                 Join Now
               </Button>
             </CardContent>
@@ -106,10 +129,22 @@ export function PromotionalBanners() {
                 Consult with our qualified pharmacists for personalized health advice.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button className="bg-success hover:bg-success/90">
+                <Button 
+                  className="bg-success hover:bg-success/90 hover:scale-105 transition-transform"
+                  onClick={() => {
+                    const phoneNumber = '255621624287';
+                    const message = 'Hello, I would like to book a free health consultation regarding diabetes prevention and management.';
+                    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                  }}
+                >
                   Book Free Consultation
                 </Button>
-                <Button variant="outline" className="border-success text-success hover:bg-success/10">
+                <Button 
+                  variant="outline" 
+                  className="border-success text-success hover:bg-success/10 hover:scale-105 transition-transform"
+                  onClick={() => navigate('/about')}
+                >
                   Learn More
                 </Button>
               </div>

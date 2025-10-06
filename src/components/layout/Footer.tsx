@@ -1,4 +1,5 @@
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import gaciniaLogo from '@/assets/gacinia-logo.png';
 
 export function Footer() {
@@ -36,21 +37,21 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-heading text-base font-semibold">Quick Links</h4>
             <div className="space-y-2">
-              <a href="/catalog/medicines" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
+              <Link to="/products?category=prescription-medicines" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
                 Medicines
-              </a>
-              <a href="/catalog/cosmetics" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
+              </Link>
+              <Link to="/products?category=cosmetics-personal-care" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
                 Cosmetics
-              </a>
-              <a href="/catalog/equipment" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
+              </Link>
+              <Link to="/products?category=medical-equipment" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
                 Medical Equipment
-              </a>
-              <a href="/wholesale" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
+              </Link>
+              <Link to="/products?wholesale=true" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
                 Wholesale Portal
-              </a>
-              <a href="/about" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
+              </Link>
+              <Link to="/about" className="block text-sm opacity-90 hover:opacity-100 transition-opacity">
                 About Us
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -105,9 +106,9 @@ export function Footer() {
             © {currentYear} Gacinia Pharmacy & Medical Supplies. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm opacity-75">
-            <a href="/privacy" className="hover:opacity-100 transition-opacity">Privacy Policy</a>
-            <a href="/terms" className="hover:opacity-100 transition-opacity">Terms of Service</a>
-            <a href="/returns" className="hover:opacity-100 transition-opacity">Returns</a>
+            <Link to="/privacy" className="hover:opacity-100 transition-opacity">Privacy Policy</Link>
+            <Link to="/terms" className="hover:opacity-100 transition-opacity">Terms of Service</Link>
+            <Link to="/returns" className="hover:opacity-100 transition-opacity">Returns</Link>
           </div>
         </div>
       </div>

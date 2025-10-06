@@ -250,7 +250,17 @@ export function PurchaseOptions({ product }: PurchaseOptionsProps) {
                 </span>
               </div>
             )}
-            <Button variant="outline" size="sm" className="border-blue-300 text-blue-700">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-blue-300 text-blue-700 hover:bg-blue-100"
+              onClick={() => {
+                const phoneNumber = '255621624287'; // Gacinia Pharmacy WhatsApp number
+                const message = `Hello, I'm interested in wholesale pricing for:\n\n*${product.name}*\n${product.wholesale_price ? `Wholesale Price: TZS ${product.wholesale_price.toLocaleString()}` : ''}\n\nI would like to discuss bulk order options.`;
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+              }}
+            >
               Contact for Wholesale
             </Button>
           </CardContent>

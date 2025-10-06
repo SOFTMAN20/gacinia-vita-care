@@ -137,29 +137,34 @@ const About = () => {
         
         <main id="main-content" role="main">
           {/* Hero Section */}
-          <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-16">
-            <div className="container mx-auto px-4">
+          <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20 md:py-28 overflow-hidden">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
+            
+            <div className="container mx-auto px-4 relative z-10">
               <div className="max-w-4xl mx-auto text-center">
-                <Badge variant="secondary" className="mb-4">
+                <Badge variant="secondary" className="mb-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
+                  <Star className="w-3 h-3 mr-1 inline" />
                   {language === 'en' ? 'About Gacinia Pharmacy' : 'Kuhusu Gacinia Pharmacy'}
                 </Badge>
-                <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-6">
+                <h1 className="font-heading text-4xl md:text-6xl font-bold text-foreground mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
                   {language === 'en' 
                     ? 'Your Trusted Healthcare Partner in Mbeya' 
                     : 'Mshirika Wako wa Kuaminika wa Afya Mbeya'
                   }
                 </h1>
-                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-5 duration-1000">
                   {language === 'en'
                     ? 'Since 2020, Gacinia Pharmacy has been dedicated to providing quality pharmaceutical services, medical supplies, and healthcare solutions to the Mbeya community and beyond.'
                     : 'Tangu 2020, Gacinia Pharmacy imejitoa kutoa huduma za ubora za dawa, vifaa vya matibabu, na suluhisho za afya kwa jamii ya Mbeya na zaidi.'
                   }
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-6 duration-1000">
                   <Button 
                     size="lg" 
                     onClick={() => navigate('/products')}
-                    className="bg-primary hover:bg-primary/90"
+                    className="bg-primary hover:bg-primary/90 hover:scale-105 transition-transform shadow-lg"
                   >
                     {language === 'en' ? 'Shop Our Products' : 'Nunua Bidhaa Zetu'}
                   </Button>
@@ -167,6 +172,7 @@ const About = () => {
                     variant="outline" 
                     size="lg"
                     onClick={() => navigate('/contact')}
+                    className="hover:scale-105 transition-transform"
                   >
                     {language === 'en' ? 'Contact Us' : 'Wasiliana Nasi'}
                   </Button>
@@ -176,13 +182,22 @@ const About = () => {
           </section>
 
           {/* Stats Section */}
-          <section className="py-12 bg-primary text-primary-foreground">
-            <div className="container mx-auto px-4">
+          <section className="py-16 bg-gradient-to-r from-primary via-primary/95 to-primary text-primary-foreground relative overflow-hidden">
+            {/* Decorative pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 border-2 border-white rounded-full"></div>
+              <div className="absolute bottom-0 right-0 w-60 h-60 border-2 border-white rounded-full"></div>
+            </div>
+            
+            <div className="container mx-auto px-4 relative z-10">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 {stats.map((stat, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="text-3xl md:text-4xl font-bold">{stat.number}</div>
-                    <div className="text-sm opacity-90">
+                  <div 
+                    key={index} 
+                    className="space-y-2 hover:scale-110 transition-transform duration-300"
+                  >
+                    <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
+                    <div className="text-sm md:text-base opacity-90 font-medium">
                       {language === 'en' ? stat.label : stat.labelSw}
                     </div>
                   </div>
@@ -281,15 +296,18 @@ const About = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {values.map((value, index) => (
-                  <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                  <Card 
+                    key={index} 
+                    className="text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border-2 hover:border-primary/20 group"
+                  >
                     <CardContent className="p-6">
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                         <value.icon className="w-8 h-8 text-primary" />
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">
+                      <h3 className="font-semibold text-foreground mb-2 text-lg">
                         {language === 'en' ? value.title : value.titleSw}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {language === 'en' ? value.description : value.descriptionSw}
                       </p>
                     </CardContent>
@@ -316,17 +334,20 @@ const About = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {services.map((service, index) => (
-                  <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <Card 
+                    key={index} 
+                    className="hover:shadow-xl hover:border-primary/30 transition-all duration-300 group"
+                  >
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <service.icon className="w-6 h-6 text-primary" />
+                        <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                          <service.icon className="w-7 h-7 text-primary" />
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-foreground mb-2">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-foreground mb-2 text-lg">
                             {language === 'en' ? service.title : service.titleSw}
                           </h3>
-                          <p className="text-muted-foreground">
+                          <p className="text-muted-foreground leading-relaxed">
                             {language === 'en' ? service.description : service.descriptionSw}
                           </p>
                         </div>
@@ -355,19 +376,22 @@ const About = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {certifications.map((cert, index) => (
-                  <Card key={index} className="text-center">
-                    <CardContent className="p-6">
-                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle className="w-8 h-8 text-green-600" />
+                  <Card 
+                    key={index} 
+                    className="text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-2 hover:border-green-200 group"
+                  >
+                    <CardContent className="p-8">
+                      <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-green-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                        <CheckCircle className="w-10 h-10 text-green-600" />
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">
+                      <h3 className="font-semibold text-foreground mb-3 text-lg">
                         {language === 'en' ? cert.title : cert.titleSw}
                       </h3>
-                      <p className="text-sm text-muted-foreground mb-1">
+                      <p className="text-sm text-muted-foreground mb-2 font-medium">
                         {cert.authority}
                       </p>
-                      <Badge variant="outline" className="text-xs">
-                        {cert.year}
+                      <Badge variant="outline" className="text-xs font-semibold">
+                        Since {cert.year}
                       </Badge>
                     </CardContent>
                   </Card>
@@ -377,29 +401,34 @@ const About = () => {
           </section>
 
           {/* Contact CTA Section */}
-          <section className="py-16 bg-primary text-primary-foreground">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="font-heading text-3xl font-bold mb-4">
+          <section className="py-20 bg-gradient-to-br from-primary via-primary/95 to-primary/90 text-primary-foreground relative overflow-hidden">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+            
+            <div className="container mx-auto px-4 text-center relative z-10">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6">
                 {language === 'en' ? 'Ready to Experience Quality Healthcare?' : 'Uko Tayari Kupata Huduma za Afya za Ubora?'}
               </h2>
-              <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto leading-relaxed">
                 {language === 'en'
                   ? 'Visit our pharmacy today or explore our online catalog to discover how we can serve your healthcare needs.'
                   : 'Tembelea duka letu la dawa leo au chunguza katalogi yetu ya mtandaoni ili uone jinsi tunavyoweza kutumikia mahitaji yako ya afya.'
                 }
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
                 <Button 
                   variant="secondary" 
                   size="lg"
                   onClick={() => navigate('/products')}
+                  className="hover:scale-105 transition-transform shadow-xl"
                 >
                   {language === 'en' ? 'Shop Now' : 'Nunua Sasa'}
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="border-white text-white hover:bg-white hover:text-primary"
+                  className="border-2 border-white text-white hover:bg-white hover:text-primary hover:scale-105 transition-all"
                   onClick={() => navigate('/contact')}
                 >
                   {language === 'en' ? 'Get in Touch' : 'Wasiliana Nasi'}
@@ -407,23 +436,29 @@ const About = () => {
               </div>
               
               {/* Quick Contact Info */}
-              <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  <span className="text-sm">
+              <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="flex flex-col items-center gap-3 p-4 rounded-lg bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-colors">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <span className="text-sm font-medium">
                     {language === 'en' 
                       ? 'Standi Kuu ya Mabasi, Mbeya' 
                       : 'Standi Kuu ya Mabasi, Mbeya'
                     }
                   </span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Phone className="w-5 h-5" />
-                  <span className="text-sm">+255 621 624 287</span>
+                <div className="flex flex-col items-center gap-3 p-4 rounded-lg bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-colors">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <Phone className="w-6 h-6" />
+                  </div>
+                  <span className="text-sm font-medium">+255 621 624 287</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  <span className="text-sm">
+                <div className="flex flex-col items-center gap-3 p-4 rounded-lg bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-colors">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <Clock className="w-6 h-6" />
+                  </div>
+                  <span className="text-sm font-medium">
                     {language === 'en' ? 'Mon-Sat 8AM-8PM' : 'Jumatatu-Jumamosi 8AM-8PM'}
                   </span>
                 </div>

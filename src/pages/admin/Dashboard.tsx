@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   Package, 
@@ -308,6 +309,7 @@ const LowStockAlertsSection = () => {
 };
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [showProductForm, setShowProductForm] = useState(false);
   const { data: dashboardData, loading, error } = useAdminDashboard();
   const { createProduct } = useAdminProducts();
@@ -398,7 +400,11 @@ export default function AdminDashboard() {
             <span className="sm:hidden">Add Product</span>
             <span className="hidden sm:inline">Add Product</span>
           </Button>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button 
+            variant="outline" 
+            className="w-full sm:w-auto"
+            onClick={() => navigate('/admin/reports')}
+          >
             <span className="sm:hidden">Reports</span>
             <span className="hidden sm:inline">View Reports</span>
           </Button>
