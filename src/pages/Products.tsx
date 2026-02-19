@@ -30,17 +30,18 @@ const Products = () => {
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     brands: [],
-    priceRange: [0, 100000] as [number, number],
+    priceRange: [0, 10000000] as [number, number],
     availability: [],
     special: []
   });
 
   // Memoize filters to avoid refetch loops
+  // Only apply price filters when user has actively changed them from defaults
   const stableFilters = useMemo(() => ({
     category: filters.categories.length > 0 ? filters.categories[0] : undefined,
     search: searchQuery || undefined,
-    minPrice: filters.priceRange[0],
-    maxPrice: filters.priceRange[1],
+    minPrice: filters.priceRange[0] > 0 ? filters.priceRange[0] : undefined,
+    maxPrice: filters.priceRange[1] < 10000000 ? filters.priceRange[1] : undefined,
   }), [filters.categories, filters.priceRange, searchQuery]);
 
   const { products, loading, error } = useProducts(stableFilters);
@@ -56,7 +57,7 @@ const Products = () => {
     const newFilters: FilterState = {
       categories: [],
       brands: [],
-      priceRange: [0, 100000] as [number, number],
+      priceRange: [0, 10000000] as [number, number],
       availability: [],
       special: []
     };
@@ -177,7 +178,7 @@ const Products = () => {
     setFilters({
       categories: [],
       brands: [],
-      priceRange: [0, 100000] as [number, number],
+      priceRange: [0, 10000000] as [number, number],
       availability: [],
       special: []
     });

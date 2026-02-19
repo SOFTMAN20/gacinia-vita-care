@@ -638,10 +638,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_cart_items: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_cart_items: { Args: never; Returns: undefined }
       create_user_profile: {
         Args: {
           user_email: string
@@ -657,6 +654,12 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string | null
           username: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       has_role: {
@@ -679,6 +682,12 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string | null
           username: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
     }
