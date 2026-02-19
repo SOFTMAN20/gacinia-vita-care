@@ -65,7 +65,7 @@ export function ProductFilters({
     filters.brands.length + 
     filters.availability.length + 
     filters.special.length +
-    (filters.priceRange[0] > 0 || filters.priceRange[1] < 100000 ? 1 : 0);
+    (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000000 ? 1 : 0);
 
   const FilterSection = ({ 
     title, 
@@ -149,9 +149,9 @@ export function ProductFilters({
             <Slider
               value={filters.priceRange}
               onValueChange={(value) => updateFilter('priceRange', value as [number, number])}
-              max={100000}
+              max={10000000}
               min={0}
-              step={1000}
+              step={5000}
               className="w-full"
             />
             <div className="flex items-center justify-between text-sm text-muted-foreground">
