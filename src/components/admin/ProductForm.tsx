@@ -736,6 +736,19 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
               </Card>
             </div>
           </div>
+          {/* Bottom Action Buttons */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" type="button" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              disabled={isLoading}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isLoading ? 'Saving...' : 'Save Product'}
+            </Button>
+          </div>
         </form>
       </Form>
       <AddBrandDialog
