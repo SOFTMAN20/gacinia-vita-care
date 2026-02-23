@@ -117,9 +117,9 @@ export function HeroSection() {
         <img
           src={currentSlideData.image}
           alt={currentSlideData.alt}
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary/40 to-secondary/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/20 to-secondary/30" />
       </div>
 
       {/* Content */}
