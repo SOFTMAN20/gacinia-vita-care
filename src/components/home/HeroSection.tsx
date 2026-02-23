@@ -119,7 +119,7 @@ export function HeroSection() {
           alt={currentSlideData.alt}
           className="w-full h-full object-cover opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/20 to-secondary/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/15 via-black/20 to-secondary/15" />
       </div>
 
       {/* Content */}
