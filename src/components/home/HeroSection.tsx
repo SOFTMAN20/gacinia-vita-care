@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import heroPharmacyMain from '@/assets/hero-pharmacy-main.jpg';
 import heroMedicalSupplies from '@/assets/hero-medical-supplies.jpg';
 import heroDelivery from '@/assets/hero-delivery.jpg';
+import heroMotherChild from '@/assets/hero-mother-child.jpg';
 
 export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -47,6 +48,18 @@ export function HeroSection() {
       image: heroDelivery,
       alt: "Fast medical delivery service"
     },
+    {
+      title: "Caring for Your Family's Health",
+      subtitle: "Quality medicines and healthcare products for mothers and children",
+      titleSw: "Kutunza Afya ya Familia Yako",
+      subtitleSw: "Dawa bora na bidhaa za afya kwa akina mama na watoto",
+      cta1: "Shop Now",
+      cta1Sw: "Nunua Sasa",
+      cta2: "View Categories",
+      cta2Sw: "Tazama Makundi",
+      image: heroMotherChild,
+      alt: "Mother and child at pharmacy receiving medicine"
+    },
   ];
 
   const [language] = useState<'en' | 'sw'>('en'); // This would come from global state
@@ -75,7 +88,6 @@ export function HeroSection() {
         navigate('/contact');
         break;
       case 2: { // Learn More
-        // For now, scroll to trust section or navigate to about
         const trustSection = document.querySelector('#trust-section');
         if (trustSection) {
           trustSection.scrollIntoView({ behavior: 'smooth' });
@@ -84,6 +96,9 @@ export function HeroSection() {
         }
         break;
       }
+      case 3: // View Categories
+        navigate('/products');
+        break;
       default:
         navigate('/contact');
     }
