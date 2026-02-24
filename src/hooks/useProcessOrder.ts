@@ -59,15 +59,50 @@ export const useProcessOrder = () => {
         throw new Error(data.error || 'Failed to process order');
       }
 
-      // Clear cart on successful order
+      const order = data.order;
+
+      // For non-COD payments, create a Snippe payment session
+      if (orderData.payment_method !== 'cod') {
+        try {
+          const redirectUrl = `${window.location.origin}/payment/return?order_number=${order.order_number}&status=completed`;
+
+          const { data: snippeData, error: snippeError } = await supabase.functions.invoke('snippe-payment', {
+            body: {
+              order_id: order.id,
+              redirect_url: redirectUrl,
+            }
+          });
+
+          if (snippeError) {
+            console.error('Snippe payment error:', snippeError);
+            // Order was created but payment session failed - still return the order
+            toast({
+              title: 'Order Created',
+              description: `Order #${order.order_number} created. Payment link could not be generated - please contact support.`,
+              variant: 'destructive',
+            });
+            clearCart();
+            return { ...order, payment_redirect: null };
+          }
+
+          if (snippeData?.checkout_url) {
+            clearCart();
+            return { ...order, payment_redirect: snippeData.checkout_url };
+          }
+        } catch (snippeErr) {
+          console.error('Snippe integration error:', snippeErr);
+        }
+      }
+
+      // For COD or if Snippe redirect not available
       clearCart();
 
       toast({
         title: 'Order Placed Successfully!',
-        description: `Your order #${data.order.order_number} has been placed and is being processed.`,
+        description: `Your order #${order.order_number} has been placed and is being processed.`,
       });
 
-      return data.order;
+      return { ...order, payment_redirect: null };
 
     } catch (err: any) {
       console.error('Error processing order:', err);

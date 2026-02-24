@@ -32,6 +32,12 @@ verify_jwt = true
 [functions.send-notification]  
 verify_jwt = false
 
+[functions.snippe-payment]
+verify_jwt = false
+
+[functions.snippe-webhook]
+verify_jwt = false
+
 [realtime]
 enabled = true
 port = 54324

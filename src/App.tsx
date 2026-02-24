@@ -19,6 +19,7 @@ import Checkout from "./pages/Checkout";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
+import PaymentReturn from "./pages/PaymentReturn";
 import { AdminLayout } from "./components/layout/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
@@ -47,6 +48,7 @@ const App = () => (
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/payment/return" element={<PaymentReturn />} />
                     <Route path="/checkout" element={
                       <ProtectedRoute>
                         <Checkout />

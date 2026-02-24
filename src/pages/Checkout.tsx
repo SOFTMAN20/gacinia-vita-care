@@ -42,7 +42,7 @@ interface DeliveryInfo {
 }
 
 interface PaymentInfo {
-  method: 'mpesa' | 'bank' | 'cod';
+  method: 'mobile_money' | 'card' | 'cod';
   mpesaPhone: string;
   bankDetails: string;
 }
@@ -71,7 +71,7 @@ const Checkout = () => {
   });
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
-    method: 'mpesa',
+    method: 'mobile_money',
     mpesaPhone: '',
     bankDetails: ''
   });
@@ -136,8 +136,16 @@ const Checkout = () => {
         notes: deliveryInfo.instructions
       };
 
-      // Use the new processOrder function which calls our edge function
+      // Use the processOrder function which calls our edge function
       const order = await processOrder(orderData);
+      
+      // If there's a payment redirect (Snippe checkout), redirect the user
+      if (order.payment_redirect) {
+        window.location.href = order.payment_redirect;
+        return;
+      }
+
+      // For COD orders, show confirmation
       setOrderNumber(order.order_number || `GCN${Date.now().toString().slice(-6)}`);
       setCurrentStep('confirmation');
 
@@ -156,11 +164,9 @@ const Checkout = () => {
       case 'delivery':
         return deliveryInfo.fullName && deliveryInfo.phone && deliveryInfo.address;
       case 'payment':
-        return paymentInfo.method && (
-          paymentInfo.method === 'cod' || 
-          (paymentInfo.method === 'mpesa' && paymentInfo.mpesaPhone) ||
-          (paymentInfo.method === 'bank' && paymentInfo.bankDetails)
-        );
+        return paymentInfo.method === 'cod' || 
+          paymentInfo.method === 'mobile_money' || 
+          paymentInfo.method === 'card';
       default:
         return true;
     }
@@ -393,42 +399,32 @@ const Checkout = () => {
               >
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="mpesa" id="mpesa" />
-                    <Label htmlFor="mpesa" className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="mobile_money" id="mobile_money" />
+                    <Label htmlFor="mobile_money" className="flex items-center gap-2 cursor-pointer">
                       <Phone size={16} />
-                      M-Pesa
+                      Mobile Money (M-Pesa, Airtel, Halotel)
                     </Label>
                   </div>
-                  {paymentInfo.method === 'mpesa' && (
-                    <div className="ml-6 space-y-2">
-                      <Label htmlFor="mpesaPhone">M-Pesa Phone Number</Label>
-                      <Input
-                        id="mpesaPhone"
-                        value={paymentInfo.mpesaPhone}
-                        onChange={(e) => setPaymentInfo({...paymentInfo, mpesaPhone: e.target.value})}
-                        placeholder="+255 xxx xxx xxx"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        You will receive an STK push to complete payment
+                  {paymentInfo.method === 'mobile_money' && (
+                    <div className="ml-6">
+                      <p className="text-sm text-muted-foreground">
+                        You'll be redirected to a secure payment page to complete payment via mobile money.
                       </p>
                     </div>
                   )}
 
                   <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="bank" id="bank" />
-                    <Label htmlFor="bank" className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="card" id="card" />
+                    <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer">
                       <CreditCard size={16} />
-                      Bank Transfer
+                      Card Payment (Visa / Mastercard)
                     </Label>
                   </div>
-                  {paymentInfo.method === 'bank' && (
-                    <div className="ml-6 space-y-2">
-                      <div className="p-4 bg-muted rounded-lg">
-                        <h4 className="font-medium mb-2">Bank Details:</h4>
-                        <p className="text-sm">Bank: CRDB Bank</p>
-                        <p className="text-sm">Account: 0150-XXX-XXX</p>
-                        <p className="text-sm">Reference: {`GCN${Date.now().toString().slice(-6)}`}</p>
-                      </div>
+                  {paymentInfo.method === 'card' && (
+                    <div className="ml-6">
+                      <p className="text-sm text-muted-foreground">
+                        You'll be redirected to a secure payment page to enter your card details.
+                      </p>
                     </div>
                   )}
 
