@@ -61,7 +61,7 @@ export const useProcessOrder = () => {
 
       const order = data.order;
 
-      // For non-COD payments, create a Snippe payment session
+      // For non-COD payments, create a Snippe payment session and redirect immediately
       if (orderData.payment_method !== 'cod') {
         try {
           const redirectUrl = `${window.location.origin}/payment/return?order_number=${order.order_number}&status=completed`;
@@ -75,7 +75,6 @@ export const useProcessOrder = () => {
 
           if (snippeError) {
             console.error('Snippe payment error:', snippeError);
-            // Order was created but payment session failed - still return the order
             toast({
               title: 'Order Created',
               description: `Order #${order.order_number} created. Payment link could not be generated - please contact support.`,
@@ -87,6 +86,8 @@ export const useProcessOrder = () => {
 
           if (snippeData?.checkout_url) {
             clearCart();
+            // Redirect immediately to Snippe payment page - no success toast
+            window.location.href = snippeData.checkout_url;
             return { ...order, payment_redirect: snippeData.checkout_url };
           }
         } catch (snippeErr) {
@@ -94,7 +95,7 @@ export const useProcessOrder = () => {
         }
       }
 
-      // For COD or if Snippe redirect not available
+      // For COD orders only, show success toast
       clearCart();
 
       toast({
