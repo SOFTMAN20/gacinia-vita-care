@@ -142,7 +142,7 @@ serve(async (req: Request) => {
 
     console.log('Creating Snippe session:', JSON.stringify(sessionPayload));
 
-    const snippeResponse = await fetch(`${SNIPPE_API_URL}/v1/sessions`, {
+    const snippeResponse = await fetch(`${SNIPPE_API_URL}/api/v1/sessions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${SNIPPE_API_KEY}`,
