@@ -111,9 +111,12 @@ serve(async (req: Request) => {
     const customerPhone = deliveryAddress?.phone || profile?.phone || '';
     const customerEmail = deliveryAddress?.email || '';
 
+    // Ensure amount meets Snippe minimum (100 TZS)
+    const paymentAmount = Math.max(Math.round(order.total_amount), 100);
+
     // Create Snippe payment session
     const sessionPayload: any = {
-      amount: Math.round(order.total_amount),
+      amount: paymentAmount,
       currency: 'TZS',
       allowed_methods: ['mobile_money', 'qr', 'card'],
       description: `Gacinia Order #${order.order_number}`,

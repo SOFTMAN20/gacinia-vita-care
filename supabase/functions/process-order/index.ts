@@ -165,24 +165,27 @@ const handler = async (req: Request): Promise<Response> => {
       // Don't fail the order for this
     }
 
-    // 7. Send notification to customer
-    try {
-      await supabaseClient.functions.invoke('send-notification', {
-        body: {
-          user_id: orderData.user_id,
-          type: 'order_created',
-          title: 'Order Placed Successfully',
-          message: `Your order #${order.order_number} has been placed and is being processed.`,
-          data: {
-            order_id: order.id,
-            order_number: order.order_number,
-            total_amount: totalAmount
+    // 7. Send notification to customer (only for COD orders; non-COD get notified after payment)
+    if (orderData.payment_method === 'cod') {
+      try {
+        await supabaseClient.functions.invoke('send-notification', {
+          body: {
+            user_id: orderData.user_id,
+            type: 'order_created',
+            title: 'Order Placed Successfully',
+            message: `Your order #${order.order_number} has been placed and is being processed.`,
+            data: {
+              order_id: order.id,
+              order_number: order.order_number,
+              total_amount: totalAmount
+            }
           }
-        }
-      });
-    } catch (notificationError) {
-      console.error('Failed to send customer notification:', notificationError);
-      // Don't fail the order for notification issues
+        });
+      } catch (notificationError) {
+        console.error('Failed to send customer notification:', notificationError);
+      }
+    } else {
+      console.log('Skipping customer notification for non-COD order - will notify after payment');
     }
 
     // 8. Send notification to admins about new order
