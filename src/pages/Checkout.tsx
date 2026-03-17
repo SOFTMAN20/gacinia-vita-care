@@ -335,14 +335,14 @@ const Checkout = () => {
                     <RadioGroupItem value="delivery" id="delivery" />
                     <Label htmlFor="delivery" className="flex items-center gap-2">
                       <Truck size={16} />
-                      Home Delivery (TZS 5,000)
+                      Home Delivery (TZS 5,000 — free over TZS 50,000)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="pickup" id="pickup" />
                     <Label htmlFor="pickup" className="flex items-center gap-2">
                       <MapPin size={16} />
-                      Pickup from Pharmacy (Free)
+                      Pickup from Pharmacy (Free — no delivery fee)
                     </Label>
                   </div>
                 </RadioGroup>
@@ -448,11 +448,16 @@ const Checkout = () => {
               <div className="border-t pt-4">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total Amount:</span>
-                  <span>TZS {(state.total + (paymentInfo.method === 'cod' ? 2000 : 0)).toLocaleString()}</span>
+                  <span>TZS {(state.total + (paymentInfo.method === 'cod' ? 2000 : 0) + (deliveryInfo.deliveryType === 'delivery' && state.subtotal <= 50000 ? 5000 : 0)).toLocaleString()}</span>
                 </div>
                 {paymentInfo.method === 'cod' && (
                   <p className="text-sm text-muted-foreground">
                     Includes TZS 2,000 Cash on Delivery fee
+                  </p>
+                )}
+                {deliveryInfo.deliveryType === 'pickup' && (
+                  <p className="text-sm text-green-600">
+                    No delivery fee for pharmacy pickup
                   </p>
                 )}
               </div>

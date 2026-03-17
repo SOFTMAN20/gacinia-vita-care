@@ -82,7 +82,8 @@ const handler = async (req: Request): Promise<Response> => {
       };
     });
 
-    const deliveryFee = subtotal > 50000 ? 0 : 5000; // Free delivery over 50,000 TZS
+    const isPickup = orderData.delivery_address?.deliveryType === 'pickup';
+    const deliveryFee = isPickup ? 0 : (subtotal > 50000 ? 0 : 5000); // Free for pickup or over 50,000 TZS
     const taxAmount = 0; // No tax as requested
     const totalAmount = subtotal + deliveryFee;
 
