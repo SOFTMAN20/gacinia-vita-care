@@ -335,14 +335,14 @@ const Checkout = () => {
                     <RadioGroupItem value="delivery" id="delivery" />
                     <Label htmlFor="delivery" className="flex items-center gap-2">
                       <Truck size={16} />
-                      Home Delivery (TZS 5,000)
+                      Home Delivery (TZS 5,000 — free over TZS 50,000)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="pickup" id="pickup" />
                     <Label htmlFor="pickup" className="flex items-center gap-2">
                       <MapPin size={16} />
-                      Pickup from Pharmacy (Free)
+                      Pickup from Pharmacy (Free — no delivery fee)
                     </Label>
                   </div>
                 </RadioGroup>
