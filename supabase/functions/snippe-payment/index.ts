@@ -151,7 +151,14 @@ serve(async (req: Request) => {
       body: JSON.stringify(sessionPayload),
     });
 
-    const snippeData = await snippeResponse.json();
+    const snippeResponseText = await snippeResponse.text();
+    let snippeData: any;
+    try {
+      snippeData = JSON.parse(snippeResponseText);
+    } catch {
+      console.error('Snippe API returned non-JSON:', snippeResponseText);
+      throw new Error(`Snippe API error [${snippeResponse.status}]: ${snippeResponseText}`);
+    }
 
     if (!snippeResponse.ok) {
       console.error('Snippe API error:', JSON.stringify(snippeData));
