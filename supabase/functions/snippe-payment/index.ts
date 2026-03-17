@@ -34,9 +34,8 @@ serve(async (req: Request) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,7 +69,7 @@ serve(async (req: Request) => {
     }
 
     // Verify the order belongs to the authenticated user
-    if (order.user_id !== claimsData.claims.sub) {
+    if (order.user_id !== user.id) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -143,7 +142,7 @@ serve(async (req: Request) => {
 
     console.log('Creating Snippe session:', JSON.stringify(sessionPayload));
 
-    const snippeResponse = await fetch(`${SNIPPE_API_URL}/v1/sessions`, {
+    const snippeResponse = await fetch(`${SNIPPE_API_URL}/api/v1/sessions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${SNIPPE_API_KEY}`,
@@ -152,7 +151,14 @@ serve(async (req: Request) => {
       body: JSON.stringify(sessionPayload),
     });
 
-    const snippeData = await snippeResponse.json();
+    const snippeResponseText = await snippeResponse.text();
+    let snippeData: any;
+    try {
+      snippeData = JSON.parse(snippeResponseText);
+    } catch {
+      console.error('Snippe API returned non-JSON:', snippeResponseText);
+      throw new Error(`Snippe API error [${snippeResponse.status}]: ${snippeResponseText}`);
+    }
 
     if (!snippeResponse.ok) {
       console.error('Snippe API error:', JSON.stringify(snippeData));
