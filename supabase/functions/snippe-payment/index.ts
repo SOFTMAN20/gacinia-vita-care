@@ -69,7 +69,7 @@ serve(async (req: Request) => {
     }
 
     // Verify the order belongs to the authenticated user
-    if (order.user_id !== claimsData.claims.sub) {
+    if (order.user_id !== user.id) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
