@@ -62,15 +62,17 @@ serve(async (req: Request) => {
 
       if (order) {
         try {
+          // Send "Order Placed Successfully" notification (was deferred until payment)
           await supabase.from('notifications').insert({
             user_id: order.user_id,
-            type: 'payment_confirmed',
-            title: 'Payment Confirmed',
-            message: `Payment for order #${order.order_number} has been confirmed. TZS ${order.total_amount.toLocaleString()}`,
+            type: 'order_created',
+            title: 'Order Placed Successfully',
+            message: `Your order #${order.order_number} has been placed and payment confirmed. TZS ${order.total_amount.toLocaleString()}`,
             data: {
               order_id: orderId,
               order_number: order.order_number,
-              amount: data.amount?.value,
+              total_amount: order.total_amount,
+              amount_paid: data.amount?.value,
               channel: data.channel?.type,
               provider: data.channel?.provider,
             },
