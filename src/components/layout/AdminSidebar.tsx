@@ -19,12 +19,18 @@ import gaciniaLogo from '@/assets/gacinia-logo.png';
 
 interface AdminSidebarProps {
   className?: string;
+  onCollapsedChange?: (collapsed: boolean) => void;
 }
 
-export function AdminSidebar({ className }: AdminSidebarProps) {
+export function AdminSidebar({ className, onCollapsedChange }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const handleCollapse = (value: boolean) => {
+    setCollapsed(value);
+    onCollapsedChange?.(value);
+  };
 
   const menuItems = [
     { 
