@@ -50,6 +50,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -231,11 +232,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
-          <AdminSidebar />
+          <AdminSidebar onCollapsedChange={setSidebarCollapsed} />
         </div>
 
         {/* Main Content - offset by sidebar width on desktop */}
-        <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
           {/* Top Header */}
           <header className="bg-surface border-b border-border h-16 flex items-center justify-between px-4 lg:px-6">
             <div className="flex items-center gap-4">
