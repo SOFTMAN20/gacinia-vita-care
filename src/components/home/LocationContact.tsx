@@ -101,7 +101,7 @@ export function LocationContact() {
                   <div>
                     <p className="font-medium">WhatsApp</p>
                     <p className="text-sm text-muted-foreground">
-                      +255621624287
+                      +255 756 519 286
                     </p>
                   </div>
                 </div>
