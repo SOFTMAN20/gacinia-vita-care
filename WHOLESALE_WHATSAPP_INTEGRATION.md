@@ -17,7 +17,7 @@ When a user clicks the "Contact for Wholesale" button on a product with wholesal
    - Product name
    - Wholesale price (if available)
    - Request for bulk order discussion
-3. **Direct contact** to Gacinia Pharmacy WhatsApp: +255 621 624 287
+3. **Direct contact** to Gacinia Pharmacy WhatsApp: +255 756 519 286
 
 ### Message Template
 
