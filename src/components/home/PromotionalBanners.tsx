@@ -132,7 +132,7 @@ export function PromotionalBanners() {
                 <Button 
                   className="bg-success hover:bg-success/90 hover:scale-105 transition-transform"
                   onClick={() => {
-                    const phoneNumber = '255621624287';
+                    const phoneNumber = '255756519286';
                     const message = 'Hello, I would like to book a free health consultation regarding diabetes prevention and management.';
                     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                     window.open(whatsappUrl, '_blank');
