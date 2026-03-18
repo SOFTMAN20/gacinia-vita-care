@@ -107,7 +107,7 @@ export function AdminSidebar({ className, onCollapsedChange }: AdminSidebarProps
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={() => handleCollapse(!collapsed)}
             className="ml-auto"
           >
             {collapsed ? (
