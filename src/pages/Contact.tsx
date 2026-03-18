@@ -93,10 +93,10 @@ const Contact = () => {
       icon: Phone,
       title: 'Phone',
       titleSw: 'Simu',
-      value: '+255 621 624 287',
+      value: '+255 756 519 286 / +255 713 201 140',
       description: 'Call us for immediate assistance',
       descriptionSw: 'Tupigie simu kwa msaada wa haraka',
-      action: () => window.open('tel:+255621624287')
+      action: () => window.open('tel:+255756519286')
     },
     {
       icon: MessageCircle,
