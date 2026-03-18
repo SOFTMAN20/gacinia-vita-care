@@ -62,7 +62,7 @@ I would like to discuss bulk order options.
 
 ### Technical Details
 
-- **Phone Number**: 255621624287 (international format without +)
+- **Phone Number**: 255756519286 (international format without +)
 - **URL Format**: `https://wa.me/{phone}?text={encoded_message}`
 - **Opens in**: New tab/window (`_blank`)
 - **Message Encoding**: URL-encoded for special characters
