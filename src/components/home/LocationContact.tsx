@@ -81,9 +81,8 @@ export function LocationContact() {
                   <Phone className="w-5 h-5 text-primary mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-muted-foreground">
-                      +255621624287
-                    </p>
+                    <p className="text-sm text-muted-foreground">+255 756 519 286</p>
+                    <p className="text-sm text-muted-foreground">+255 713 201 140</p>
                   </div>
                 </div>
 
