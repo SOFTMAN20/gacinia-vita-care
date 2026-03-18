@@ -232,7 +232,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
-          <AdminSidebar />
+          <AdminSidebar onCollapsedChange={setSidebarCollapsed} />
         </div>
 
         {/* Main Content - offset by sidebar width on desktop */}
