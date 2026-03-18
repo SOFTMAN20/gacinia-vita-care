@@ -17,7 +17,7 @@ When a user clicks the "Contact for Wholesale" button on a product with wholesal
    - Product name
    - Wholesale price (if available)
    - Request for bulk order discussion
-3. **Direct contact** to Gacinia Pharmacy WhatsApp: +255 621 624 287
+3. **Direct contact** to Gacinia Pharmacy WhatsApp: +255 756 519 286
 
 ### Message Template
 
@@ -62,7 +62,7 @@ I would like to discuss bulk order options.
 
 ### Technical Details
 
-- **Phone Number**: 255621624287 (international format without +)
+- **Phone Number**: 255756519286 (international format without +)
 - **URL Format**: `https://wa.me/{phone}?text={encoded_message}`
 - **Opens in**: New tab/window (`_blank`)
 - **Message Encoding**: URL-encoded for special characters

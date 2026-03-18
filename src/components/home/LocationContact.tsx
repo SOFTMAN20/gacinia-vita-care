@@ -81,9 +81,8 @@ export function LocationContact() {
                   <Phone className="w-5 h-5 text-primary mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-muted-foreground">
-                      +255621624287
-                    </p>
+                    <p className="text-sm text-muted-foreground">+255 756 519 286</p>
+                    <p className="text-sm text-muted-foreground">+255 713 201 140</p>
                   </div>
                 </div>
 
@@ -102,7 +101,7 @@ export function LocationContact() {
                   <div>
                     <p className="font-medium">WhatsApp</p>
                     <p className="text-sm text-muted-foreground">
-                      +255621624287
+                      +255 756 519 286
                     </p>
                   </div>
                 </div>
@@ -144,7 +143,7 @@ export function LocationContact() {
             <div className="grid grid-cols-2 gap-4">
               <Button 
                 className="h-auto py-4 flex flex-col gap-2"
-                onClick={() => window.open('https://wa.me/255621624287?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20your%20pharmacy%20services.', '_blank')}
+                onClick={() => window.open('https://wa.me/255756519286?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20your%20pharmacy%20services.', '_blank')}
               >
                 <Phone className="w-5 h-5" />
                 <span className="text-sm">Call Now</span>
@@ -152,7 +151,7 @@ export function LocationContact() {
               <Button 
                 variant="outline" 
                 className="h-auto py-4 flex flex-col gap-2"
-                onClick={() => window.open('https://wa.me/255621624287?text=Hello%2C%20I%20would%20like%20to%20book%20a%20consultation%20with%20your%20pharmacy.', '_blank')}
+                onClick={() => window.open('https://wa.me/255756519286?text=Hello%2C%20I%20would%20like%20to%20book%20a%20consultation%20with%20your%20pharmacy.', '_blank')}
               >
                 <Calendar className="w-5 h-5" />
                 <span className="text-sm">Book Consultation</span>

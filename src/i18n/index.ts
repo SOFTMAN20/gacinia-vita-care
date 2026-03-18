@@ -20,7 +20,7 @@ const resources = {
       },
       // Header
       header: {
-        phone: '+255621624287',
+        phone: '+255756519286',
         location: 'Standi Kuu ya Mabasi Opposite to Agakhan Hospital, Mbeya 6586',
         tagline: 'Licensed Pharmacy & Medical Supplies',
         company: 'Gacinia',
@@ -60,7 +60,7 @@ const resources = {
       },
       // Header
       header: {
-        phone: '+255621624287',
+        phone: '+255756519286',
         location: 'Standi Kuu ya Mabasi Opposite to Hospitali ya Agakhan, Mbeya 6586',
         tagline: 'Duka la Dawa Lililoidhinishwa na Vifaa vya Matibabu',
         company: 'Gacinia',
