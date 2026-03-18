@@ -102,10 +102,10 @@ const Contact = () => {
       icon: MessageCircle,
       title: 'WhatsApp',
       titleSw: 'WhatsApp',
-      value: '+255 621 624 287',
+      value: '+255 756 519 286',
       description: 'Chat with us on WhatsApp',
       descriptionSw: 'Ongea nasi kwenye WhatsApp',
-      action: () => window.open('https://wa.me/255621624287')
+      action: () => window.open('https://wa.me/255756519286')
     },
     {
       icon: Mail,
