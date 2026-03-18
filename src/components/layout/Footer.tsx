@@ -79,9 +79,12 @@ export function Footer() {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2">
-                <Phone size={16} className="opacity-75" />
-                <p className="text-sm opacity-90">+255621624287</p>
+              <div className="flex items-start space-x-2">
+                <Phone size={16} className="mt-0.5 opacity-75" />
+                <div className="text-sm opacity-90">
+                  <p>+255 756 519 286</p>
+                  <p>+255 713 201 140</p>
+                </div>
               </div>
               
               <div className="flex items-center space-x-2">
