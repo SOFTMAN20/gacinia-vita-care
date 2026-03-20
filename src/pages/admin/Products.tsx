@@ -471,7 +471,15 @@ export default function AdminProducts() {
                               seoTitle: '',
                               seoDescription: '',
                               tags: product.key_features || [],
-                              images: product.images || []
+                              images: product.images || [],
+                              usageInstructions: product.usage_instructions || '',
+                              dosage: product.dosage || '',
+                              ingredients: product.ingredients || '',
+                              storageRequirements: product.storage_requirements || '',
+                              manufacturer: product.manufacturer || '',
+                              dimensions: product.dimensions || '',
+                              batchNumber: product.batch_number || '',
+                              expiryDate: product.expiry_date || '',
                             };
                             setEditingProduct({ ...product, ...formData });
                             setShowProductForm(true);
