@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -34,26 +35,23 @@ import { ImageUploader } from '@/components/ui/image-uploader';
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   nameSwahili: z.string().optional(),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().optional().default(''),
   shortDescription: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
   brand: z.string().optional(),
   sku: z.string().optional(),
-  retailPrice: z.number().min(0.01, 'Price must be greater than 0').or(z.literal(undefined)),
-  originalPrice: z.number().positive().optional().or(z.literal(undefined)),
-  wholesalePrice: z.number().positive().optional().or(z.literal(undefined)),
+  retailPrice: z.coerce.number().min(0.01, 'Price must be greater than 0'),
+  originalPrice: z.coerce.number().positive().optional().or(z.literal(0)).transform(v => v === 0 ? undefined : v),
+  wholesalePrice: z.coerce.number().positive().optional().or(z.literal(0)).transform(v => v === 0 ? undefined : v),
   stock: z.coerce.number().min(0, 'Stock must be positive'),
   minStock: z.coerce.number().min(0, 'Minimum stock must be positive'),
-  weight: z.number().positive().optional().or(z.literal(undefined)),
+  weight: z.coerce.number().positive().optional().or(z.literal(0)).transform(v => v === 0 ? undefined : v),
   requiresPrescription: z.boolean().default(false),
   wholesaleAvailable: z.boolean().default(false),
   featured: z.boolean().default(false),
   status: z.enum(['active', 'inactive', 'draft']).default('active'),
-  seoTitle: z.string().optional(),
-  seoDescription: z.string().optional(),
   tags: z.array(z.string()).default([]),
   images: z.array(z.string()).optional(),
-  // Specs, Usage & Safety fields
   usageInstructions: z.string().optional(),
   dosage: z.string().optional(),
   ingredients: z.string().optional(),
@@ -109,8 +107,6 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       wholesaleAvailable: product?.wholesaleAvailable || false,
       featured: product?.featured || false,
       status: product?.status || 'active',
-      seoTitle: product?.seoTitle || '',
-      seoDescription: product?.seoDescription || '',
       tags: product?.tags || [],
       usageInstructions: product?.usageInstructions || '',
       dosage: product?.dosage || '',
@@ -176,11 +172,13 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
           <Button 
             onClick={(e) => {
               console.log('🔥 Save button clicked!');
-              console.log('🔥 Form values:', form.getValues());
-              console.log('🔥 Form errors:', form.formState.errors);
-              
-              // Manually trigger form submission
-              form.handleSubmit(onFormSubmit)();
+              form.handleSubmit(onFormSubmit, (errors) => {
+                console.log('🔥 Form validation errors:', errors);
+                const errorMessages = Object.values(errors).map((err: any) => err?.message).filter(Boolean);
+                if (errorMessages.length > 0) {
+                  toast.error(`Please fix: ${errorMessages.join(', ')}`);
+                }
+              })();
             }}
             disabled={isLoading}
           >
