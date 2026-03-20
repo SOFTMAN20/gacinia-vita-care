@@ -112,6 +112,14 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       seoTitle: product?.seoTitle || '',
       seoDescription: product?.seoDescription || '',
       tags: product?.tags || [],
+      usageInstructions: product?.usageInstructions || '',
+      dosage: product?.dosage || '',
+      ingredients: product?.ingredients || '',
+      storageRequirements: product?.storageRequirements || '',
+      manufacturer: product?.manufacturer || '',
+      dimensions: product?.dimensions || '',
+      batchNumber: product?.batchNumber || '',
+      expiryDate: product?.expiryDate || '',
     },
   });
 
