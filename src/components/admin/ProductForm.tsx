@@ -293,51 +293,8 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                 </CardContent>
               </Card>
 
-              {/* SEO Settings */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>SEO Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="seoTitle"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SEO Title</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="SEO optimized title" />
-                        </FormControl>
-                        <FormDescription>
-                          Title that appears in search engines (recommended: 50-60 characters)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
-                  <FormField
-                    control={form.control}
-                    name="seoDescription"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SEO Description</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            {...field} 
-                            placeholder="SEO meta description"
-                            rows={3}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Description that appears in search engines (recommended: 150-160 characters)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
+
 
               {/* Specifications, Usage & Safety */}
               <Card>
