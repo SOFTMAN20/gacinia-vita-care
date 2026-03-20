@@ -172,11 +172,13 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
           <Button 
             onClick={(e) => {
               console.log('🔥 Save button clicked!');
-              console.log('🔥 Form values:', form.getValues());
-              console.log('🔥 Form errors:', form.formState.errors);
-              
-              // Manually trigger form submission
-              form.handleSubmit(onFormSubmit)();
+              form.handleSubmit(onFormSubmit, (errors) => {
+                console.log('🔥 Form validation errors:', errors);
+                const errorMessages = Object.values(errors).map((err: any) => err?.message).filter(Boolean);
+                if (errorMessages.length > 0) {
+                  toast.error(`Please fix: ${errorMessages.join(', ')}`);
+                }
+              })();
             }}
             disabled={isLoading}
           >
