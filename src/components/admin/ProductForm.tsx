@@ -53,6 +53,15 @@ const productSchema = z.object({
   seoDescription: z.string().optional(),
   tags: z.array(z.string()).default([]),
   images: z.array(z.string()).optional(),
+  // Specs, Usage & Safety fields
+  usageInstructions: z.string().optional(),
+  dosage: z.string().optional(),
+  ingredients: z.string().optional(),
+  storageRequirements: z.string().optional(),
+  manufacturer: z.string().optional(),
+  dimensions: z.string().optional(),
+  batchNumber: z.string().optional(),
+  expiryDate: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -103,6 +112,14 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       seoTitle: product?.seoTitle || '',
       seoDescription: product?.seoDescription || '',
       tags: product?.tags || [],
+      usageInstructions: product?.usageInstructions || '',
+      dosage: product?.dosage || '',
+      ingredients: product?.ingredients || '',
+      storageRequirements: product?.storageRequirements || '',
+      manufacturer: product?.manufacturer || '',
+      dimensions: product?.dimensions || '',
+      batchNumber: product?.batchNumber || '',
+      expiryDate: product?.expiryDate || '',
     },
   });
 
@@ -315,6 +332,144 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
                         <FormDescription>
                           Description that appears in search engines (recommended: 150-160 characters)
                         </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Specifications, Usage & Safety */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Specifications, Usage & Safety</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="manufacturer"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Manufacturer</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="e.g., GlaxoSmithKline" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="dimensions"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Dimensions</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="e.g., 10cm x 5cm x 3cm" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="batchNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Batch Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="e.g., BN-2026-001" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="expiryDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Expiry Date</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="date" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="dosage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dosage</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="e.g., Adults: 1-2 tablets every 4-6 hours. Max 8 tablets in 24 hours."
+                            rows={2}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="usageInstructions"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Usage Instructions</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="How to use this product, precautions, side effects..."
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="ingredients"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ingredients / Composition</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Active ingredients, inactive ingredients..."
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="storageRequirements"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Storage Requirements</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="e.g., Store below 25°C in a dry place. Keep away from children."
+                            rows={2}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

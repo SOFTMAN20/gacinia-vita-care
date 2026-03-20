@@ -132,6 +132,14 @@ export default function AdminProducts() {
         is_active: data.status === 'active',
         featured: Boolean(data.featured),
         in_stock: Number(data.stock) > 0,
+        usage_instructions: data.usageInstructions || null,
+        dosage: data.dosage || null,
+        ingredients: data.ingredients || null,
+        storage_requirements: data.storageRequirements || null,
+        manufacturer: data.manufacturer || null,
+        dimensions: data.dimensions || null,
+        batch_number: data.batchNumber || null,
+        expiry_date: data.expiryDate || null,
       };
 
       console.log('📦 Final product data to be sent:', productData);
@@ -463,7 +471,15 @@ export default function AdminProducts() {
                               seoTitle: '',
                               seoDescription: '',
                               tags: product.key_features || [],
-                              images: product.images || []
+                              images: product.images || [],
+                              usageInstructions: product.usage_instructions || '',
+                              dosage: product.dosage || '',
+                              ingredients: product.ingredients || '',
+                              storageRequirements: product.storage_requirements || '',
+                              manufacturer: product.manufacturer || '',
+                              dimensions: product.dimensions || '',
+                              batchNumber: product.batch_number || '',
+                              expiryDate: product.expiry_date || '',
                             };
                             setEditingProduct({ ...product, ...formData });
                             setShowProductForm(true);
