@@ -132,6 +132,14 @@ export default function AdminProducts() {
         is_active: data.status === 'active',
         featured: Boolean(data.featured),
         in_stock: Number(data.stock) > 0,
+        usage_instructions: data.usageInstructions || null,
+        dosage: data.dosage || null,
+        ingredients: data.ingredients || null,
+        storage_requirements: data.storageRequirements || null,
+        manufacturer: data.manufacturer || null,
+        dimensions: data.dimensions || null,
+        batch_number: data.batchNumber || null,
+        expiry_date: data.expiryDate || null,
       };
 
       console.log('📦 Final product data to be sent:', productData);
