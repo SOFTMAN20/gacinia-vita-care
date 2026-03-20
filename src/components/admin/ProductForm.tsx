@@ -53,6 +53,15 @@ const productSchema = z.object({
   seoDescription: z.string().optional(),
   tags: z.array(z.string()).default([]),
   images: z.array(z.string()).optional(),
+  // Specs, Usage & Safety fields
+  usageInstructions: z.string().optional(),
+  dosage: z.string().optional(),
+  ingredients: z.string().optional(),
+  storageRequirements: z.string().optional(),
+  manufacturer: z.string().optional(),
+  dimensions: z.string().optional(),
+  batchNumber: z.string().optional(),
+  expiryDate: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
