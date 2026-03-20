@@ -106,8 +106,6 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       wholesaleAvailable: product?.wholesaleAvailable || false,
       featured: product?.featured || false,
       status: product?.status || 'active',
-      seoTitle: product?.seoTitle || '',
-      seoDescription: product?.seoDescription || '',
       tags: product?.tags || [],
       usageInstructions: product?.usageInstructions || '',
       dosage: product?.dosage || '',
