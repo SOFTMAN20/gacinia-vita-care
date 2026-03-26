@@ -118,7 +118,7 @@ serve(async (req: Request) => {
     const sessionPayload: any = {
       amount: paymentAmount,
       currency: 'TZS',
-      allowed_methods: ['mobile_money', 'qr', 'card'],
+      allowed_methods: ['mobile_money', 'card'],
       description: `Gacinia Order #${order.order_number}`,
       metadata: {
         order_id: order.id,
