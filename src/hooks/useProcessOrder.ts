@@ -64,7 +64,7 @@ export const useProcessOrder = () => {
       // For non-COD payments, create a Snippe payment session and redirect immediately
       if (orderData.payment_method !== 'cod') {
         try {
-          const redirectUrl = `${window.location.origin}/payment/return?order_number=${order.order_number}&status=completed`;
+          const redirectUrl = `${window.location.origin}/payment/return?order_number=${order.order_number}`;
 
           const { data: snippeData, error: snippeError } = await supabase.functions.invoke('snippe-payment', {
             body: {

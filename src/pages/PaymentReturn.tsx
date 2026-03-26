@@ -5,14 +5,54 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCart } from '@/contexts/CartContext';
-import { CheckCircle, Clock, XCircle, ShoppingBag, Home } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { CheckCircle, Clock, XCircle, ShoppingBag, Home, Loader2 } from 'lucide-react';
 
 const PaymentReturn = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { state } = useCart();
-  const [status] = useState(searchParams.get('status') || 'pending');
   const orderNumber = searchParams.get('order_number') || '';
+  const [paymentStatus, setPaymentStatus] = useState<'loading' | 'paid' | 'pending' | 'failed'>('loading');
+
+  useEffect(() => {
+    if (!orderNumber) {
+      setPaymentStatus('pending');
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = 15; // Poll for up to ~30 seconds
+
+    const checkStatus = async () => {
+      const { data: order } = await supabase
+        .from('orders')
+        .select('payment_status')
+        .eq('order_number', orderNumber)
+        .single();
+
+      if (order?.payment_status === 'paid') {
+        setPaymentStatus('paid');
+        return true;
+      } else if (order?.payment_status === 'failed') {
+        setPaymentStatus('failed');
+        return true;
+      }
+      return false;
+    };
+
+    const poll = async () => {
+      const done = await checkStatus();
+      if (!done && attempts < maxAttempts) {
+        attempts++;
+        setTimeout(poll, 2000);
+      } else if (!done) {
+        setPaymentStatus('pending');
+      }
+    };
+
+    poll();
+  }, [orderNumber]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,7 +60,17 @@ const PaymentReturn = () => {
       
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-lg mx-auto text-center space-y-6">
-          {status === 'completed' || status === 'paid' ? (
+          {paymentStatus === 'loading' ? (
+            <>
+              <div className="w-20 h-20 mx-auto bg-muted rounded-full flex items-center justify-center">
+                <Loader2 size={40} className="text-primary animate-spin" />
+              </div>
+              <h1 className="text-3xl font-bold">Verifying Payment...</h1>
+              <p className="text-muted-foreground">
+                Please wait while we confirm your payment. This may take a moment.
+              </p>
+            </>
+          ) : paymentStatus === 'paid' ? (
             <>
               <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center">
                 <CheckCircle size={40} className="text-green-600" />
@@ -30,7 +80,7 @@ const PaymentReturn = () => {
                 Your payment has been confirmed. Your order is now being processed.
               </p>
             </>
-          ) : status === 'failed' ? (
+          ) : paymentStatus === 'failed' ? (
             <>
               <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center">
                 <XCircle size={40} className="text-red-600" />
