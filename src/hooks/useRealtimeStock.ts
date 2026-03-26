@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/providers/RealtimeProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface StockUpdate {
   product_id: string;
@@ -13,6 +14,8 @@ interface StockUpdate {
 
 export const useRealtimeStock = () => {
   const { toast } = useToast();
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
 
   // Handle stock update notifications
   const handleStockUpdate = useCallback((payload: any) => {
@@ -39,33 +42,33 @@ export const useRealtimeStock = () => {
         queryKey: ['products']
       });
       
-      // Show toast for significant stock decreases (likely from orders)
-      if (stockChange < 0) {
-        toast({
-          title: 'Stock Updated',
-          description: `${stockUpdate.product_name} stock decreased by ${Math.abs(stockChange)} units`,
-        });
-      }
-      
-      // Show warning for low stock
-      if (newProduct.stock_count <= (newProduct.min_stock_level || 5) && newProduct.stock_count > 0) {
-        toast({
-          title: 'Low Stock Alert',
-          description: `${stockUpdate.product_name} is running low (${newProduct.stock_count} remaining)`,
-          variant: 'destructive',
-        });
-      }
-      
-      // Show alert for out of stock
-      if (newProduct.stock_count === 0 && oldProduct.stock_count > 0) {
-        toast({
-          title: 'Out of Stock',
-          description: `${stockUpdate.product_name} is now out of stock`,
-          variant: 'destructive',
-        });
+      // Only show stock notifications to admins
+      if (isAdmin) {
+        if (stockChange < 0) {
+          toast({
+            title: 'Stock Updated',
+            description: `${stockUpdate.product_name} stock decreased by ${Math.abs(stockChange)} units`,
+          });
+        }
+        
+        if (newProduct.stock_count <= (newProduct.min_stock_level || 5) && newProduct.stock_count > 0) {
+          toast({
+            title: 'Low Stock Alert',
+            description: `${stockUpdate.product_name} is running low (${newProduct.stock_count} remaining)`,
+            variant: 'destructive',
+          });
+        }
+        
+        if (newProduct.stock_count === 0 && oldProduct.stock_count > 0) {
+          toast({
+            title: 'Out of Stock',
+            description: `${stockUpdate.product_name} is now out of stock`,
+            variant: 'destructive',
+          });
+        }
       }
     }
-  }, [toast]);
+  }, [toast, isAdmin]);
 
   useEffect(() => {
     console.log('Setting up real-time stock monitoring...');
