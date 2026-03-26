@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/providers/RealtimeProvider';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface StockUpdate {
   product_id: string;
@@ -13,6 +14,8 @@ interface StockUpdate {
 
 export const useRealtimeStock = () => {
   const { toast } = useToast();
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
 
   // Handle stock update notifications
   const handleStockUpdate = useCallback((payload: any) => {
