@@ -25,36 +25,33 @@ export const useRealtimeStock = () => {
     
     const stockChange = newProduct.stock_count - oldProduct.stock_count;
     
-    // Only show notifications for significant stock changes
     if (Math.abs(stockChange) > 0) {
-      const stockUpdate: StockUpdate = {
-        product_id: newProduct.id,
+      console.log('Stock update detected:', {
         product_name: newProduct.name,
         old_stock: oldProduct.stock_count,
         new_stock: newProduct.stock_count,
         change: stockChange
-      };
-      
-      console.log('Stock update detected:', stockUpdate);
+      });
       
       // Invalidate product queries to refetch with new stock data
       queryClient.invalidateQueries({
         queryKey: ['products']
       });
       
-      // Only show stock notifications to admins
-      if (isAdmin) {
+      // Only show stock notifications to admins - check profile directly
+      const currentIsAdmin = profile?.role === 'admin';
+      if (currentIsAdmin) {
         if (stockChange < 0) {
           toast({
             title: 'Stock Updated',
-            description: `${stockUpdate.product_name} stock decreased by ${Math.abs(stockChange)} units`,
+            description: `${newProduct.name} stock decreased by ${Math.abs(stockChange)} units`,
           });
         }
         
         if (newProduct.stock_count <= (newProduct.min_stock_level || 5) && newProduct.stock_count > 0) {
           toast({
             title: 'Low Stock Alert',
-            description: `${stockUpdate.product_name} is running low (${newProduct.stock_count} remaining)`,
+            description: `${newProduct.name} is running low (${newProduct.stock_count} remaining)`,
             variant: 'destructive',
           });
         }
@@ -62,13 +59,13 @@ export const useRealtimeStock = () => {
         if (newProduct.stock_count === 0 && oldProduct.stock_count > 0) {
           toast({
             title: 'Out of Stock',
-            description: `${stockUpdate.product_name} is now out of stock`,
+            description: `${newProduct.name} is now out of stock`,
             variant: 'destructive',
           });
         }
       }
     }
-  }, [toast, isAdmin]);
+  }, [toast, profile]);
 
   useEffect(() => {
     console.log('Setting up real-time stock monitoring...');
